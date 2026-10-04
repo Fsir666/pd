@@ -1,6 +1,0 @@
-- [x] Hot templates section displays in a 2-column waterfall layout.
-- [x] Hot template cards show image, title, author, and heat correctly.
-- [x] Toolbox section displays in a Bento grid layout with mixed card sizes.
-- [x] "Generate Pixel Art" (生成像素图) and other key tools are highlighted with larger cards.
-- [x] Clicking on any tool or template card navigates to the correct page.
-- [x] The layout looks consistent and visually appealing on the simulator.

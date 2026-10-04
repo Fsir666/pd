@@ -1,9 +1,0 @@
-<svg width="200" height="200" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
-  <!-- 像素笑脸 -->
-  <rect width="10" height="10" fill="#FFEB3B"/> <!-- 黄色背景 -->
-  <rect x="2" y="2" width="2" height="2" fill="#333"/> <!-- 左眼 -->
-  <rect x="6" y="2" width="2" height="2" fill="#333"/> <!-- 右眼 -->
-  <rect x="2" y="6" width="1" height="1" fill="#333"/> <!-- 嘴巴左 -->
-  <rect x="7" y="6" width="1" height="1" fill="#333"/> <!-- 嘴巴右 -->
-  <rect x="3" y="7" width="4" height="1" fill="#333"/> <!-- 嘴巴底 -->
-</svg>
