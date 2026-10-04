@@ -1,0 +1,35 @@
+<view class="page-root">
+  <!-- 背景 -->
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+  </view>
+
+  <view class="container">
+    <!-- 功能介绍与上传引导 -->
+    <view class="intro-section glass-card" wx:if="{{showIntro}}">
+      <view class="icon-header">
+        <text class="feature-icon">✨</text>
+      </view>
+      <text class="title">照片转卡通</text>
+      <text class="subtitle">AI 智能绘画，一键生成专属卡通形象</text>
+      
+      <view class="features-list">
+        <view class="feature-item">
+          <text class="item-icon">🤖</text>
+          <text class="item-text">AI 智能风格化</text>
+        </view>
+        <view class="feature-item">
+          <text class="item-icon">🎨</text>
+          <text class="item-text">保留人物神态特征</text>
+        </view>
+        <view class="feature-item">
+          <text class="item-icon">🌈</text>
+          <text class="item-text">二次元/3D多种风格</text>
+        </view>
+      </view>
+
+      <button class="btn-primary" bindtap="onChooseImage">上传照片生成</button>
+    </view>
+  </view>
+</view>

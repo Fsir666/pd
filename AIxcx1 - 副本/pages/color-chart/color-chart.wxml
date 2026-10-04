@@ -1,0 +1,140 @@
+<view class="container">
+  <view class="search-container">
+    <view class="search-box">
+      <icon type="search" size="16" color="#999" />
+      <input 
+        class="search-input" 
+        placeholder="搜索色号 (如 A1, E2, #FAF5CD)" 
+        placeholder-class="placeholder"
+        bindinput="onSearchInput" 
+        bindconfirm="onSearchTap"
+        confirm-type="search"
+        value="{{searchQuery}}"
+      />
+      <view class="search-actions">
+        <view class="clear-btn" wx:if="{{searchQuery}}" bindtap="onClearTap">
+          <text class="clear-text">清空</text>
+        </view>
+        <view class="search-btn" bindtap="onSearchTap">
+          <text class="search-text">搜索</text>
+        </view>
+      </view>
+    </view>
+    <view class="search-meta">
+      <text class="meta-text">共 {{totalCount}} 色</text>
+      <text class="meta-text" wx:if="{{hasSearched}}">结果 {{resultCount}}</text>
+    </view>
+
+    <scroll-view scroll-x class="series-bar" show-scrollbar="{{false}}">
+      <view class="series-inner">
+        <view class="series-chip {{selectedSeries === 'ALL' ? 'active' : ''}}" bindtap="onSeriesTap" data-series="ALL">
+          <text>全部色卡</text>
+        </view>
+        <view class="series-chip {{selectedSeries === item.series ? 'active' : ''}}" wx:for="{{seriesChips}}" wx:key="series" bindtap="onSeriesTap" data-series="{{item.series}}">
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="color-list">
+    <view class="guide-card">
+      <view class="guide-header">
+        <view class="guide-title-wrap">
+          <text class="guide-title">295色品牌对照表</text>
+          <text class="guide-subtitle">使用说明</text>
+        </view>
+        <view class="guide-toggle" bindtap="onToggleGuide">
+          <text class="guide-toggle-text">{{guideExpanded ? '收起' : '展开'}}</text>
+        </view>
+      </view>
+
+      <view class="guide-body" wx:if="{{guideExpanded}}">
+        <view class="guide-row">
+          <text class="guide-label">包含拼豆品牌</text>
+          <view class="brand-chips">
+            <view class="brand-chip"><text>MARD</text></view>
+            <view class="brand-chip"><text>COCO</text></view>
+            <view class="brand-chip"><text>漫漫</text></view>
+            <view class="brand-chip"><text>盼盼</text></view>
+            <view class="brand-chip"><text>咪小窝</text></view>
+          </view>
+        </view>
+
+        <view class="guide-row">
+          <text class="guide-label">色号说明</text>
+          <text class="guide-text">黄豆豆小舞色号与 MARD 相同</text>
+        </view>
+
+        <view class="guide-row">
+          <text class="guide-label">系列范围</text>
+          <view class="guide-list">
+            <view class="guide-li">
+              <text class="dot">•</text>
+              <text class="guide-text">221色包含系列：A 至 M</text>
+            </view>
+            <view class="guide-li">
+              <text class="dot">•</text>
+              <text class="guide-text">295色包含系列：A 至 ZG</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="guide-row">
+          <text class="guide-label">小技巧</text>
+          <view class="guide-list">
+            <view class="guide-li">
+              <text class="dot">•</text>
+              <text class="guide-text">点击色块/色号即可复制</text>
+            </view>
+            <view class="guide-li">
+              <text class="dot">•</text>
+              <text class="guide-text">先输入关键字，点击“搜索”再筛选系列</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <block wx:if="{{displayList.length > 0}}">
+      <view class="color-card" wx:for="{{displayList}}" wx:key="hex">
+        <view class="color-preview" style="background-color: {{item.hex}};" bindtap="onCopy" data-text="{{item.hex}}">
+          <text class="hex-text" style="color: {{item.isDark ? '#FFF' : '#000'}}">{{item.hex}}</text>
+        </view>
+        
+        <view class="codes-grid">
+          <view class="code-item" bindtap="onCopy" data-text="{{item.mard}}">
+            <text class="label">MARD</text>
+            <text class="value">{{item.mard}}</text>
+          </view>
+          <view class="code-item" bindtap="onCopy" data-text="{{item.coco}}">
+            <text class="label">COCO</text>
+            <text class="value">{{item.coco}}</text>
+          </view>
+          <view class="code-item" bindtap="onCopy" data-text="{{item.manman}}">
+            <text class="label">漫漫</text>
+            <text class="value">{{item.manman}}</text>
+          </view>
+          <view class="code-item" bindtap="onCopy" data-text="{{item.panpan}}">
+            <text class="label">盼盼</text>
+            <text class="value">{{item.panpan}}</text>
+          </view>
+          <view class="code-item" bindtap="onCopy" data-text="{{item.miwo}}">
+            <text class="label">咪小窝</text>
+            <text class="value">{{item.miwo}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    
+    <view wx:else class="empty-state">
+      <text>未找到匹配的色号</text>
+    </view>
+    
+    <view class="spacer"></view>
+  </view>
+
+  <view class="back-top" wx:if="{{showBackTop}}" bindtap="onBackTop">
+    <text class="back-top-text">↑</text>
+  </view>
+</view>

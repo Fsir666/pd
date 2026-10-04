@@ -1,0 +1,397 @@
+const app = getApp();
+
+Page({
+  data: {
+    userInfo: {
+      coins: 0,
+      energy: 0
+    },
+    isLogged: false,
+    isRefreshing: false,
+    banners: [
+      { id: 1, color: '#FFD700', text: '新手拼豆指南' },
+      { id: 2, color: '#87CEEB', text: '本周热门图纸' },
+      { id: 3, color: '#FF69B4', text: '拼豆作品大赛' }
+    ],
+    hotTemplates: [], // Keep for compatibility if needed
+    leftTemplates: [],
+    rightTemplates: [],
+    // Unified small tools list for scroll view
+    allSmallTools: [
+      { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#54A0FF', animClass: 'wiggle', size: 'small' },
+      { id: 4, title: '色卡表', desc: '色卡对照', icon: '🎨', color: '#FF6B6B', animClass: 'spin-slow', size: 'small' },
+      { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#AF52DE', animClass: 'breathe', size: 'small' },
+      { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#FF9F43', animClass: 'pulse' },
+      { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#5F27CD', animClass: 'bounce' },
+      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#48DBFB', animClass: 'float' },
+      { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#54A0FF', animClass: 'wiggle' }
+    ],
+    isToolsExpanded: false,
+    currentTab: 0,
+    cursorLeft: '0%', // 初始光标位置
+    isDragging: false, // 是否正在拖拽
+    isStretching: false, // 是否正在弹性形变
+    tabScales: [1.1, 1, 1, 1], // 初始缩放，Tab 0 激活
+    particles: [], // 粒子数组
+    isDevtools: false,
+  },
+  
+  onLoad() {
+    console.log('Page Load');
+    this.fetchHotTemplates();
+    
+    // Get window width for tabbar drag calculation
+    const sysInfo = wx.getSystemInfoSync();
+    this.windowWidth = sysInfo.windowWidth;
+    this.setData({ isDevtools: sysInfo && sysInfo.platform === 'devtools' });
+    
+    // TabBar Metrics (assuming 90% width, centered)
+    this.tabBarWidth = this.windowWidth * 0.9;
+    this.tabBarLeft = this.windowWidth * 0.05;
+
+    // Initialize drag variables
+    this._lastX = 0;
+    this._lastTime = 0;
+
+    // 初始化刷新音效
+    this.refreshAudio = wx.createInnerAudioContext();
+    // 提示：如果项目中没有此文件，请添加 audio/ding.mp3，或者修改此处为存在的音频文件
+    this.refreshAudio.src = '/audio/ding.mp3'; 
+  },
+
+  // ... (keeping existing methods)
+
+  // TabBar Interaction
+  // Removed custom implementation, now using custom-tab-bar component
+
+  navigateToTab(index) {
+    if (index === 0) {
+      // 已经在首页，滚动到顶部
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 300
+      });
+      return;
+    }
+    
+    if (index === 1) {
+      wx.switchTab({ url: '/pages/mall/mall' });
+      return;
+    }
+    
+    if (index === 2) {
+      wx.switchTab({ url: '/pages/square/square' });
+      return;
+    }
+
+    if (index === 3) {
+      wx.switchTab({ url: '/pages/profile/profile' });
+      return;
+    }
+  },
+
+  onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      const tabBar = this.getTabBar();
+      tabBar.setData({
+        isDragging: true,
+        selected: 0,
+        cursorLeft: '0%',
+        cursorWidth: '120rpx',
+        hoverIndex: -1
+      });
+      wx.nextTick(() => {
+        const tb = this.getTabBar && this.getTabBar();
+        tb && tb.setData({ isDragging: false });
+      });
+    }
+
+    // 每次显示页面时同步最新数据
+    this.updateLocalUserData();
+    if (app.globalData.isLogged) {
+      this.fetchWallet();
+    }
+  },
+
+  fetchHotTemplates(isRefresh = false) {
+    if (!isRefresh) {
+      wx.showLoading({ title: '加载榜单...' });
+    }
+    
+    // 直接查询 templates 集合
+    const db = wx.cloud.database();
+    return db.collection('templates')
+      .orderBy('heat', 'desc')
+      .limit(10)
+      .get()
+      .then(async res => {
+        if (!isRefresh) {
+          wx.hideLoading();
+        }
+
+        // 批量换取临时链接 (解决部分云图片加载问题)
+        const fileList = res.data
+          .filter(item => item.imageUrl && item.imageUrl.startsWith('cloud://'))
+          .map(item => item.imageUrl);
+          
+        let urlMap = {};
+        if (fileList.length > 0) {
+          try {
+            const urlRes = await wx.cloud.getTempFileURL({ fileList });
+            urlRes.fileList.forEach(file => {
+              if (file.status === 0) {
+                urlMap[file.fileID] = file.tempFileURL;
+              }
+            });
+          } catch (e) {
+            console.error('换取链接失败', e);
+          }
+        }
+        
+        // 格式化数据以匹配UI
+        const templates = res.data.map((item, index) => {
+          // 尝试使用 HTTP 链接
+          const realUrl = (item.imageUrl && urlMap[item.imageUrl]) ? urlMap[item.imageUrl] : item.imageUrl;
+          
+          return {
+            ...item,
+            id: item._id, // 映射 _id 到 id
+            rank: index + 1,
+            // 确保字段存在
+            image: item.image || '🎨', // 如果没有 icon，给个默认
+            imageUrl: realUrl, // 更新为 HTTP 链接
+            time: item.time || '-',
+            size: item.size || '32x32'
+          };
+        });
+        
+        const leftTemplates = [];
+        const rightTemplates = [];
+        
+        templates.forEach((item, index) => {
+          if (index % 2 === 0) {
+            leftTemplates.push(item);
+          } else {
+            rightTemplates.push(item);
+          }
+        });
+
+        this.setData({
+          hotTemplates: templates,
+          leftTemplates,
+          rightTemplates
+        });
+        return { ok: true };
+      }).catch(err => {
+        if (!isRefresh) {
+          wx.hideLoading();
+        }
+        console.error('获取热门榜单失败', err);
+        if (!isRefresh) {
+          wx.showToast({ title: '加载失败', icon: 'none' });
+        }
+        return { ok: false, err };
+      });
+  },
+
+  onRefresh() {
+    if (this._freshing) return;
+    this._freshing = true;
+    
+    const startAt = Date.now();
+    const minDuration = 300;
+
+    this.setData({ isRefreshing: true });
+
+    const like = this.selectComponent('.home-like');
+    if (like && typeof like.refreshAnimated === 'function') {
+      like.refreshAnimated();
+    }
+
+    const finish = (ok) => {
+      const elapsed = Date.now() - startAt;
+      const delay = Math.max(0, minDuration - elapsed);
+      setTimeout(() => {
+        this.setData({ isRefreshing: false });
+        this._freshing = false;
+
+        if (!ok) {
+          wx.showToast({ title: '刷新失败', icon: 'none' });
+          return;
+        }
+
+        if (this.refreshAudio) {
+          this.refreshAudio.play();
+        }
+
+        wx.vibrateShort({
+          type: 'medium',
+          fail: () => {
+            wx.vibrateShort();
+          }
+        });
+
+        wx.showToast({ title: '刷新成功', icon: 'none' });
+      }, delay);
+    };
+
+    try {
+      this.updateLocalUserData();
+    } catch (e) {
+      finish(false);
+      return;
+    }
+
+    this.fetchHotTemplates(true)
+      .then((res) => finish(!!(res && res.ok)))
+      .catch(() => finish(false));
+  },
+
+  onRestore() {
+    console.log('onRestore');
+  },
+
+  updateLocalUserData() {
+    const appData = app.globalData;
+    if (appData.isLogged && appData.userInfo) {
+      this.setData({
+        userInfo: appData.userInfo,
+        isLogged: true
+      });
+    } else {
+      // 未登录时的默认状态
+      this.setData({
+        userInfo: { coins: '-', energy: '-' },
+        isLogged: false
+      });
+    }
+  },
+
+  fetchWallet() {
+    if (!app.globalData.isLogged) return Promise.resolve(false)
+    return wx.cloud.callFunction({
+      name: 'template-api',
+      data: { action: 'getWallet' }
+    }).then((res) => {
+      const r = res && res.result
+      if (!r || r.code !== 0) return false
+      const d = r.data || {}
+      const coins = typeof d.coins === 'number' ? d.coins : 0
+      const energy = typeof d.energy === 'number' ? d.energy : 0
+      app.updateUserInfo({ coins, energy })
+      this.updateLocalUserData()
+      return true
+    }).catch(() => false)
+  },
+
+  onStartGame() {
+    if (!this.data.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再开始游戏',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: '/pages/profile/profile' });
+          }
+        }
+      });
+      return;
+    }
+    // 跳转到游戏页面（拼豆编辑器）
+    wx.navigateTo({ url: '/pages/game/game' });
+  },
+
+  goToDetail(e) {
+    const { id, title, imageUrl, author, time, likes } = e.currentTarget.dataset;
+    
+    // Construct URL with encoded parameters
+    let url = `/pages/detail/detail?id=${id}`;
+    if (title) url += `&title=${encodeURIComponent(title)}`;
+    if (imageUrl) url += `&imageUrl=${encodeURIComponent(imageUrl)}`;
+    if (author) url += `&author=${encodeURIComponent(author)}`;
+    if (time) url += `&time=${encodeURIComponent(time)}`;
+    if (likes) url += `&likes=${likes}`;
+    
+    wx.navigateTo({ url });
+  },
+
+  onTemplateTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const template = this.data.hotTemplates.find(t => t.id === id);
+    
+    if (template) {
+      // 跳转到详情页，传递ID和图片URL
+      let url = `/pages/template-detail/template-detail?id=${id}`;
+      if (template.imageUrl) {
+        url += `&imageUrl=${encodeURIComponent(template.imageUrl)}`;
+      }
+      wx.navigateTo({ url });
+    }
+  },
+
+  onShowAllTools() {
+    wx.navigateTo({
+      url: '/pages/all-tools/all-tools'
+    });
+    // 震动反馈
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  onToolTap(e) {
+    const id = parseInt(e.currentTarget.dataset.id);
+    
+    // 检查登录状态
+    const protectedIds = [1, 2, 3, 4, 5, 7];
+    if (protectedIds.includes(id) && !this.data.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再使用该功能',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: '/pages/profile/profile' });
+          }
+        }
+      });
+      return;
+    }
+
+    // 震动反馈
+    wx.vibrateShort({ type: 'light' });
+    
+    switch (id) {
+      case 1: // 生成像素图
+        wx.navigateTo({ url: '/pages/generate/generate' });
+        break;
+      case 2: // 抠图 (原图纸编辑)
+        wx.navigateTo({ url: '/pages/matting/matting' });
+        break;
+      case 9: // 转卡通
+        wx.navigateTo({ url: '/pages/cartoon/cartoon' });
+        break;
+      case 3: // 我的仓库
+        wx.navigateTo({ url: '/pages/warehouse/warehouse' });
+        break;
+      case 4: // 色卡表
+        wx.navigateTo({ url: '/pages/color-chart/color-chart' });
+        break;
+      case 5: // 我的作品
+        wx.navigateTo({ url: '/pages/my-works/my-works' });
+        break;
+      case 6: // 新手教程
+        wx.navigateTo({ url: '/pages/beginner-guide/beginner-guide' });
+        break;
+      case 7: // 收藏图纸
+        wx.navigateTo({ url: '/pages/my-collections/my-collections' });
+        break;
+      case 8: // 我的订单
+        wx.navigateTo({ url: '/pages/my-orders/my-orders' });
+        break;
+      default:
+        wx.showToast({ title: '功能开发中...', icon: 'none' });
+    }
+  },
+
+  // End of Page
+})

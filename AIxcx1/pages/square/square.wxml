@@ -1,0 +1,182 @@
+<view class="page-root">
+  <view class="paper-bg"></view>
+
+  <scroll-view class="scroll" scroll-y>
+    <view class="content">
+      <!-- 轮播图 -->
+      <view class="section">
+        <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" duration="500" circular="true">
+          <swiper-item>
+            <view class="banner-item banner-item-1">
+              <view class="banner-content">
+                <text class="banner-title">🎨 拼豆模式</text>
+                <text class="banner-desc">自由创作拼豆作品，支持多种品牌色板</text>
+                <view class="banner-btn" bindtap="goToBeadMode">开始创作</view>
+              </view>
+            </view>
+          </swiper-item>
+          <swiper-item>
+            <view class="banner-item banner-item-2">
+              <view class="banner-content">
+                <text class="banner-title">📚 图纸库</text>
+                <text class="banner-desc">海量精选模板，涵盖多种分类</text>
+                <view class="banner-btn" bindtap="goToMall">浏览模板</view>
+              </view>
+            </view>
+          </swiper-item>
+          <swiper-item>
+            <view class="banner-item banner-item-3">
+              <view class="banner-content">
+                <text class="banner-title">🖼️ 一键抠图</text>
+                <text class="banner-desc">上传图片自动抠图，快速生成拼豆图纸</text>
+                <view class="banner-btn" bindtap="goToCutout">体验功能</view>
+              </view>
+            </view>
+          </swiper-item>
+          <swiper-item>
+            <view class="banner-item banner-item-4">
+              <view class="banner-content">
+                <text class="banner-title">🎨 色卡对照表</text>
+                <text class="banner-desc">不同品牌色卡对比，方便选择合适颜色</text>
+                <view class="banner-btn" bindtap="goToColorChart">查看对比</view>
+              </view>
+            </view>
+          </swiper-item>
+          <swiper-item>
+            <view class="banner-item banner-item-5">
+              <view class="banner-content">
+                <text class="banner-title">📖 新手教程</text>
+                <text class="banner-desc">详细的拼豆创作教程，快速上手</text>
+                <view class="banner-btn" bindtap="goToTutorial">开始学习</view>
+              </view>
+            </view>
+          </swiper-item>
+        </swiper>
+      </view>
+
+      <!-- 公告栏 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-icon">📢</text>
+          <text class="section-title">公告</text>
+        </view>
+        <view class="notice-card">
+          <view class="notice-item">
+            <text class="notice-badge">新</text>
+            <text class="notice-text">拼豆助手小程序正式上线啦！欢迎体验拼豆创作的乐趣～</text>
+          </view>
+          <view class="notice-item">
+            <text class="notice-badge">热</text>
+            <text class="notice-text">新增内容安全审核，保障平台环境健康</text>
+          </view>
+          <view class="notice-item">
+            <text class="notice-badge">活</text>
+            <text class="notice-text">新手福利活动进行中，首次创作送100积分</text>
+          </view>
+          <view class="notice-item">
+            <text class="notice-badge">更</text>
+            <text class="notice-text">导出功能优化，支持更高清的图片导出</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 新手教程 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-icon">📖</text>
+          <text class="section-title">新手教程</text>
+        </view>
+        <view class="tutorial-grid">
+          <view class="tutorial-card" bindtap="goToBeadMode">
+            <view class="tutorial-icon">🎨</view>
+            <view class="tutorial-title">开始创作</view>
+            <view class="tutorial-desc">学习如何使用拼豆模式</view>
+          </view>
+          <view class="tutorial-card" bindtap="goToMall">
+            <view class="tutorial-icon">📚</view>
+            <view class="tutorial-title">浏览模板</view>
+            <view class="tutorial-desc">发现精选拼豆图纸</view>
+          </view>
+          <view class="tutorial-card" bindtap="goToProfile">
+            <view class="tutorial-icon">💾</view>
+            <view class="tutorial-title">我的作品</view>
+            <view class="tutorial-desc">保存和管理你的创作</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 功能介绍 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-icon">✨</text>
+          <text class="section-title">功能介绍</text>
+        </view>
+        <view class="feature-list">
+          <view class="feature-item">
+            <view class="feature-icon">🎨</view>
+            <view class="feature-content">
+              <view class="feature-title">拼豆模式</view>
+              <view class="feature-desc">自由创作拼豆作品，支持多种品牌色板，实时预览效果</view>
+            </view>
+          </view>
+          <view class="feature-item">
+            <view class="feature-icon">📚</view>
+            <view class="feature-content">
+              <view class="feature-title">图纸库</view>
+              <view class="feature-desc">海量精选模板，涵盖动物、人物、风景等多种分类</view>
+            </view>
+          </view>
+          <view class="feature-item">
+            <view class="feature-icon">📤</view>
+            <view class="feature-content">
+              <view class="feature-title">导出分享</view>
+              <view class="feature-desc">一键导出高清图片，分享你的创作成果</view>
+            </view>
+          </view>
+          <view class="feature-item">
+            <view class="feature-icon">📊</view>
+            <view class="feature-content">
+              <view class="feature-title">用料统计</view>
+              <view class="feature-desc">自动统计各颜色用量，方便采购拼豆材料</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 拼豆礼物 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-icon">🎁</text>
+          <text class="section-title">拼豆礼物</text>
+          <text class="coming-soon-tag">即将上线</text>
+        </view>
+        <view class="gift-card" bindtap="showComingSoon">
+          <view class="gift-content">
+            <view class="gift-title">达人手作服务</view>
+            <view class="gift-desc">将你的图纸变成真实的拼豆作品，送给自己或朋友一份独特的礼物</view>
+            <view class="gift-features">
+              <text class="gift-feature">✓ 精选达人</text>
+              <text class="gift-feature">✓ 品质保障</text>
+              <text class="gift-feature">✓ 定制服务</text>
+            </view>
+          </view>
+          <view class="gift-arrow">→</view>
+        </view>
+      </view>
+
+      <!-- 底部间距 -->
+      <view style="height: 160rpx;"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 即将上线弹窗 -->
+  <view class="comingsoon-mask {{comingSoonVisible ? 'show' : ''}}" catchtap="hideComingSoon">
+    <view class="comingsoon-card" catchtap="hideComingSoon">
+      <view class="comingsoon-title">🎁 拼豆礼物即将上线</view>
+      <view class="comingsoon-desc">我们正在筹备达人手作服务
+上线后可以将图纸变成真实的拼豆作品
+敬请期待～</view>
+      <view class="comingsoon-btn">好的，期待中</view>
+    </view>
+  </view>
+</view>

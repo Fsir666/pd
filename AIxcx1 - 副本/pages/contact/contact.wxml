@@ -1,0 +1,31 @@
+<view class="page-container">
+  <view class="contact-header">
+    <view class="icon-wrapper">
+      <text class="header-icon">👩‍💻</text>
+    </view>
+    <text class="header-title">有什么可以帮您？</text>
+    <text class="header-desc">我们通常在 9:00 - 18:00 在线</text>
+  </view>
+
+  <view class="menu-group">
+    <view class="menu-item" bindtap="onFaqTap" data-id="1">
+      <text class="item-title">如何发布作品？</text>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onFaqTap" data-id="2">
+      <text class="item-title">订单什么时候发货？</text>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onFaqTap" data-id="3">
+      <text class="item-title">图纸可以商用吗？</text>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="action-area">
+    <button class="contact-btn" bindtap="handleContact">
+      <text class="btn-icon">💬</text>
+      <text>联系人工客服</text>
+    </button>
+  </view>
+</view>

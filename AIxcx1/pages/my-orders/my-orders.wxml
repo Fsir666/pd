@@ -1,0 +1,49 @@
+<view class="intro-container">
+  <!-- 顶部装饰 -->
+  <view class="intro-header">
+    <view class="icon-bg">
+      <text class="header-icon">🧾</text>
+    </view>
+    <text class="app-title">智能订单</text>
+    <text class="app-subtitle">Smart Order System</text>
+  </view>
+
+  <!-- 功能特性列表 -->
+  <view class="feature-list">
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #E0C3FC25;">
+        <text class="feature-icon">🚚</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">实时追踪</text>
+        <text class="feature-desc">随时掌握包裹动态，从发货到签收，每一个状态都尽在掌握。</text>
+      </view>
+    </view>
+
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #FFD1FF25;">
+        <text class="feature-icon">📅</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">历史记录</text>
+        <text class="feature-desc">永久保存您的购买历史，方便随时回购或查询往期订单详情。</text>
+      </view>
+    </view>
+
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #D4F1F425;">
+        <text class="feature-icon">🛡️</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">智能售后</text>
+        <text class="feature-desc">一键申请售后服务，自动匹配解决方案，让购物更安心。</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-action">
+    <button class="enter-btn" bindtap="onEnterOrders">查看订单</button>
+    <button class="testpay-btn" bindtap="onTestPay">测试支付（0.01元）</button>
+  </view>
+</view>

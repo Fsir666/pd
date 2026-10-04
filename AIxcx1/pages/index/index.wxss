@@ -1,0 +1,809 @@
+/* Global Page Setup */
+.page-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #F2F4F8;
+  overflow: hidden;
+}
+
+/* Ambient Diffused Background */
+.ambient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.7;
+}
+
+.orb-1 {
+  width: 600rpx;
+  height: 600rpx;
+  background: #E0C3FC; /* Soft Purple */
+  top: -150rpx;
+  left: -100rpx;
+  animation: float 10s infinite ease-in-out;
+}
+
+.orb-2 {
+  width: 500rpx;
+  height: 500rpx;
+  background: #FFD1FF; /* Soft Pink */
+  bottom: 10%;
+  right: -100rpx;
+  animation: float 12s infinite ease-in-out reverse;
+}
+
+.orb-3 {
+  width: 400rpx;
+  height: 400rpx;
+  background: #D4F1F4; /* Soft Blue */
+  top: 40%;
+  left: 20%;
+  animation: float 15s infinite ease-in-out 2s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20rpx, 30rpx); }
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.38));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
+  border-radius: 32rpx;
+}
+
+/* Scroll View & Container */
+scroll-view {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+}
+
+.container {
+  padding-bottom: 200rpx;
+}
+
+.like-strip {
+  height: 88rpx;
+  padding: 0 24rpx 18rpx;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* 工具箱 (Toolbox) */
+.toolbox-section {
+  padding: 0 24rpx 40rpx;
+}
+
+.toolbox-shell {
+  padding: 16rpx;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.36));
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
+}
+
+.toolbox-feature-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+}
+
+.tool-feature {
+  border-radius: 32rpx;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.46));
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 14rpx 40rpx rgba(0, 0, 0, 0.06);
+  padding: 18rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.tool-feature:active {
+  transform: scale(0.985);
+}
+
+.tool-feature--primary {
+  min-height: 190rpx;
+}
+
+.tool-feature--secondary {
+  min-height: 190rpx;
+}
+
+.tool-feature-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.tool-feature-icon {
+  margin-bottom: 0;
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 28rpx;
+  font-size: 52rpx;
+  box-shadow: 0 10rpx 26rpx rgba(0, 0, 0, 0.08);
+}
+
+.tool-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.tool-feature-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2328;
+  letter-spacing: 0.3rpx;
+}
+
+.tool-feature--secondary .tool-feature-title {
+  font-size: 28rpx;
+  font-weight: 650;
+}
+
+.tool-feature-desc {
+  font-size: 22rpx;
+  color: rgba(31, 35, 40, 0.62);
+}
+
+.toolbox-grid.toolbox-grid--compact {
+  gap: 16rpx;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: row;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 0 10rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.toolbox-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+  grid-auto-flow: dense;
+}
+
+/* Base Card Style */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 10rpx;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 60%),
+    rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  border-radius: 32rpx;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+  height: 100%; /* Ensure full height in grid */
+  box-sizing: border-box;
+}
+
+.toolbox-scroll-container {
+  position: relative;
+  height: 480rpx; /* Show roughly 3 rows of items (including feature row) */
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.toolbox-scroll-view {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Small (1x1) */
+.tool-card.size-small {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.tool-card:active {
+  transform: scale(0.96);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 60%),
+    rgba(255, 255, 255, 0.70);
+  box-shadow: 0 8rpx 22rpx rgba(0, 0, 0, 0.05);
+}
+
+/* Tool Icon Base */
+.tool-icon {
+  font-size: 56rpx;
+  margin-bottom: 16rpx;
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+  transition: transform 0.3s ease;
+}
+
+.tool-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.tool-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1F2328;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tool-desc {
+  display: none;
+}
+
+/* --- Size Variations --- */
+
+/* Large (2x2) */
+.tool-card.size-large {
+  grid-column: span 2;
+  grid-row: span 2;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 32rpx;
+}
+
+.tool-card.size-large .tool-icon {
+  font-size: 80rpx;
+  width: 140rpx;
+  height: 140rpx;
+  margin-bottom: 0;
+  border-radius: 40rpx;
+  background: #fff;
+  box-shadow: 0 12rpx 30rpx rgba(0,0,0,0.08);
+}
+
+.tool-card.size-large .tool-info {
+  align-items: flex-start;
+}
+
+.tool-card.size-large .tool-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  margin-bottom: 8rpx;
+  text-align: left;
+}
+
+.tool-card.size-large .tool-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #888;
+  text-align: left;
+  line-height: 1.4;
+}
+
+/* Medium (2x1) */
+.tool-card.size-medium {
+  grid-column: span 2;
+  grid-row: span 1;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 24rpx;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.tool-card.size-medium .tool-icon {
+  margin-bottom: 0;
+  margin-right: 24rpx;
+  width: 100rpx;
+  height: 100rpx;
+  font-size: 50rpx;
+  flex-shrink: 0;
+}
+
+.tool-card.size-medium .tool-info {
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+}
+
+.tool-card.size-medium .tool-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+  text-align: left;
+}
+
+.tool-card.size-medium .tool-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #777;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* Small (1x1) */
+.tool-card.size-small {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+/* Replaced by above block */
+
+/* 显示全部工具按钮 */
+.show-all-btn-container {
+  margin-top: 0;
+}
+
+.show-all-btn {
+  width: 100%;
+  height: 80rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 26rpx;
+  color: #666;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.show-all-btn:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.arrow-icon {
+  margin-left: 10rpx;
+  font-weight: bold;
+  transform: rotate(90deg);
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.arrow-icon.expanded {
+  transform: rotate(-90deg);
+}
+
+.extra-tools {
+  margin-top: 20rpx;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 动态图标动画 Keyframes */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); filter: brightness(100%); }
+  50% { transform: scale(0.85); filter: brightness(110%); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12rpx); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12rpx); }
+}
+
+/* 应用动画 */
+.tool-icon.pulse { animation: pulse 2s infinite ease-in-out; }
+.tool-icon.wiggle { animation: wiggle 1.5s infinite ease-in-out; }
+.tool-icon.breathe { animation: breathe 2s infinite ease-in-out; } /* Faster and stronger */
+.tool-icon.spin-slow { animation: spin-slow 8s infinite linear; }
+.tool-icon.bounce { animation: bounce 2s infinite ease-in-out; }
+.tool-icon.float { animation: float 3s infinite ease-in-out; }
+
+/* iOS 26 悬浮导航栏 (Custom Floating TabBar) - Apple Glass Style */
+/* Removed from here, moved to component */
+
+/* Add padding to prevent content blocking */
+.container {
+  padding-bottom: calc(120rpx + 40rpx + env(safe-area-inset-bottom));
+}
+
+/* 顶部状态栏 */
+.header-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  margin: 20rpx auto; /* Center horizontally */
+  z-index: 100;
+  position: sticky; 
+  top: 20rpx;
+  width: calc(100% - 48rpx); /* Full width minus margins */
+  box-sizing: border-box;
+  /* Glass Container Style */
+  background: rgba(255, 255, 255, 0.2); /* Very light background */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 44rpx; /* Rounded pill shape */
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.05);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.5); /* Inner pill background */
+  padding: 8rpx 20rpx;
+  border-radius: 32rpx;
+  /* Remove individual borders/shadows if inside glass container, or keep subtle */
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.02); 
+}
+
+.status-item .icon {
+  margin-right: 8rpx;
+  font-size: 32rpx;
+}
+
+.status-item .value {
+  font-weight: 800;
+  color: #333;
+  margin-right: 8rpx;
+}
+
+.status-item .label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 轮播图 */
+.banner-swiper {
+  height: 300rpx;
+  margin: 30rpx 24rpx;
+  border-radius: 32rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.08);
+  transform: translateZ(0); /* Fix for iOS overflow radius */
+}
+
+.banner-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 36rpx;
+  font-weight: bold;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.2);
+}
+
+/* 开始游戏入口 - Glass Button Upgrade */
+.game-start-section {
+  padding: 0 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.start-btn-card {
+  /* High Saturation Gradient + Glass */
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.85), rgba(255, 140, 66, 0.85));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20rpx 40rpx rgba(255, 107, 0, 0.3);
+  border-radius: 44rpx;
+  padding: 50rpx 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.start-btn-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 10rpx 20rpx rgba(255, 107, 0, 0.2);
+}
+
+.start-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.start-title {
+  font-size: 48rpx;
+  font-weight: 800;
+  margin-bottom: 10rpx;
+  letter-spacing: 2rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+}
+
+.start-desc {
+  font-size: 26rpx;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.start-icon {
+  font-size: 80rpx;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 4rpx 8rpx rgba(0,0,0,0.2));
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10rpx); }
+}
+
+/* 热度榜单 - Waterfall Layout */
+.rank-section {
+  padding: 0 24rpx 40rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 0 10rpx;
+}
+
+.section-title-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2328;
+  letter-spacing: 0.4rpx;
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: rgba(31, 35, 40, 0.50);
+}
+
+.rank-list-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.rank-column {
+  width: 48.5%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rank-item {
+  width: 100%;
+  margin-bottom: 24rpx;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 62%),
+    rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
+  border-radius: 32rpx;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.rank-item:active {
+  transform: scale(0.98);
+}
+
+/* Rank Glow Effects - Subtle borders or shadows */
+.rank-gold {
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 0 10rpx 30rpx rgba(255, 215, 0, 0.15);
+}
+
+.rank-silver {
+  border: 1px solid rgba(192, 192, 192, 0.5);
+  box-shadow: 0 10rpx 30rpx rgba(192, 192, 192, 0.15);
+}
+
+.rank-bronze {
+  border: 1px solid rgba(205, 127, 50, 0.5);
+  box-shadow: 0 10rpx 30rpx rgba(205, 127, 50, 0.15);
+}
+
+/* Image Area */
+.rank-img-box {
+  position: relative;
+  width: 100%;
+  min-height: 200rpx;
+  background: #f0f0f0;
+}
+
+.rank-img-real {
+  width: 100%;
+  display: block; /* Remove bottom space */
+  border-radius: 32rpx 32rpx 0 0; /* Optional: if overflow hidden is not enough */
+}
+
+.rank-img-placeholder {
+  width: 100%;
+  height: 300rpx; /* Default height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 80rpx;
+  background: #eee;
+}
+
+/* Badge */
+.rank-badge {
+  position: absolute;
+  top: 10rpx;
+  left: 10rpx;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rpx;
+}
+
+.rank-badge.normal {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 4rpx 12rpx;
+}
+
+/* Content Area */
+.rank-content {
+  padding: 16rpx 20rpx;
+}
+
+.rank-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.rank-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rank-author-row {
+  display: flex;
+  align-items: center;
+}
+
+.rank-author {
+  font-size: 22rpx;
+  color: #888;
+  max-width: 150rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-heat {
+  display: flex;
+  align-items: center;
+  color: #FF6B00;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.heat-icon {
+  font-size: 20rpx;
+  margin-right: 4rpx;
+}
+
+/* Custom Refresher */
+.custom-refresher {
+  width: 100vw;
+  height: 200rpx;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 20rpx;
+}
+
+.refresh-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.refresh-icon {
+  font-size: 40rpx;
+  margin-bottom: 10rpx;
+  transition: transform 0.1s;
+}
+
+.refresh-icon.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.refresh-text {
+  font-size: 24rpx;
+  color: #999;
+}

@@ -1,0 +1,63 @@
+<view class="page-root">
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+    <view class="orb orb-3"></view>
+  </view>
+
+  <view class="container">
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+    <view wx:elif="{{profile}}" class="content">
+      <view class="profile-card glass-card">
+        <image class="avatar" src="{{profile.user.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="meta">
+          <view class="name-row">
+            <view class="name-block">
+              <view class="nick">{{profile.user.nickName}}</view>
+              <view class="uid" wx:if="{{profile.user.userId}}">ID: {{profile.user.userId}}</view>
+            </view>
+            <view
+              wx:if="{{!isSelf}}"
+              class="follow-btn {{profile.isFollowing ? 'following' : ''}}"
+              bindtap="onToggleFollow"
+            >
+              {{followLoading ? '处理中' : (profile.isFollowing ? '已关注' : '关注')}}
+            </view>
+          </view>
+          <view class="bio">{{profile.user.bio || '暂无简介'}}</view>
+          <view class="stats-row">
+            <view class="stat">
+              <view class="stat-num">{{profile.worksCount}}</view>
+              <view class="stat-label">作品</view>
+            </view>
+            <view class="stat">
+              <view class="stat-num">{{profile.followerCount}}</view>
+              <view class="stat-label">粉丝</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-title">作品</view>
+      <view wx:if="{{works.length === 0}}" class="empty">暂无公开作品</view>
+      <view wx:else class="works-grid">
+        <view
+          class="work-card glass-card"
+          wx:for="{{works}}"
+          wx:key="_id"
+          bindtap="goToWork"
+          data-id="{{item._id}}"
+        >
+          <image class="work-img" src="{{item.imageUrl}}" mode="widthFix" lazy-load></image>
+          <view class="work-title">{{item.title || '未命名'}}</view>
+          <view class="work-meta">
+            <view class="work-like">❤️ {{item.likeCount || item.heat || 0}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty">用户不存在</view>
+  </view>
+</view>

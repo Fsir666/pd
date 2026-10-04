@@ -1,0 +1,172 @@
+<view class="container">
+  <!-- 1. 顶部大图 (视差滚动) -->
+  <image 
+    class="hero-image" 
+    src="{{imageUrl}}" 
+    mode="aspectFill" 
+    bindtap="previewImage" 
+    style="{{heroStyle}}"
+  ></image>
+
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">
+    <text class="back-icon">←</text>
+  </view>
+
+  <!-- 2. 内容卡片 -->
+  <view class="content-card">
+    <view class="card-header">
+      <text class="title">{{title}}</text>
+      <view class="tags-container">
+        <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
+      </view>
+    </view>
+
+    <view class="primary-actions">
+      <view class="primary-btn primary-remix" bindtap="onRemix">复刻同款</view>
+      <view class="primary-btn primary-copy" bindtap="onCopyMaterialList">复制清单</view>
+    </view>
+
+    <!-- 作者信息栏 -->
+    <view class="author-info">
+      <image class="avatar" src="{{author.avatar}}" mode="aspectFill" catchtap="goToAuthor"></image>
+      <view class="author-meta">
+        <text class="nickname" catchtap="goToAuthor">{{author.nickname}}</text>
+        <view class="author-subrow">
+          <text class="follower-text">粉丝 {{authorFollowerCount}}</text>
+          <view
+            class="follow-btn {{isFollowingAuthor ? 'following' : ''}} {{followLoading ? 'disabled' : ''}}"
+            catchtap="onToggleFollowAuthor"
+          >
+            {{isFollowingAuthor ? '已关注' : '关注作者'}}
+          </view>
+        </view>
+        <!-- 移除统计信息，保持纯净 -->
+        <!-- 作者栏操作按钮组 -->
+        <view class="author-actions">
+          <view class="action-pill like-pill {{isLiked ? 'active' : ''}}" bindtap="onLike">
+            <text class="icon">{{isLiked ? '❤️' : '🤍'}}</text>
+            <text class="count">{{stats.likes}}</text>
+          </view>
+          <view class="action-pill collect-pill {{isCollected ? 'active' : ''}}" bindtap="onCollect">
+            <text class="icon">{{isCollected ? '⭐️' : '☆'}}</text>
+            <text class="label">{{isCollected ? '已收藏' : '收藏'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 描述 -->
+    <view class="description">
+      <text>{{description}}</text>
+    </view>
+
+    <view class="section-container recommend-section" wx:if="{{recommendWorks.length > 0}}">
+      <view class="recommend-head">
+        <text class="section-title">同款/相似推荐</text>
+      </view>
+      <scroll-view scroll-x class="recommend-scroll" show-scrollbar="{{false}}">
+        <view class="recommend-row">
+          <view
+            class="recommend-card"
+            wx:for="{{recommendWorks}}"
+            wx:key="_id"
+            bindtap="goToRecommendWork"
+            data-id="{{item._id}}"
+          >
+            <image class="recommend-img" src="{{item.imageUrl}}" mode="aspectFill"></image>
+            <view class="recommend-meta">
+              <text class="recommend-title">{{item.title}}</text>
+              <text class="recommend-sub">{{item.author}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 4. 评论区 -->
+    <view class="section-container comment-section">
+      <view class="comment-header">
+        <text class="section-title">评论 ({{comments.length}})</text>
+        <view class="comment-tabs">
+          <view class="tab {{activeTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{0}}">最新</view>
+          <view class="divider">|</view>
+          <view class="tab {{activeTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{1}}">最热</view>
+        </view>
+      </view>
+
+      <!-- 评论列表 -->
+      <view class="comment-list">
+        <view class="comment-item" wx:for="{{comments}}" wx:key="_id">
+          <image class="user-avatar" src="{{item.userInfo.avatar}}" mode="aspectFill"></image>
+          <view class="comment-main">
+            <view class="comment-user-info">
+              <text class="user-nickname">{{item.userInfo.nickname}}</text>
+              <text class="comment-time">{{item.createTime}}</text>
+            </view>
+            <view class="comment-text">{{item.content}}</view>
+            <image 
+              class="comment-img" 
+              wx:if="{{item.image}}" 
+              src="{{item.image}}" 
+              mode="widthFix"
+              bindtap="previewCommentImage"
+              data-src="{{item.image}}"
+            ></image>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 底部留白防止遮挡 -->
+      <view class="footer-spacing"></view>
+    </view>
+  </view>
+
+  <!-- 粒子特效容器 -->
+  <view class="particle-system" pointer-events="none">
+    <view 
+      wx:for="{{particleList}}" 
+      wx:key="id" 
+      class="particle" 
+      style="{{item.style}}"
+    >{{item.emoji}}</view>
+  </view>
+
+  <!-- 5. 底部固定评论/操作栏 (Safe Area Adaption) -->
+  <view class="bottom-action-bar">
+    <!-- 图片预览区 (仅在有图时显示) -->
+    <view class="image-preview-bar" wx:if="{{commentImage}}">
+      <view class="preview-wrapper">
+        <image class="preview-thumb" src="{{commentImage}}" mode="aspectFill"></image>
+        <view class="delete-btn" bindtap="onDeleteImage">×</view>
+      </view>
+    </view>
+
+    <!-- 输入栏 -->
+    <view class="input-row">
+      <view class="input-container">
+        <input 
+          class="main-input" 
+          placeholder="说点什么..." 
+          value="{{commentContent}}" 
+          bindinput="onInput"
+          confirm-type="send"
+          bindconfirm="onSubmitComment"
+        />
+        <view class="camera-btn" bindtap="onChooseImage">
+          <text class="icon">📷</text>
+        </view>
+      </view>
+      
+      <!-- 发送按钮：仅在有内容时显示 -->
+      <view class="send-btn" wx:if="{{commentContent || commentImage}}" bindtap="onSubmitComment">发送</view>
+      
+      <!-- 主操作按钮：同款拼豆 -->
+      <view class="remix-btn" bindtap="onRemix">复刻同款</view>
+      <button class="share-btn" open-type="share">分享</button>
+    </view>
+    
+    <!-- iPhone X+ 底部安全区 -->
+    <view class="safe-area-bottom"></view>
+  </view>
+</view>

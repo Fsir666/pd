@@ -1,0 +1,197 @@
+page {
+  background-color: #F8F9FB;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 顶部筛选区域 */
+.filter-wrapper {
+  background-color: #FFFFFF;
+  padding: 20rpx 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  height: 80rpx;
+  flex-shrink: 0;
+}
+
+.series-scroll {
+  width: 100%;
+  height: 100%;
+}
+
+.series-list {
+  display: flex;
+  padding: 0 20rpx;
+  align-items: center;
+}
+
+.series-item {
+  flex-shrink: 0;
+  padding: 12rpx 30rpx;
+  margin-right: 20rpx;
+  border-radius: 36rpx;
+  background-color: #F0F2F5;
+  color: #666;
+  font-size: 26rpx;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.series-item.active {
+  background-color: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 内容区域 */
+.content-scroll {
+  flex: 1;
+  height: 0; /* 必须设置高度以便 flex 生效 */
+  box-sizing: border-box;
+}
+
+.scroll-inner {
+  padding: 20rpx;
+}
+
+.color-group {
+  margin-bottom: 40rpx;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 0 4rpx;
+  background-color: #fff; /* 增加背景色以便点击 */
+  height: 80rpx;
+  border-radius: 12rpx;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.group-indicator {
+  width: 8rpx;
+  height: 28rpx;
+  background-color: #FFD93D;
+  margin-right: 12rpx;
+  border-radius: 4rpx;
+  margin-left: 20rpx; /* 增加左边距 */
+}
+
+.group-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.group-count {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 16rpx;
+}
+
+.arrow-icon {
+  width: 16rpx;
+  height: 16rpx;
+  border-top: 4rpx solid #ccc;
+  border-right: 4rpx solid #ccc;
+  transform: rotate(135deg); /* 默认向下箭头（表示折叠状态） */
+  transition: transform 0.3s ease;
+  margin-right: 20rpx;
+}
+
+.arrow-icon.expanded {
+  transform: rotate(-45deg); /* 展开时向上箭头 */
+}
+
+/* 颜色网格 */
+.collapsible-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.collapsible-wrapper.expanded {
+  max-height: none;
+  overflow: visible;
+  opacity: 1;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列 */
+  gap: 20rpx;
+  padding: 0 4rpx;
+}
+
+.color-card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.color-preview {
+  width: 100%;
+  padding-bottom: 75%; /* 4:3 比例 */
+  position: relative;
+}
+
+.color-info {
+  padding: 16rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.color-code {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.stock-badge {
+  font-size: 20rpx;
+  color: #1989fa;
+  background-color: rgba(25, 137, 250, 0.1);
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  font-weight: 600;
+}
+
+.color-hex {
+  font-size: 20rpx;
+  color: #999;
+  font-family: Menlo, monospace;
+}
+
+.footer-spacer {
+  height: 40rpx;
+}

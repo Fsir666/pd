@@ -1,0 +1,199 @@
+<view class="page-root">
+  <!-- 背景光效 -->
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+  </view>
+
+  <!-- 状态: 编辑与结果界面 -->
+  <view class="editor-container">
+    
+    <!-- 上传图片卡片 -->
+    <view class="upload-card glass-card" bindtap="onChooseImage">
+      <view class="upload-content">
+        <view class="upload-icon-box">
+          <view class="upload-icon-inner">📷</view>
+        </view>
+        <view class="upload-text">
+          <view class="upload-title-row">
+            <text class="upload-title">{{imageUrl ? '更换图片' : '上传图片'}}</text>
+            <text class="upload-arrow">›</text>
+          </view>
+          <text class="upload-desc">{{imageUrl ? '点击重新选择图片' : '点击从相册中选择图片'}}</text>
+        </view>
+      </view>
+      <image wx:if="{{imageUrl}}" src="{{imageUrl}}" class="upload-preview" mode="aspectFill"></image>
+    </view>
+    
+    <!-- 生成结果预览区域 -->
+    <!-- 隐藏的 processCanvas 用于图片处理 -->
+    <canvas type="2d" id="processCanvas" class="process-canvas" style="position: absolute; top: -9999px; left: -9999px; width:{{processWidth}}px; height:{{processHeight}}px;"></canvas>
+    
+    <block wx:if="{{isGenerated}}">
+      <!-- 预览卡片 -->
+      <view class="preview-card glass-card">
+        <view class="canvas-container" bindlongpress="onCompareStart" bindtouchend="onCompareEnd" bindtouchcancel="onCompareEnd">
+          
+          <!-- 对比用原图 (隐藏，按住显示) -->
+          <image 
+            src="{{imageUrl}}" 
+            class="compare-overlay {{isComparing ? 'active' : ''}}" 
+            mode="scaleToFill" 
+            style="width:{{displayW}}px; height:{{displayH}}px;"
+          ></image>
+
+          <!-- 展示用 Canvas -->
+          <canvas
+            type="2d"
+            id="displayCanvas"
+            class="display-canvas {{isComparing ? 'hidden' : ''}}"
+            style="width:{{displayW}}px; height:{{displayH}}px;"
+            bindtouchstart="onCanvasTouchStart"
+            catchtouchmove="onCanvasTouchMove"
+            bindtouchend="onCanvasTouchEnd"
+            bindtouchcancel="onCanvasTouchEnd"
+          ></canvas>
+          
+          <view class="compare-hint" wx:if="{{!isComparing}}">
+            <text>👁️ 长按对比原图</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 顶部工具栏 (网格/标尺/色号) -->
+      <view class="tools-row">
+        <view class="tool-btn glass-card {{showGrid ? 'active' : ''}}" bindtap="onToggleGrid">
+          <view class="tool-icon">#</view>
+          <text class="tool-label">网格</text>
+        </view>
+        <view class="tool-btn glass-card {{showRuler ? 'active' : ''}}" bindtap="onToggleRuler">
+          <view class="tool-icon">📏</view>
+          <text class="tool-label">标尺</text>
+        </view>
+        <view class="tool-btn glass-card {{showCellCodes ? 'active' : ''}}" bindtap="onToggleCellCodes">
+          <view class="tool-icon">A1</view>
+          <text class="tool-label">色号</text>
+        </view>
+      </view>
+
+       <!-- 辅助网格选项 (仅当网格开启时显示) -->
+       <view class="aux-grid-panel glass-card" wx:if="{{showGrid}}">
+           <view class="aux-row">
+              <text class="aux-label">辅助粗线</text>
+              <view class="aux-segments">
+                 <view class="aux-chip {{auxGridIndex === 0 ? 'active' : ''}}" bindtap="onSetAuxGrid" data-index="0">无</view>
+                 <view class="aux-chip {{auxGridIndex === 1 ? 'active' : ''}}" bindtap="onSetAuxGrid" data-index="1">5格</view>
+                 <view class="aux-chip {{auxGridIndex === 2 ? 'active' : ''}}" bindtap="onSetAuxGrid" data-index="2">10格</view>
+              </view>
+           </view>
+       </view>
+    </block>
+
+    <!-- 参数设置区域 -->
+    
+    <!-- 尺寸卡片 (生成后显示) -->
+    <view class="settings-card glass-card" wx:if="{{isGenerated}}">
+      <view class="card-header">
+        <text class="card-title">调整尺寸</text>
+        <view class="value-badge">{{processWidth}}x{{processHeight}}</view>
+      </view>
+      <view class="slider-container">
+        <slider min="16" max="128" step="4" value="{{processWidth}}" activeColor="#007AFF" backgroundColor="#E5E5EA" block-size="28" bindchange="onProcessSizeChange" bindchanging="onProcessSizeChanging"/>
+      </view>
+      <view class="size-hint">提示：调整尺寸后会自动重新生成哦～</view>
+    </view>
+
+    <!-- 品牌色卡卡片 -->
+    <view class="settings-card glass-card">
+      <view class="card-header">
+        <text class="card-title">品牌色卡</text>
+      </view>
+      <scroll-view scroll-x class="brand-scroll" show-scrollbar="{{false}}">
+        <view class="brand-scroll-inner">
+          <view class="ios-chip {{selectedBrand === item.key ? 'active' : ''}}" wx:for="{{brandOptions}}" wx:key="key" bindtap="onBrandTap" data-brand="{{item.key}}">
+            <text>{{item.key ? item.label : '空'}}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-x class="series-scroll" show-scrollbar="{{false}}" wx:if="{{brandSeriesOptions.length}}">
+        <view class="series-scroll-inner">
+          <view class="ios-chip small {{selectedBrandSeries === item.key ? 'active' : ''}}" wx:for="{{brandSeriesOptions}}" wx:key="key" bindtap="onBrandSeriesTap" data-series="{{item.key}}">
+            <text>{{item.label}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 功能介绍卡片 -->
+    <view class="intro-card glass-card">
+      <view class="intro-content">
+        <view class="intro-icon">✨</view>
+        <view class="intro-text">
+          <view class="intro-title">AI 智能生成像素图 🎨</view>
+          <view class="intro-desc">上传你喜欢的图片，AI 会自动转换成拼豆图案哦～还能智能匹配品牌色卡，让 DIY 更简单！💕</view>
+        </view>
+      </view>
+      <view class="intro-features">
+        <view class="feature-item">
+          <text class="feature-icon">🤖</text>
+          <text class="feature-text">AI 算法</text>
+        </view>
+        <view class="feature-item">
+          <text class="feature-icon">🎨</text>
+          <text class="feature-text">精准配色</text>
+        </view>
+        <view class="feature-item">
+          <text class="feature-icon">✨</text>
+          <text class="feature-text">一键生成</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用色统计卡片 (仅生成后显示) -->
+    <block wx:if="{{isGenerated}}">
+      <canvas type="2d" id="exportCanvas" class="export-canvas" style="width:{{exportW}}px; height:{{exportH}}px;"></canvas>
+      
+      <view class="settings-card glass-card">
+        <view class="card-header">
+          <view class="header-left">
+            <text class="card-title">用色统计</text>
+            <view class="brand-badge" wx:if="{{selectedBrand}}">{{selectedBrand}}</view>
+          </view>
+          <text class="header-right-text">共 {{statsTotalColors}} 色 / {{statsTotalBeads}} 颗</text>
+        </view>
+
+        <!-- 统计排序 Tab -->
+        <view class="stats-tabs-container">
+           <view class="stats-tab {{statsSortMode === 'count' ? 'active' : ''}}" bindtap="onStatsSortChange" data-mode="count">按数量</view>
+           <view class="stats-tab {{statsSortMode === 'code' ? 'active' : ''}}" bindtap="onStatsSortChange" data-mode="code">按色号</view>
+        </view>
+
+        <view class="stats-list-container">
+          <view class="stats-row" wx:for="{{statsList}}" wx:key="key">
+            <view class="stats-row-left">
+              <view class="stats-index">{{index + 1}}</view>
+              <view class="stats-circle" style="background-color: {{item.hex}}"></view>
+              <view class="stats-info">
+                <text class="stats-code-text">{{item.code}}</text>
+                <text class="stats-hex-text">{{item.hex}}</text>
+              </view>
+            </view>
+            <view class="stats-count-text">{{item.count}} 颗</view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 底部留白 -->
+    <view style="height: 200rpx;"></view>
+
+    <!-- 底部固定操作栏 -->
+    <view class="bottom-float-bar" wx:if="{{isGenerated}}">
+        <view class="bottom-actions-row">
+            <button class="ios-btn-white" bindtap="onGoToBeadMode">沉浸拼豆</button>
+            <button class="ios-btn-primary" bindtap="onSaveImage" loading="{{isSaving}}" disabled="{{isSaving}}">{{isSaving ? '正在保存…' : '保存高清图'}}</button>
+        </view>
+    </view>
+    
+  </view>
+</view>

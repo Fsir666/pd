@@ -1,0 +1,67 @@
+  <!-- Modal: Add/Edit Brand -->
+  <view class="modal-mask" wx:if="{{addBrandVisible}}">
+    <view class="modal-card">
+      <view class="modal-title">{{editingBrandId ? '编辑品牌' : '新建品牌'}}</view>
+      <input class="modal-input" placeholder="请输入品牌名称" value="{{tempBrandName}}" bindinput="onBrandNameInput" />
+      <view class="modal-actions">
+        <view class="modal-btn ghost" bindtap="closeAddBrandModal">取消</view>
+        <view class="modal-btn primary" bindtap="confirmAddBrand">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Modal: Add/Edit Series -->
+  <view class="modal-mask" wx:if="{{addSeriesVisible}}">
+    <view class="modal-card">
+      <view class="modal-title">{{editingSeriesId ? '编辑色卡' : '新建色卡'}}</view>
+      <input class="modal-input" placeholder="请输入色卡名称" value="{{tempSeriesName}}" bindinput="onSeriesNameInput" />
+      <view class="modal-actions">
+        <view class="modal-btn ghost" bindtap="closeAddSeriesModal">取消</view>
+        <view class="modal-btn primary" bindtap="confirmAddSeries">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Modal: Add/Edit Group (Series) -->
+  <view class="modal-mask" wx:if="{{addGroupVisible}}">
+    <view class="modal-card">
+      <view class="modal-title">{{editingGroupId ? '编辑系列' : '新建系列'}}</view>
+      <input class="modal-input" placeholder="请输入系列名称" value="{{tempGroupName}}" bindinput="onGroupNameInput" />
+      <view class="modal-actions">
+        <view class="modal-btn ghost" bindtap="closeAddGroupModal">取消</view>
+        <view class="modal-btn primary" bindtap="confirmAddGroup">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Modal: Add Color -->
+  <view class="modal-mask" wx:if="{{addColorVisible}}">
+    <view class="modal-card">
+      <view class="modal-title">添加颜色</view>
+      <view class="form-item">
+        <text class="form-label">色号</text>
+        <input class="modal-input" placeholder="例如: A01" value="{{tempColorCode}}" bindinput="onColorCodeInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">颜色 (点击选择或输入HEX)</text>
+        <view class="color-picker-row">
+          <view class="color-preview-box" style="background-color: {{tempColorHex}}"></view>
+          <input class="modal-input hex-input" placeholder="#FFFFFF" value="{{tempColorHex}}" bindinput="onColorHexInput" />
+        </view>
+        <view class="color-picker-container">
+          <view class="sv-panel" id="svPanel" bindtouchstart="onSvTouchStart" bindtouchmove="onSvTouchMove" catchtouchmove="onSvTouchMove" style="background-color: hsl({{hsv.h}}, 100%, 50%);">
+            <view class="sv-white-overlay"></view>
+            <view class="sv-black-overlay"></view>
+            <view class="picker-handle" style="left: {{svHandle.x}}px; top: {{svHandle.y}}px;"></view>
+          </view>
+          <view class="hue-slider" id="hueSlider" bindtouchstart="onHueTouchStart" bindtouchmove="onHueTouchMove" catchtouchmove="onHueTouchMove">
+            <view class="hue-handle" style="left: {{hueHandle.x}}px;"></view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn ghost" bindtap="closeAddColorModal">取消</view>
+        <view class="modal-btn primary" bindtap="confirmAddColor">确定</view>
+      </view>
+    </view>
+  </view>

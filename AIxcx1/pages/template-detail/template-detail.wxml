@@ -1,0 +1,145 @@
+<view class="container" wx:if="{{template}}">
+  <!-- 顶部预览区 -->
+  <view class="preview-card" bindtap="showFullScreen">
+    <canvas type="2d" id="previewCanvas" class="preview-canvas"></canvas>
+    <view class="preview-hint">点击放大交互</view>
+  </view>
+
+  <!-- 全屏交互弹窗 -->
+  <view class="fullscreen-modal" wx:if="{{showModal}}" catchtouchmove="preventScroll">
+    <view class="modal-content">
+      <canvas type="2d" id="fullScreenCanvas" class="fullscreen-canvas"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+      ></canvas>
+      <view class="close-btn" catchtap="closeFullScreen">×</view>
+      <view class="operation-tip">单指旋转 · 双指缩放</view>
+    </view>
+  </view>
+
+  <!-- 基础信息区 -->
+  <view class="info-card">
+    <view class="title-section">
+      <view>
+        <text class="title">{{template.title}}</text>
+        <text class="author">设计师: {{template.author}}</text>
+      </view>
+      <view class="heat-badge" bindtap="onLikeTemplate">
+        <text>🔥 {{template.heat}}</text>
+      </view>
+    </view>
+
+    <view class="data-grid">
+      <view class="data-item">
+        <text class="data-value">{{template.time}}</text>
+        <text class="data-label">预计耗时</text>
+      </view>
+      <view class="data-item">
+        <text class="data-value">{{template.difficulty}}</text>
+        <text class="data-label">难度等级</text>
+      </view>
+      <view class="data-item">
+        <text class="data-value">{{currentSizeStr}}</text>
+        <text class="data-label">尺寸规格</text>
+      </view>
+      <view class="data-item">
+        <text class="data-value">{{template.beadsCount}}</text>
+        <text class="data-label">豆子数量</text>
+      </view>
+    </view>
+    
+    <!-- 尺寸/难度选择 -->
+    <view class="size-selector">
+      <view class="selector-title">图纸规格</view>
+      <view class="size-options">
+        <view 
+          class="size-option {{index === sizeIndex ? 'active' : ''}}" 
+          wx:for="{{sizeOptions}}" 
+          wx:key="size"
+          bindtap="onSizeSelect"
+          data-index="{{index}}"
+        >
+          {{item.level}} ({{item.size}})
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详情描述 -->
+  <view class="info-card">
+    <text class="section-title">图纸介绍</text>
+    <text class="desc-text">{{template.description}}</text>
+  </view>
+
+  <!-- 评论区 -->
+  <view class="info-card comment-section">
+    <view class="comment-header">
+      <text class="section-title">评论 ({{comments.length}})</text>
+      <view class="comment-tabs">
+        <view class="tab {{activeTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{0}}">最新</view>
+        <view class="divider">|</view>
+        <view class="tab {{activeTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{1}}">最热</view>
+      </view>
+    </view>
+
+    <!-- 发表评论区域 (移至上方) -->
+    <view class="comment-input-area">
+      <view class="input-box">
+        <input 
+          class="comment-input" 
+          placeholder="说点什么..." 
+          value="{{commentContent}}" 
+          bindinput="onInput"
+        />
+        <view class="image-btn" bindtap="onChooseImage">📷</view>
+      </view>
+      <view class="send-btn" bindtap="onSubmitComment">发送</view>
+    </view>
+    
+    <!-- 选中的图片预览 (移至上方) -->
+    <view class="selected-images" wx:if="{{commentImages.length > 0}}">
+      <view class="selected-img-wrapper" wx:for="{{commentImages}}" wx:key="*this">
+        <image class="selected-img" src="{{item}}" mode="aspectFill"></image>
+        <view class="delete-img" bindtap="onDeleteImage" data-index="{{index}}">×</view>
+      </view>
+    </view>
+
+    <!-- 评论列表 -->
+    <view class="comment-list">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <image class="user-avatar" src="{{item.userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <view class="comment-content-box">
+          <view class="user-header">
+            <text class="user-name">{{item.userInfo.nickName}}</text>
+            <view class="like-box">
+              <text class="like-count">{{item.likes}}</text>
+              <text class="like-icon">👍</text>
+            </view>
+          </view>
+          <view class="comment-text">{{item.content}}</view>
+          <view class="comment-images" wx:if="{{item.images && item.images.length > 0}}">
+            <image 
+              class="comment-img" 
+              wx:for="{{item.images}}" 
+              wx:for-item="img" 
+              wx:key="*this" 
+              src="{{img}}" 
+              mode="aspectFill"
+            ></image>
+          </view>
+          <view class="comment-time">{{item.createTime}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="price-info">
+      <text class="price-label">消耗体力</text>
+      <text class="price-value">⚡ 2</text>
+    </view>
+    <view class="action-btn" bindtap="onStartBuild">拼一下</view>
+  </view>
+</view>

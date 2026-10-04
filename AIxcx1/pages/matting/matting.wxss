@@ -1,0 +1,253 @@
+/* Global Page Setup */
+.page-root {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #F2F4F8;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Ambient Background */
+.ambient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+}
+
+.orb-1 {
+  width: 500rpx;
+  height: 500rpx;
+  background: #54A0FF; /* Blue for Matting */
+  top: -100rpx;
+  right: -100rpx;
+}
+
+.orb-2 {
+  width: 400rpx;
+  height: 400rpx;
+  background: #A3CB38; /* Green accent */
+  bottom: 20%;
+  left: -50rpx;
+}
+
+/* Container */
+.container {
+  position: relative;
+  z-index: 1;
+  padding: 40rpx;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.04);
+  border-radius: 40rpx;
+  padding: 50rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Intro Section */
+.icon-header {
+  width: 140rpx;
+  height: 140rpx;
+  background: linear-gradient(135deg, #fff, #f0f2f5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 10rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.feature-icon {
+  font-size: 64rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #1d1d1f;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #86868b;
+  margin-bottom: 60rpx;
+  text-align: center;
+}
+
+.features-list {
+  width: 100%;
+  margin-bottom: 60rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  background: rgba(255,255,255,0.5);
+  padding: 24rpx;
+  border-radius: 20rpx;
+}
+
+.item-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.item-text {
+  font-size: 30rpx;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.btn-primary {
+  width: 92%;
+  max-width: 560rpx;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #0A84FF, #54A0FF);
+  color: white;
+  border-radius: 999rpx;
+  height: 92rpx;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 800;
+  border: none;
+  box-shadow: 0 14rpx 34rpx rgba(0, 122, 255, 0.28);
+  letter-spacing: 0.6rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* Processing Section */
+.processing-section {
+  padding: 80rpx 40rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid rgba(0, 122, 255, 0.1);
+  border-top-color: #007AFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+.processing-text {
+  font-size: 30rpx;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.processing-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #86868b;
+  text-align: center;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Result Section */
+.result-section {
+  width: 100%;
+}
+
+.result-card {
+  padding: 30rpx;
+  align-items: stretch;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.result-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.btn-reupload {
+  font-size: 26rpx;
+  color: #007AFF;
+  padding: 10rpx 24rpx;
+  background: rgba(0, 122, 255, 0.1);
+  border-radius: 30rpx;
+}
+
+.image-compare {
+  width: 100%;
+  height: 600rpx;
+  background-color: #f5f5f7;
+  border-radius: 24rpx;
+  overflow: hidden;
+  margin-bottom: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Checkerboard pattern for transparency */
+  background-image: linear-gradient(45deg, #eee 25%, transparent 25%), 
+                    linear-gradient(-45deg, #eee 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #eee 75%), 
+                    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.result-image {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-save {
+  width: 100%;
+  background: #34C759;
+  color: white;
+  border-radius: 100rpx;
+  padding: 24rpx 0;
+  font-size: 32rpx;
+  font-weight: 600;
+  box-shadow: 0 10rpx 20rpx rgba(52, 199, 89, 0.2);
+}
+
+.btn-save:active {
+  transform: scale(0.98);
+}

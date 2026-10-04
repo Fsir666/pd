@@ -1,0 +1,366 @@
+.page-root {
+  min-height: 100vh;
+  background: #f5f5f7;
+  position: relative;
+}
+
+.paper-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #f8f9fa 0%, #f5f5f7 100%);
+  z-index: -1;
+}
+
+.scroll {
+  height: 100vh;
+}
+
+.content {
+  padding: 24rpx;
+}
+
+/* 通用区块样式 */
+.section {
+  margin-bottom: 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+/* 轮播图 */
+.banner-swiper {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.banner-item {
+  width: 100%;
+  height: 300rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+}
+
+.banner-item-1 {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+}
+
+.banner-item-2 {
+  background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+}
+
+.banner-item-3 {
+  background: linear-gradient(135deg, #96ceb4, #feca57);
+}
+
+.banner-item-4 {
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+}
+
+.banner-item-5 {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.banner-content {
+  text-align: center;
+  padding: 0 40rpx;
+}
+
+.banner-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.banner-desc {
+  font-size: 28rpx;
+  margin-bottom: 32rpx;
+  line-height: 1.4;
+  display: block;
+  opacity: 0.9;
+}
+
+.banner-btn {
+  display: inline-block;
+  padding: 16rpx 48rpx;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.banner-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 公告栏 */
+.notice-card {
+  background: #f5f5f7;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.04);
+}
+
+.notice-item:last-child {
+  border-bottom: none;
+}
+
+.notice-badge {
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 8rpx;
+  margin-right: 16rpx;
+}
+
+.notice-text {
+  font-size: 28rpx;
+  color: #1c1c1e;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* 新手教程 */
+.tutorial-grid {
+  display: flex;
+  gap: 16rpx;
+}
+
+.tutorial-card {
+  flex: 1;
+  background: linear-gradient(135deg, #f8f9fa, #f5f5f7);
+  border-radius: 20rpx;
+  padding: 24rpx 16rpx;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.tutorial-card:active {
+  transform: scale(0.98);
+  background: #e8e8ed;
+}
+
+.tutorial-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.tutorial-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.tutorial-desc {
+  font-size: 22rpx;
+  color: #8e8e93;
+  line-height: 1.3;
+}
+
+/* 功能介绍 */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx;
+  background: #f5f5f7;
+  border-radius: 16rpx;
+  transition: all 0.2s ease;
+}
+
+.feature-item:active {
+  background: #e8e8ed;
+}
+
+.feature-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #8e8e93;
+  line-height: 1.4;
+}
+
+/* 拼豆礼物 */
+.coming-soon-tag {
+  margin-left: auto;
+  padding: 6rpx 16rpx;
+  background: linear-gradient(135deg, #ff9500, #ff6b00);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 20rpx;
+}
+
+.gift-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+  border-radius: 20rpx;
+  border: 2rpx solid rgba(255, 149, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.gift-card:active {
+  transform: scale(0.98);
+}
+
+.gift-content {
+  flex: 1;
+}
+
+.gift-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #ff6b00;
+  margin-bottom: 12rpx;
+}
+
+.gift-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 16rpx;
+}
+
+.gift-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.gift-feature {
+  font-size: 24rpx;
+  color: #ff6b00;
+  font-weight: 500;
+}
+
+.gift-arrow {
+  font-size: 40rpx;
+  color: #ff6b00;
+  margin-left: 16rpx;
+}
+
+/* 即将上线弹窗 */
+.comingsoon-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+.comingsoon-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.comingsoon-card {
+  width: 90%;
+  max-width: 640rpx;
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 48rpx 40rpx;
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.comingsoon-mask.show .comingsoon-card {
+  transform: scale(1);
+}
+
+.comingsoon-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 24rpx;
+}
+
+.comingsoon-desc {
+  font-size: 28rpx;
+  color: #8e8e93;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+  white-space: pre-line;
+}
+
+.comingsoon-btn {
+  display: inline-block;
+  padding: 20rpx 64rpx;
+  background: linear-gradient(135deg, #007AFF, #0055D5);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+}

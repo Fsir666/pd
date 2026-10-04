@@ -1,0 +1,86 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/my-collections/my-collections",
+    "pages/my-works/my-works",
+    "pages/mall/mall",
+    "pages/square/square",
+    "pages/search/search",
+    "pages/game/game",
+    "pages/warehouse/warehouse",
+    "pages/warehouse/manage/manage",
+    "pages/bead-mode/bead-mode",
+    "pages/profile/profile",
+    "pages/follow-list/follow-list",
+    "pages/user-profile/user-profile",
+    "pages/template-detail/template-detail",
+    "pages/developer/developer",
+    "pages/developer/add-template/add-template",
+    "pages/developer/mock-template/mock-template",
+    "pages/my-orders/my-orders",
+    "pages/contact/contact",
+    "pages/beginner-guide/beginner-guide",
+    "pages/color-chart/color-chart",
+    "pages/generate/generate",
+    "pages/matting/matting",
+    "pages/cartoon/cartoon",
+    "pages/cartoon-generate/cartoon-generate",
+    "pages/all-tools/all-tools"
+  ],
+  "usingComponents": {
+    "like-float": "/components/like-float/like-float"
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "拼豆",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#FF6B00",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab_home.png",
+        "selectedIconPath": "images/tab_home_active.png"
+      },
+      {
+        "pagePath": "pages/mall/mall",
+        "text": "社区",
+        "iconPath": "images/tab_mall.png",
+        "selectedIconPath": "images/tab_mall_active.png"
+      },
+      {
+        "pagePath": "pages/square/square",
+        "text": "广场",
+        "iconPath": "images/tab_game.png",
+        "selectedIconPath": "images/tab_game_active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tab_me.png",
+        "selectedIconPath": "images/tab_me_active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存导出的图纸图片到相册"
+    }
+  },
+  "networkTimeout": {
+    "request": 120000,
+    "connectSocket": 60000,
+    "uploadFile": 60000,
+    "downloadFile": 60000
+  }
+}

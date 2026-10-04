@@ -1,0 +1,127 @@
+<view class="page-container">
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+    <view class="orb orb-3"></view>
+  </view>
+  <view class="header-bg"></view>
+
+  <view class="content-container">
+    <view class="search-card glass-card">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        value="{{query}}"
+        focus="{{focus}}"
+        placeholder="搜索用户或作品（支持模糊）"
+        confirm-type="search"
+        bindinput="onInput"
+        bindconfirm="onConfirm"
+      />
+      <view class="search-clear" wx:if="{{query}}" bindtap="onClear">清空</view>
+    </view>
+
+    <view class="seg-card glass-card">
+      <view class="seg-item {{tab === 'all' ? 'active' : ''}}" data-tab="all" bindtap="onTabTap">全部</view>
+      <view class="seg-item {{tab === 'users' ? 'active' : ''}}" data-tab="users" bindtap="onTabTap">用户</view>
+      <view class="seg-item {{tab === 'works' ? 'active' : ''}}" data-tab="works" bindtap="onTabTap">作品</view>
+    </view>
+
+    <view wx:if="{{!query}}" class="discover-card glass-card">
+      <view class="discover-title">试试搜索</view>
+      <view class="discover-chips">
+        <view class="discover-chip" bindtap="onHistoryTap" data-key="可爱">可爱</view>
+        <view class="discover-chip" bindtap="onHistoryTap" data-key="动漫">动漫</view>
+        <view class="discover-chip" bindtap="onHistoryTap" data-key="像素">像素</view>
+        <view class="discover-chip" bindtap="onHistoryTap" data-key="节日">节日</view>
+      </view>
+
+      <view wx:if="{{history.length > 0}}" class="history">
+        <view class="history-head">
+          <text class="history-title">最近搜索</text>
+          <view class="history-clear" bindtap="onClearHistory">清空</view>
+        </view>
+        <view class="history-chips">
+          <view
+            class="history-chip"
+            wx:for="{{history}}"
+            wx:key="*this"
+            bindtap="onHistoryTap"
+            data-key="{{item}}"
+          >
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="results-card glass-card">
+      <view wx:if="{{loading}}" class="loading">搜索中...</view>
+      <view wx:else>
+        <view wx:if="{{(tab === 'all' || tab === 'users') && users.length > 0}}" class="section">
+          <view class="section-head">
+            <text class="section-title">用户</text>
+            <text class="section-count">{{users.length}}</text>
+          </view>
+          <view
+            class="user-row-item"
+            wx:for="{{users}}"
+            wx:key="_openid"
+            bindtap="goToUserProfile"
+            data-openid="{{item._openid}}"
+          >
+            <image class="user-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+            <view class="user-row-main">
+              <view class="user-row-name">{{item.nickName}}</view>
+              <view class="user-row-bio">{{item.bio || '暂无简介'}}</view>
+            </view>
+            <view
+              class="follow-btn {{item.isFollowing ? 'following' : ''}}"
+              catchtap="onToggleFollow"
+              data-openid="{{item._openid}}"
+              data-index="{{index}}"
+            >
+              {{item.isFollowing ? '已关注' : '关注'}}
+            </view>
+          </view>
+        </view>
+
+        <view wx:if="{{(tab === 'all' || tab === 'works') && works.length > 0}}" class="section">
+          <view class="section-head">
+            <text class="section-title">作品</text>
+            <text class="section-count">{{works.length}}</text>
+          </view>
+          <view
+            class="work-row-item"
+            wx:for="{{works}}"
+            wx:key="_id"
+            bindtap="goToDetail"
+            data-id="{{item._id}}"
+            data-title="{{item.content || item.title || '未命名'}}"
+            data-image-url="{{item.imageUrl}}"
+            data-author="{{item.author}}"
+            data-likes="{{item.likes}}"
+          >
+            <image class="work-thumb" src="{{item.imageUrl}}" mode="aspectFill"></image>
+            <view class="work-row-main">
+              <view class="work-row-title">{{item.content || item.title || '未命名'}}</view>
+              <view class="work-row-sub">
+                <view class="work-row-author">{{item.author || '匿名用户'}}</view>
+                <view class="work-row-like">❤️ {{item.likes || 0}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view
+          wx:if="{{hasSearched && ((tab === 'all' && users.length === 0 && works.length === 0) || (tab === 'users' && users.length === 0) || (tab === 'works' && works.length === 0))}}"
+          class="empty"
+        >
+          未找到相关内容
+        </view>
+      </view>
+    </view>
+
+    <view class="safe-bottom"></view>
+  </view>
+</view>

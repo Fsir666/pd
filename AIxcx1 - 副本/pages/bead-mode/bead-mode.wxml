@@ -1,0 +1,590 @@
+<view class="page">
+  <view class="nav" style="height: {{headerHeight}}px; padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner" style="padding-left: {{safeInsetLeft + 12}}px; padding-right: {{safeInsetRight + 12}}px;">
+      <view class="back-btn" bindtap="onBack">
+        <text class="back-icon">‹</text>
+      </view>
+      <view class="nav-center">
+        <view class="nav-title">拼豆模式</view>
+        <view class="nav-status">
+          <text class="status-item">品牌 {{selectedBrand}}</text>
+          <text class="status-dot">·</text>
+          <text class="status-item">工具 {{activeToolLabel}}</text>
+          <text class="status-dot">·</text>
+          <text class="status-item">倍率 {{zoomPercent}}%</text>
+        </view>
+      </view>
+      <view class="nav-right"></view>
+    </view>
+  </view>
+
+  <view class="land-root" style="top: {{headerHeight}}px;">
+    <view class="help-fab" style="left: {{helpBtnLeft}}px; top: {{helpBtnTop}}px;" bindtap="onOpenHelp">?</view>
+    <view class="left" style="left: {{boardCenterLeft}}px;">
+      <view class="board-shell glass-card" style="width: {{boardWrapSize}}px; height: {{boardWrapSize}}px;">
+        <view class="board-wrap" style="width: {{boardWrapSize}}px; height: {{boardWrapSize}}px;">
+          <canvas
+            wx:show="{{showRuler}}"
+            type="2d"
+            class="ruler-canvas x-ruler"
+            id="xRulerCanvas"
+            style="left: {{rulerSize}}px; top: 0px; width: {{boardSize}}px; height: {{rulerSize}}px;"
+          ></canvas>
+          <canvas
+            wx:show="{{showRuler}}"
+            type="2d"
+            class="ruler-canvas y-ruler"
+            id="yRulerCanvas"
+            style="left: 0px; top: {{rulerSize}}px; width: {{rulerSize}}px; height: {{boardSize}}px;"
+          ></canvas>
+          <view
+            class="board-viewport"
+            id="viewport"
+            style="width: {{boardSize}}px; height: {{boardSize}}px; left: {{showRuler ? rulerSize : 0}}px; top: {{showRuler ? rulerSize : 0}}px;"
+            bindtouchstart="onTouchStart"
+            catchtouchmove="onTouchMove"
+            bindtouchend="onTouchEnd"
+            bindtouchcancel="onTouchEnd"
+          >
+            <canvas type="2d" class="board-canvas" id="boardCanvas" style="width: {{boardSize}}px; height: {{boardSize}}px;"></canvas>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view
+      class="zoom-bar"
+      id="zoomBar"
+      style="left: {{zoomBarLeft}}px; top: {{zoomBarTop}}px; height: {{zoomBarHeight}}px;"
+      bindtouchstart="onZoomTouchStart"
+      catchtouchmove="onZoomTouchMove"
+      bindtouchend="onZoomTouchEnd"
+      bindtouchcancel="onZoomTouchEnd"
+    >
+      <view class="zoom-track"></view>
+      <view class="zoom-handle" style="top: {{zoomHandleTop}}px; background-color: {{brushCode ? brushHex : '#000000'}};"></view>
+    </view>
+
+    <view
+      class="right {{toolbarCollapsed ? 'collapsed' : ''}}"
+      style="width: {{toolbarWidth}}px; right: {{safeInsetRight + 14}}px; top: 14px; bottom: {{safeInsetBottom + 14 + (toolbarCollapsed ? 0 : 52)}}px;"
+    >
+      <view class="toolbar-toggle" bindtap="onToggleToolbar" style="right: {{safeInsetRight + 14}}px; bottom: {{safeInsetBottom + 14}}px;">
+        <text class="toolbar-toggle-text">
+          {{
+            toolbarCollapsed
+              ? (useShortRightToggleLabel ? '展开右栏' : '展开右侧工具栏')
+              : (useShortRightToggleLabel ? '缩放右栏' : '缩放右侧工具栏')
+          }}
+        </text>
+        <text class="toolbar-toggle-icon">{{toolbarCollapsed ? '‹' : '›'}}</text>
+      </view>
+
+      <view class="panel glass-card">
+        <view class="panel-content">
+          <view class="right-shell">
+            <view class="right-nav">
+              <view
+                class="nav-item {{rightPage === 'settings' ? 'active' : ''}}"
+                bindtap="onRightNavTap"
+                data-page="settings"
+              >
+                <view class="nav-dot"></view>
+                <text class="nav-text">设置</text>
+              </view>
+              <view
+                class="nav-item {{rightPage === 'tools' ? 'active' : ''}}"
+                bindtap="onRightNavTap"
+                data-page="tools"
+              >
+                <view class="nav-dot"></view>
+                <text class="nav-text">品牌选择</text>
+              </view>
+              <view
+                class="nav-item {{rightPage === 'export' ? 'active' : ''}}"
+                bindtap="onRightNavTap"
+                data-page="export"
+              >
+                <view class="nav-dot"></view>
+                <text class="nav-text">保存图纸</text>
+              </view>
+            </view>
+
+            <view class="right-page">
+              <view class="page-stack {{rightPage}}">
+              <view class="page-tools page-pane">
+                <view class="panel-top">
+                  <view class="panel-title">品牌选择</view>
+                  <view class="panel-sub">{{statsTotalColors}}色 / {{statsTotalBeads}}颗</view>
+                </view>
+
+                <scroll-view scroll-x class="brand-tabs" show-scrollbar="{{false}}">
+                  <view class="brand-row">
+                    <view
+                      class="brand-chip {{selectedBrand === item ? 'active' : ''}}"
+                      wx:for="{{brandOptions}}"
+                      wx:key="item"
+                      data-brand="{{item}}"
+                      bindtap="onBrandTap"
+                    >
+                      {{item}}
+                    </view>
+                  </view>
+                </scroll-view>
+
+                <view class="sort-tabs">
+                  <view class="sort-chip {{statsSort === 'count' ? 'active' : ''}}" data-sort="count" bindtap="onStatsSortTap">按数量</view>
+                  <view class="sort-chip {{statsSort === 'code' ? 'active' : ''}}" data-sort="code" bindtap="onStatsSortTap">按色号</view>
+                </view>
+
+                <scroll-view scroll-y class="stats-scroll" show-scrollbar="{{false}}">
+                  <view class="stats-grid" style="grid-template-columns: repeat({{statsColumns}}, 1fr);">
+                    <view
+                      class="stats-card {{highlightBeads ? 'pickable' : ''}} {{highlightBeads && highlightFocusMap[item.hex] ? 'active' : ''}}"
+                      wx:for="{{statsList}}"
+                      wx:key="key"
+                      data-hex="{{item.hex}}"
+                      bindtap="onStatsCardTap"
+                    >
+                      <view class="stats-tile" style="background-color: {{item.hex}};">
+                        <view class="tile-top">
+                          <text class="tile-tag tile-code">{{item.code}}</text>
+                        </view>
+                        <view class="tile-bottom">
+                          <text class="tile-tag tile-count">{{item.count}}颗</text>
+                        </view>
+                      </view>
+                    </view>
+                  </view>
+                  <view class="bottom-pad"></view>
+                </scroll-view>
+              </view>
+
+              <view class="page-settings page-pane">
+                <view class="panel-top">
+                  <view class="panel-title">设置</view>
+                  <view class="panel-sub">显示与辅助</view>
+                </view>
+
+                <scroll-view scroll-y="true" class="settings-scroll" show-scrollbar="{{false}}">
+                  <view class="setting-card">
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">网格线</text>
+                        <text class="setting-desc">显示色块分割线</text>
+                      </view>
+                      <switch checked="{{showGrid}}" bindchange="onToggleGrid" color="#FF6A00" />
+                    </view>
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">标尺</text>
+                        <text class="setting-desc">显示色块坐标</text>
+                      </view>
+                      <switch checked="{{showRuler}}" bindchange="onToggleRuler" color="#FF6A00" />
+                    </view>
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">色号显示</text>
+                        <text class="setting-desc">在色块上显示编号</text>
+                      </view>
+                      <switch checked="{{showCellCodes}}" bindchange="onToggleCellCodes" color="#FF6A00" />
+                    </view>
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">高亮色块</text>
+                        <text class="setting-desc">开启后可在品牌选择点色块高亮</text>
+                      </view>
+                      <switch checked="{{highlightBeads}}" bindchange="onToggleHighlightBeads" color="#FF6A00" />
+                    </view>
+                    <view wx:if="{{highlightBeads}}" class="setting-row setting-row-vertical">
+                      <view class="setting-left">
+                        <text class="setting-name">高亮模式</text>
+                        <text class="setting-desc">支持多选高亮；其它色可半透明或隐藏</text>
+                      </view>
+                      <view class="highlight-mode-row">
+                        <view class="highlight-mode-chip {{highlightMode === 'dim' ? 'active' : ''}}" data-mode="dim" bindtap="onHighlightModeTap">半透明其它</view>
+                        <view class="highlight-mode-chip {{highlightMode === 'hide' ? 'active' : ''}}" data-mode="hide" bindtap="onHighlightModeTap">隐藏其它</view>
+                        <view class="highlight-mode-chip {{highlightFocusHexes.length ? '' : 'disabled'}}" bindtap="onClearHighlights">清空高亮</view>
+                      </view>
+                    </view>
+                  </view>
+                  <view class="bottom-pad"></view>
+                </scroll-view>
+              </view>
+
+              <view class="page-export page-pane">
+                <view class="panel-top">
+                  <view class="panel-title">保存图纸</view>
+                  <view class="panel-sub">导出图片到相册</view>
+                </view>
+
+                <scroll-view scroll-y class="export-scroll" show-scrollbar="{{false}}">
+                  <view class="setting-card">
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">网格线</text>
+                        <text class="setting-desc">导出图片显示网格</text>
+                      </view>
+                      <switch checked="{{exportShowGrid}}" bindchange="onExportToggleGrid" color="#FF6A00" />
+                    </view>
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">标尺</text>
+                        <text class="setting-desc">导出图片显示坐标</text>
+                      </view>
+                      <switch checked="{{exportShowRuler}}" bindchange="onExportToggleRuler" color="#FF6A00" />
+                    </view>
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">色号显示</text>
+                        <text class="setting-desc">导出图片显示色号</text>
+                      </view>
+                      <switch checked="{{exportShowCodes}}" bindchange="onExportToggleCodes" color="#FF6A00" />
+                    </view>
+
+                    <view class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">规格尺寸</text>
+                        <text class="setting-desc">在图片底部添加规格</text>
+                      </view>
+                      <picker mode="selector" range="{{exportSpecOptions}}" range-key="label" value="{{exportSpecIndex}}" bindchange="onExportSpecChange">
+                        <view class="export-picker">{{exportSpecOptions[exportSpecIndex].label}}</view>
+                      </picker>
+                    </view>
+
+                    <view wx:if="{{exportSpecOptions[exportSpecIndex].key === 'cm'}}" class="setting-row">
+                      <view class="setting-left">
+                        <text class="setting-name">单颗直径</text>
+                        <text class="setting-desc">默认 5mm</text>
+                      </view>
+                      <input class="export-input" type="digit" value="{{exportBeadMm}}" bindinput="onExportBeadInput" />
+                    </view>
+                  </view>
+                  <view class="bottom-pad"></view>
+                </scroll-view>
+
+                <view class="export-footer">
+                  <view class="export-save-btn primary" bindtap="onExportSaveTap">保存到相册</view>
+                  <view class="export-save-btn secondary" bindtap="onExportSaveToWorksTap">保存到我的作品</view>
+                </view>
+              </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+  </view>
+</view>
+
+<view
+  class="tool-dock {{leftDockCollapsed ? 'collapsed' : ''}}"
+  style="left: {{leftDockLeft}}px; top: {{headerHeight + 14}}px; bottom: {{safeInsetBottom + 14 + (leftDockCollapsed ? 0 : 52)}}px;"
+>
+  <view class="tool-card tool-card-a" style="width: {{leftDockCollapsed ? 'auto' : leftDockExpandedWidth + 'px'}};">
+    <view class="tool-body">
+      <view class="tool-bottom">
+        <view class="tool-brush-pill" bindtap="onBrushTap">
+          <view
+            class="tool-swatch"
+            style="background-color: {{brushCode ? brushHex : 'transparent'}}; border-color: {{brushCode ? 'rgba(0,0,0,0.10)' : 'rgba(29,29,31,0.28)'}};"
+          ></view>
+          <text class="tool-brush-code">{{brushCode ? brushCode : '未选择画笔颜色'}}</text>
+        </view>
+
+        <view class="tool-toggle-row" bindtap="onToggleContinuousMode">
+          <text class="tool-toggle-label">连续模式</text>
+          <view class="tool-switch {{continuousMode ? 'on' : ''}}">
+            <view class="tool-switch-knob"></view>
+          </view>
+        </view>
+
+        <view class="tool-symmetry-row">
+          <text class="tool-toggle-label">对称绘制</text>
+          <view class="tool-symmetry-chips">
+            <view class="tool-symmetry-chip {{symmetryMode === 'off' ? 'active' : ''}}" data-mode="off" bindtap="onSymmetryTap">关</view>
+            <view class="tool-symmetry-chip {{symmetryMode === 'h' ? 'active' : ''}}" data-mode="h" bindtap="onSymmetryTap">左右</view>
+            <view class="tool-symmetry-chip {{symmetryMode === 'v' ? 'active' : ''}}" data-mode="v" bindtap="onSymmetryTap">上下</view>
+            <view class="tool-symmetry-chip {{symmetryMode === 'hv' ? 'active' : ''}}" data-mode="hv" bindtap="onSymmetryTap">四向</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="tool-mini-row">
+        <view class="tool-mini-btn {{undoCount ? '' : 'disabled'}}" bindtap="onUndoTap">↶</view>
+        <view class="tool-mini-btn {{redoCount ? '' : 'disabled'}}" bindtap="onRedoTap">↷</view>
+        <view class="tool-mini-btn" bindtap="onOpenHistory">史</view>
+      </view>
+
+      <view class="tool-main-row">
+        <view class="tool-fab tool-fab-wide {{activeTool === 'brush' ? 'active' : ''}}" bindtap="onBrushTap">
+          <view class="tool-icon">笔</view>
+          <view class="tool-main">
+            <text class="tool-title">画笔</text>
+            <text class="tool-sub">{{activeTool === 'brush' ? '已选中' : '点选颜色'}}</text>
+          </view>
+        </view>
+        <view class="tool-fab tool-fab-wide tool-erase {{activeTool === 'erase' ? 'active' : ''}}" bindtap="onEraseTap">
+          <view class="tool-icon">擦</view>
+          <view class="tool-main">
+            <text class="tool-title">擦除</text>
+            <text class="tool-sub">{{activeTool === 'erase' ? '已选中' : '点格擦除'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="tool-batch-row">
+        <view class="tool-mini-pill tool-mini-pill-wide {{activeTool === 'select' ? 'active' : ''}}" bindtap="onSelectTap">
+          选区{{selectionCount ? (' ' + selectionCount + '格') : ''}}
+        </view>
+        <view class="tool-mini-pill tool-mini-pill-wide {{activeTool === 'picker' ? 'active' : ''}}" bindtap="onPickerTap">吸管取色</view>
+      </view>
+
+      <view wx:if="{{activeTool === 'select'}}" class="tool-batch-row">
+        <view class="tool-mini-pill tool-mini-pill-wide {{selectionCount ? '' : 'disabled'}}" bindtap="onSelectionFillTap">填充</view>
+        <view class="tool-mini-pill tool-mini-pill-wide {{selectionCount ? '' : 'disabled'}}" bindtap="onSelectionClearTap">清空</view>
+      </view>
+
+      <view wx:if="{{activeTool === 'select'}}" class="tool-batch-row">
+        <view class="tool-mini-pill tool-mini-pill-wide" bindtap="onSelectionCancelTap">取消选区</view>
+        <view class="tool-mini-pill tool-mini-pill-wide disabled">点一下按色选</view>
+      </view>
+
+      <view class="tool-batch-row">
+        <view class="tool-mini-pill tool-mini-pill-wide {{activeTool === 'replace' ? 'active' : ''}}" bindtap="onReplaceTap">批量换色</view>
+        <view class="tool-mini-pill tool-mini-pill-wide {{activeTool === 'delete' ? 'active' : ''}}" bindtap="onDeleteTap">批量删色</view>
+      </view>
+
+      <view class="tool-batch-row">
+        <view class="tool-mini-pill tool-mini-pill-wide" bindtap="onFlipHorizontal">横向镜像</view>
+        <view class="tool-mini-pill tool-mini-pill-wide" bindtap="onFlipVertical">纵向镜像</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showWorkSaveDialog}}" class="work-save-mask" catchtouchmove="onRestore">
+  <view class="work-save-panel glass-card" style="margin-left: env(safe-area-inset-left); margin-right: env(safe-area-inset-right);">
+    <view class="work-save-title">保存到我的作品</view>
+    <view class="work-save-field">
+      <view class="work-save-label">标题</view>
+      <input class="work-save-input" value="{{workSaveTitle}}" maxlength="40" bindinput="onWorkSaveTitleInput" placeholder="给你的拼豆取个名字" />
+    </view>
+    <view class="work-save-field">
+      <view class="work-save-label">描述</view>
+      <textarea class="work-save-textarea" value="{{workSaveDesc}}" maxlength="200" bindinput="onWorkSaveDescInput" placeholder="写点制作想法/用色说明" />
+    </view>
+    <view class="work-save-row">
+      <view class="work-save-left">
+        <view class="work-save-label">公开到社区</view>
+        <view class="work-save-sub">公开后会展示在灵感社区</view>
+      </view>
+      <switch checked="{{workSavePublic}}" bindchange="onWorkSavePublicChange" color="#FF6A00" />
+    </view>
+    <view class="work-save-actions">
+      <view class="work-save-btn ghost" bindtap="onWorkSaveCancelTap">取消</view>
+      <view class="work-save-btn primary {{workSaveSubmitting ? 'disabled' : ''}}" bindtap="onWorkSaveConfirmTap">
+        {{workSaveSubmitting ? '保存中…' : '确认保存'}}
+      </view>
+    </view>
+  </view>
+</view>
+
+<view
+  class="left-dock-toggle"
+  style="left: {{leftDockToggleLeft}}px; bottom: {{safeInsetBottom + 14}}px;"
+  bindtap="onToggleLeftDock"
+>
+  <text class="left-dock-toggle-text">
+    {{
+      leftDockCollapsed
+        ? (useShortLeftToggleLabel ? '展开左栏' : '展开左侧工具栏')
+        : (useShortLeftToggleLabel ? '缩放左栏' : '缩放左侧工具栏')
+    }}
+  </text>
+  <text class="left-dock-toggle-icon">{{leftDockCollapsed ? '›' : '‹'}}</text>
+</view>
+
+<view wx:if="{{showHelpDialog}}" class="help-mask" bindtap="onCloseHelp">
+  <view class="help-panel glass-card" catchtap="true" style="margin-left: env(safe-area-inset-left); margin-right: env(safe-area-inset-right);">
+    <view class="help-title-row">
+      <view class="help-title">功能提示</view>
+      <view class="help-close" bindtap="onCloseHelp">关闭</view>
+    </view>
+    <scroll-view scroll-y="true" class="help-scroll" show-scrollbar="{{false}}">
+      <view class="help-section">
+        <view class="help-section-title">手势操作</view>
+        <view class="help-item">双指缩放：放大/缩小拼豆板</view>
+        <view class="help-item">单指拖动：移动视角</view>
+        <view class="help-item">缩放条：拖动左侧滑块快速调整倍率</view>
+        <view class="help-item">长按拖动：开启“连续模式”后，画笔/擦除可连续操作</view>
+      </view>
+
+      <view class="help-section">
+        <view class="help-section-title">左侧工具栏（绘制）</view>
+        <view class="help-item">展开/缩放：左下角按钮可展开或缩放左侧工具栏</view>
+        <view class="help-item">画笔：先选颜色，再点格涂色</view>
+        <view class="help-item">擦除：点格擦除；开启连续模式可长按拖动连续擦</view>
+        <view class="help-item">↶ / ↷：撤销 / 重做（灰色表示不可用）</view>
+        <view class="help-item">批量换色：先点要替换的颜色 → 再选目标颜色</view>
+        <view class="help-item">批量删色：点一个色块，删除相同颜色</view>
+        <view class="help-item">横向镜像 / 纵向镜像：翻转画面</view>
+        <view class="help-item">连续模式：开启后长按拖动可连续涂抹/擦除</view>
+      </view>
+
+      <view class="help-section">
+        <view class="help-section-title">颜色选择（画笔）</view>
+        <view class="help-item">点“未选择画笔颜色”或再次点“画笔”，打开颜色选择器</view>
+        <view class="help-item">可搜索：色号（如 A1）或十六进制（如 #FAF5CD）</view>
+        <view class="help-item">可切换系列：按系列筛选颜色</view>
+        <view class="help-item">点击某个色块：设置为当前画笔颜色</view>
+      </view>
+
+      <view class="help-section">
+        <view class="help-section-title">右侧工具栏（信息与导出）</view>
+        <view class="help-item">展开/缩放：右下角按钮可展开或缩放右侧工具栏</view>
+        <view class="help-item">品牌选择：切换色号体系，并查看颜色统计</view>
+        <view class="help-item">按数量/按色号：切换统计排序方式</view>
+        <view class="help-item">设置：网格线 / 标尺 / 色号显示</view>
+        <view class="help-item">保存图纸：导出到相册，或保存到“我的作品”</view>
+        <view class="help-item">规格尺寸：可在导出图片底部追加格数/厘米信息</view>
+        <view class="help-item">单颗直径：选择“格数 + 厘米”时可填写，默认 5mm</view>
+      </view>
+
+      <view class="help-section">
+        <view class="help-section-title">常用技巧</view>
+        <view class="help-item">倍率很高时建议先关闭“色号显示”，画面更清爽</view>
+        <view class="help-item">批量换色适合统一替换背景色/主色调</view>
+        <view class="help-item">保存到“我的作品”需要填写标题与描述，可选择是否公开到社区</view>
+      </view>
+
+      <view class="bottom-pad"></view>
+    </scroll-view>
+  </view>
+</view>
+
+<view wx:if="{{showHistoryDialog}}" class="history-mask" bindtap="onCloseHistory" catchtouchmove="onRestore">
+  <view class="history-panel glass-card" catchtap="true" style="margin-left: env(safe-area-inset-left); margin-right: env(safe-area-inset-right);">
+    <view class="history-title-row">
+      <view class="history-title">撤销历史</view>
+      <view class="history-close" bindtap="onCloseHistory">关闭</view>
+    </view>
+    <view class="history-actions">
+      <view class="history-action {{redoCount ? '' : 'disabled'}}" bindtap="onHistoryRedoAllTap">恢复到最新</view>
+    </view>
+    <scroll-view scroll-y="true" class="history-scroll" show-scrollbar="{{false}}">
+      <view wx:if="{{!historyUndoList.length}}" class="history-empty">暂无历史</view>
+      <view
+        wx:for="{{historyUndoList}}"
+        wx:key="key"
+        class="history-item"
+        data-target="{{item.targetUndoLen}}"
+        bindtap="onHistoryUndoToTap"
+      >
+        <text class="history-item-title">{{item.title}}</text>
+        <text class="history-item-meta">{{item.count}}格</text>
+      </view>
+      <view class="bottom-pad"></view>
+    </scroll-view>
+  </view>
+</view>
+
+<view wx:if="{{showBrushPicker}}" class="brush-mask" bindtap="onCloseBrushPicker">
+  <view
+    class="brush-pop glass-card"
+    catchtap="true"
+    style="left: {{safeInsetLeft + 14}}px; bottom: {{safeInsetBottom + 14 + 64}}px; max-width: calc(100vw - {{safeInsetLeft + safeInsetRight + 28}}px);"
+  >
+    <view class="brush-pop-header">
+      <view class="brush-pop-title-row">
+        <view class="brush-pop-title">选择颜色</view>
+        <view class="brush-pop-close" bindtap="onCloseBrushPicker">关闭</view>
+      </view>
+
+      <view class="brush-search">
+        <input
+          class="brush-search-input"
+          value="{{brushQuery}}"
+          placeholder="搜索色号 (如 A1, E2, #FAF5CD)"
+          confirm-type="search"
+          bindinput="onBrushQueryInput"
+          bindconfirm="onBrushSearch"
+        />
+        <view class="brush-search-btn" bindtap="onBrushSearch">搜索</view>
+      </view>
+
+      <scroll-view scroll-x class="brush-series-tabs" show-scrollbar="{{false}}">
+        <view class="series-row">
+          <view
+            class="series-chip {{brushSeriesKey === item.key ? 'active' : ''}}"
+            wx:for="{{brushSeriesOptions}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="onBrushSeriesTap"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+    <scroll-view scroll-y class="brush-pop-scroll" show-scrollbar="{{false}}">
+      <view wx:if="{{quickFavoriteList.length}}" class="brush-quick-card">
+        <view class="brush-quick-top">
+          <text class="brush-quick-title">收藏</text>
+          <text class="brush-quick-sub">长按色块可收藏/取消</text>
+        </view>
+        <view class="brush-quick-row">
+          <view
+            class="brush-quick-item"
+            wx:for="{{quickFavoriteList}}"
+            wx:key="key"
+            data-hex="{{item.hex}}"
+            bindtap="onPickQuickColor"
+          >
+            <view class="brush-quick-swatch" style="background-color: {{item.hex}};"></view>
+            <text class="brush-quick-code">{{item.code}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{quickRecentList.length}}" class="brush-quick-card">
+        <view class="brush-quick-top">
+          <text class="brush-quick-title">最近使用</text>
+          <view class="brush-quick-action" bindtap="onClearRecentColors">清空</view>
+        </view>
+        <view class="brush-quick-row">
+          <view
+            class="brush-quick-item"
+            wx:for="{{quickRecentList}}"
+            wx:key="key"
+            data-hex="{{item.hex}}"
+            bindtap="onPickQuickColor"
+          >
+            <view class="brush-quick-swatch" style="background-color: {{item.hex}};"></view>
+            <text class="brush-quick-code">{{item.code}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="brush-pop-grid">
+        <view
+          class="brush-pop-item {{brushHex === item.hex ? 'active' : ''}}"
+          wx:for="{{brushPaletteList}}"
+          wx:key="key"
+          data-hex="{{item.hex}}"
+          data-code="{{item.code}}"
+          bindtap="onPickColor"
+          bindlongpress="onToggleFavoriteColor"
+        >
+          <view wx:if="{{favoriteMap[item.hex]}}" class="brush-pop-fav">★</view>
+          <view class="brush-pop-swatch" style="background-color: {{item.hex}};"></view>
+          <text class="brush-pop-code">{{item.code}}</text>
+        </view>
+      </view>
+      <view class="bottom-pad"></view>
+    </scroll-view>
+  </view>
+</view>
+
+<canvas type="2d" id="exportCanvas" class="export-canvas"></canvas>

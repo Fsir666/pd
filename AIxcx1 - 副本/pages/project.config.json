@@ -1,0 +1,48 @@
+{
+  "setting": {
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "uglifyFileName": false,
+    "enhance": true,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "useCompilerPlugins": false,
+    "minifyWXML": true
+  },
+  "compileType": "miniprogram",
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "glob",
+        "value": "../cloudfunctions/**"
+      },
+      {
+        "type": "glob",
+        "value": "../cloudrun/**"
+      },
+      {
+        "type": "glob",
+        "value": "**/node_modules/**"
+      },
+      {
+        "type": "file",
+        "value": "../拼豆色卡测295色品牌对照表.xlsx"
+      },
+      {
+        "type": "file",
+        "value": "../beads.hex.txt"
+      }
+    ],
+    "include": []
+  },
+  "appid": "wx9db1df964c432583",
+  "cloudfunctionRoot": "../cloudfunctions/",
+  "cloudfunctionTemplateRoot": "../cloudfunctionTemplate/",
+  "editorSetting": {}
+}

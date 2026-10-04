@@ -1,0 +1,100 @@
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.half {
+  width: 48%;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.input {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  font-size: 28rpx;
+  background: #f9f9f9;
+}
+
+.textarea {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  font-size: 28rpx;
+  background: #f9f9f9;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100rpx;
+}
+
+.image-uploader {
+  width: 100%;
+  height: 300rpx;
+  border: 2rpx dashed #ddd;
+  border-radius: 12rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plus {
+  font-size: 60rpx;
+  color: #ccc;
+  line-height: 1;
+}
+
+.tip {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.submit-btn {
+  margin-top: 40rpx;
+  background-color: #07c160;
+  font-weight: bold;
+}

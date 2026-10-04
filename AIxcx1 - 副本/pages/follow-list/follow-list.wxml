@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{type === 'following' ? 'active' : ''}}" bindtap="onSwitchType" data-type="following">关注</view>
+    <view class="tab {{type === 'followers' ? 'active' : ''}}" bindtap="onSwitchType" data-type="followers">粉丝</view>
+  </view>
+
+  <view class="list">
+    <view wx:if="{{!loading && list.length === 0}}" class="empty">
+      暂无{{type === 'following' ? '关注' : '粉丝'}}
+    </view>
+
+    <view
+      wx:for="{{list}}"
+      wx:key="_openid"
+      class="row"
+      bindtap="goToUserProfile"
+      data-openid="{{item._openid}}"
+    >
+      <image class="avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="main">
+        <view class="name">{{item.nickName}}</view>
+        <view class="sub" wx:if="{{item.userId}}">ID: {{item.userId}}</view>
+        <view class="bio">{{item.bio || '暂无简介'}}</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+    <view wx:if="{{!loading && hasMore}}" class="more">上滑加载更多</view>
+  </view>
+</view>

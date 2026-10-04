@@ -1,0 +1,42 @@
+<view class="page-root">
+  <!-- 氛围背景 -->
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+    <view class="orb orb-3"></view>
+  </view>
+
+  <view class="container">
+    <block wx:if="{{loading}}">
+      <view class="loading">加载中...</view>
+    </block>
+
+    <block wx:elif="{{collections.length > 0}}">
+      <view class="collection-list">
+        <view class="card" wx:for="{{collections}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" data-title="{{item.title}}" data-img="{{item.imageUrl}}">
+          <image class="card-img" src="{{item.imageUrl}}" mode="aspectFill"></image>
+          <view class="card-info">
+            <view class="card-title">{{item.title}}</view>
+            <view class="card-author">
+               <view class="author-avatar"></view>
+               <text>{{item.author}}</text>
+            </view>
+            <view class="card-heat">
+              <text class="heat-icon">🔥</text>
+              <text>{{item.heat || 0}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="empty-state">
+        <image class="empty-img" src="/images/empty-box.png" mode="aspectFit"></image>
+        <text class="empty-text">还没收藏</text>
+        <view class="empty-tips">去首页转转吧</view>
+        <button class="go-home-btn" bindtap="goToHome">去首页</button>
+      </view>
+    </block>
+  </view>
+</view>

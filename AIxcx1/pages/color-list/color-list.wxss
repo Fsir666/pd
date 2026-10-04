@@ -1,0 +1,133 @@
+page {
+  background-color: #F8F9FB;
+  padding: 30rpx;
+  box-sizing: border-box;
+  /* 确保页面高度足够滚动 */
+  min-height: 100vh;
+}
+
+.container {
+  display: block;
+  width: 100%;
+  padding-bottom: 40rpx;
+}
+
+/* 头部区域 */
+.header-section {
+  margin-bottom: 40rpx;
+  padding-left: 10rpx;
+}
+
+.page-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #1A1A1A;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 网格布局 */
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  width: 100%;
+}
+
+/* 卡片样式 */
+.brand-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  height: 240rpx; /* 固定高度确保整齐 */
+}
+
+.brand-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.02);
+}
+
+/* 卡片顶部 */
+.card-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.brand-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 20rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.brand-info {
+  width: 100%;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6rpx;
+  flex-wrap: wrap;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 12rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+  font-weight: 500;
+}
+
+.desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 卡片底部 */
+.card-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10rpx;
+  border-top: 2rpx solid #F5F5F5;
+  padding-top: 16rpx;
+}
+
+.action-text {
+  font-size: 22rpx;
+  color: #999;
+  font-weight: 500;
+}
+
+.action-btn {
+  background: #F0F2F5;
+  padding: 8rpx 16rpx;
+  border-radius: 30rpx;
+  font-size: 20rpx;
+  color: #666;
+  font-weight: 600;
+}

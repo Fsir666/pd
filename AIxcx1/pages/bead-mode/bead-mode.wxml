@@ -1,0 +1,1012 @@
+<view class="container">
+  <view class="header-bar" style="padding-top: {{safeAreaTop}}px; height: {{headerBarHeight}}px;">
+    <view class="header-left">
+      <view class="back-button" bindtap="onBack">
+        <text class="back-icon">←</text>
+      </view>
+    </view>
+    <view class="header-center">
+      <text class="header-title">拼豆模式</text>
+      <view class="coord-display" wx:if="{{isDrawMode}}">
+        <text class="coord-label">坐标:</text>
+        <text class="coord-value">X: {{currentCoordX}}, Y: {{currentCoordY}}</text>
+      </view>
+    </view>
+    <view class="header-right">
+      <view class="header-placeholder"></view>
+    </view>
+  </view>
+  
+  <view class="x-axis" style="top: {{headerHeight}}px; left: {{yAxisWidth}}px;">
+    <view class="x-axis-label" wx:for="{{xAxisLabels}}" wx:key="index" style="left: {{item.screenX - yAxisWidth}}px;" bindtap="onXAxisTap" data-value="{{item.value}}">
+      <view class="x-axis-tick {{item.tickType}}"></view>
+      <text class="axis-text {{item.tickType}} {{item.isHighlighted ? 'highlighted' : ''}}">{{item.value}}</text>
+    </view>
+  </view>
+  
+  <view class="y-axis" style="top: {{headerHeight + xAxisHeight}}px; width: {{yAxisWidth}}px; height: calc(100vh - {{headerHeight + xAxisHeight}}px);">
+    <view class="y-axis-label" wx:for="{{yAxisLabels}}" wx:key="index" style="top: {{item.relativeY}}px;" bindtap="onYAxisTap" data-value="{{item.value}}">
+      <view class="y-axis-tick {{item.tickType}}"></view>
+      <text class="axis-text {{item.tickType}} {{item.isHighlighted ? 'highlighted' : ''}}">{{item.value}}</text>
+    </view>
+  </view>
+  
+  <view class="canvas-container" style="left: {{yAxisWidth}}px; top: {{headerHeight + xAxisHeight}}px; width: {{canvasWidth}}px; height: {{canvasHeight}}px;" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd">
+    <canvas type="2d" id="beadBoard" style="width: 100%; height: 100%;" />
+  </view>
+  
+  <view class="mini-map-container" wx:if="{{showMiniMap && miniMapBeadCount > 0 && !showColorPalette && !showSettings}}" bindtap="onMiniMapTap">
+    <canvas type="2d" id="miniMapCanvas" style="width: {{miniMapSize}}px; height: {{miniMapSize}}px;" />
+  </view>
+  
+  <!-- 画笔设置面板遮罩 - 放在ui-overlay外面确保点击生效 -->
+  <view class="brush-settings-mask" wx:if="{{showBrushSettings}}" bindtap="closeBrushSettings" catchtouchmove="preventTouchMove"></view>
+
+  <!-- 画笔设置面板 - 放在ui-overlay外面 -->
+  <view class="brush-settings-popup {{showBrushSettings ? 'show' : ''}}" wx:if="{{showBrushSettings}}" style="left: {{brushSettingsX}}px; bottom: calc(100vh - {{brushSettingsY}}px + 50px);">
+    <view class="brush-settings-arrow" style="left: 50%; transform: translateX(-50%);"></view>
+    <view class="brush-settings-content" catchtap="preventClose">
+      <view class="brush-settings-header">
+        <text class="brush-settings-title">{{brushSettingsTarget === 'brush' ? '✏️ 画笔设置' : '🧹 橡皮设置'}}</text>
+      </view>
+
+      <!-- 画笔大小 - 滑动条 -->
+      <view class="brush-settings-section">
+        <view class="brush-size-header">
+          <text class="brush-settings-label">画笔大小</text>
+          <text class="brush-size-value">{{brushSize}}</text>
+        </view>
+        <view class="brush-size-slider-container">
+          <text class="brush-size-min">1</text>
+          <slider class="brush-size-slider" min="1" max="10" value="{{brushSize}}" show-value="{{false}}" block-size="20" activeColor="#007aff" backgroundColor="#e5e5ea" bindchange="onBrushSizeChange" bindchanging="onBrushSizeChanging"/>
+          <text class="brush-size-max">10</text>
+        </view>
+      </view>
+
+      <!-- 画笔形状 -->
+      <view class="brush-settings-section" wx:if="{{brushSettingsTarget === 'brush'}}">
+        <text class="brush-settings-label">画笔形状</text>
+        <view class="brush-shape-options">
+          <view class="brush-shape-option {{brushShape === 'square' ? 'active' : ''}}" data-shape="square" bindtap="setBrushShape">
+            <view class="brush-shape-preview shape-square"></view>
+            <text class="brush-shape-label">方形</text>
+          </view>
+          <view class="brush-shape-option {{brushShape === 'cross' ? 'active' : ''}}" data-shape="cross" bindtap="setBrushShape">
+            <view class="brush-shape-preview shape-cross"></view>
+            <text class="brush-shape-label">十字</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 对称绘制 -->
+      <view class="brush-settings-section" wx:if="{{brushSettingsTarget === 'brush'}}">
+        <text class="brush-settings-label">对称绘制</text>
+        <view class="symmetry-options">
+          <view class="symmetry-option {{symmetryMode === 'none' ? 'active' : ''}}" data-mode="none" bindtap="setSymmetryMode">
+            <text class="symmetry-icon">✕</text>
+          </view>
+          <view class="symmetry-option {{symmetryMode === 'horizontal' ? 'active' : ''}}" data-mode="horizontal" bindtap="setSymmetryMode">
+            <text class="symmetry-icon">↔</text>
+          </view>
+          <view class="symmetry-option {{symmetryMode === 'vertical' ? 'active' : ''}}" data-mode="vertical" bindtap="setSymmetryMode">
+            <text class="symmetry-icon">↕</text>
+          </view>
+          <view class="symmetry-option {{symmetryMode === 'quad' ? 'active' : ''}}" data-mode="quad" bindtap="setSymmetryMode">
+            <text class="symmetry-icon">✚</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="ui-overlay">
+    <view class="toolbar-container" wx:if="{{!showColorPalette && !showSettings}}">
+      <view class="water-drop-wrapper">
+        <view class="toggle-btn-top" bindtap="toggleToolbar">
+          <text class="toggle-arrow {{toolbarExpanded ? 'expanded' : ''}}">∧</text>
+        </view>
+        
+        <view class="toolbar-capsule">
+          <view class="tooltip-wrapper {{tooltipSide === 'left' ? 'tooltip-left' : ''}} {{tooltipSide === 'center' ? 'tooltip-center' : ''}} {{tooltipSide === 'right' ? 'tooltip-right' : ''}}">
+            <view class="tooltip {{showTooltip ? 'show' : ''}}">{{tooltipText}}</view>
+          </view>
+          
+          <view
+            class="quick-btn quick-btn-left {{dragTarget === 'left' ? 'drop-target' : ''}} {{draggingTool && quickButtons.left.id === draggingTool.id ? 'dragging' : ''}} {{isDrawMode && !eraserMode && quickButtons.left.id === 'brush' ? 'active' : ''}} {{eraserMode && quickButtons.left.id === 'eraser' ? 'active' : ''}}"
+            data-side="left"
+            bindtap="onQuickButtonTap"
+            bindlongpress="onQuickButtonLongPress"
+            bindtouchmove="onQuickButtonTouchMove"
+            bindtouchend="onQuickButtonTouchEnd">
+            <view wx:if="{{quickButtons.left.id === 'palette' && selectedColor}}" class="quick-btn-color" style="background-color: {{selectedColor.hex}};"></view>
+            <view wx:else class="quick-btn-icon {{quickButtons.left.iconClass}}"></view>
+            <view wx:if="{{isDrawMode && !eraserMode && selectedColor && quickButtons.left.id === 'brush'}}" class="quick-btn-color-indicator" style="background-color: {{selectedColor.hex}};"></view>
+          </view>
+
+          <view
+            class="quick-btn quick-btn-center {{dragTarget === 'center' ? 'drop-target' : ''}} {{draggingTool && quickButtons.center.id === draggingTool.id ? 'dragging' : ''}} {{isDrawMode && !eraserMode && quickButtons.center.id === 'brush' ? 'active' : ''}} {{eraserMode && quickButtons.center.id === 'eraser' ? 'active' : ''}}"
+            data-side="center"
+            bindtap="onQuickButtonTap"
+            bindlongpress="onQuickButtonLongPress"
+            bindtouchmove="onQuickButtonTouchMove"
+            bindtouchend="onQuickButtonTouchEnd">
+            <view wx:if="{{quickButtons.center.id === 'palette' && selectedColor}}" class="quick-btn-color" style="background-color: {{selectedColor.hex}};"></view>
+            <view wx:else class="quick-btn-icon {{quickButtons.center.iconClass}}"></view>
+            <view wx:if="{{isDrawMode && !eraserMode && selectedColor && quickButtons.center.id === 'brush'}}" class="quick-btn-color-indicator" style="background-color: {{selectedColor.hex}};"></view>
+          </view>
+
+          <view
+            class="quick-btn quick-btn-right {{dragTarget === 'right' ? 'drop-target' : ''}} {{draggingTool && quickButtons.right.id === draggingTool.id ? 'dragging' : ''}} {{isDrawMode && !eraserMode && quickButtons.right.id === 'brush' ? 'active' : ''}} {{eraserMode && quickButtons.right.id === 'eraser' ? 'active' : ''}}"
+            data-side="right"
+            bindtap="onQuickButtonTap"
+            bindlongpress="onQuickButtonLongPress"
+            bindtouchmove="onQuickButtonTouchMove"
+            bindtouchend="onQuickButtonTouchEnd">
+            <view wx:if="{{quickButtons.right.id === 'palette' && selectedColor}}" class="quick-btn-color" style="background-color: {{selectedColor.hex}};"></view>
+            <view wx:else class="quick-btn-icon {{quickButtons.right.iconClass}}"></view>
+            <view wx:if="{{isDrawMode && !eraserMode && selectedColor && quickButtons.right.id === 'brush'}}" class="quick-btn-color-indicator" style="background-color: {{selectedColor.hex}};"></view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="toolbar-panel {{toolbarExpanded ? 'expanded' : ''}}">
+        <view class="toolbar-scroll">
+          <view class="toolbar-tools">
+            <view
+              class="toolbar-tool {{dragTarget === 'tool_' + item.id ? 'drop-target' : ''}} {{draggingTool && draggingTool.id === item.id ? 'dragging' : ''}} {{isDrawMode && !eraserMode && item.id === 'brush' ? 'active' : ''}} {{eraserMode && item.id === 'eraser' ? 'active' : ''}}"
+              wx:for="{{toolbarTools}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              bindtap="onToolbarToolTap"
+              bindlongpress="onToolLongPress"
+              bindtouchmove="onToolTouchMove"
+              bindtouchend="onToolTouchEnd">
+              <view class="tool-content">
+                <view class="tool-icon {{item.iconClass}}"></view>
+                <text class="tool-label">{{item.name}}</text>
+              </view>
+              <view wx:if="{{isDrawMode && !eraserMode && selectedColor && item.id === 'brush'}}" class="toolbar-tool-color" style="background-color: {{selectedColor.hex}};"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="dragging-indicator" wx:if="{{draggingTool}}">
+        <view class="dragging-tool" style="left: {{dragCurrentX - 40}}px; top: {{dragCurrentY - 40}}px;">
+          <view class="dragging-icon {{draggingTool.iconClass}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="color-palette-mask" wx:if="{{showColorPalette}}" bindtap="closeColorPalette" catchtouchmove="preventTouchMove">
+    <view class="color-palette" catchtap="preventClose" catchtouchmove="preventTouchMove">
+      <view class="palette-header">
+        <view class="palette-search-mini" wx:if="{{!isSearching}}" bindtap="startSearch">
+          <text class="search-icon-mini">🔍</text>
+          <text class="search-placeholder-mini">搜索色号...</text>
+        </view>
+        <view class="palette-search-active" wx:if="{{isSearching}}">
+          <text class="search-icon-mini">🔍</text>
+          <input class="search-input-mini" placeholder="搜索色号..." value="{{searchKeyword}}" bindinput="onSearchInput" focus="{{isSearching}}" />
+          <view class="search-clear-mini" bindtap="clearSearch" wx:if="{{searchKeyword}}">✕</view>
+        </view>
+        <view class="palette-toggle-btn" bindtap="toggleBrandColumn">
+          <text class="toggle-icon">{{brandColumnExpanded ? '◀' : '▶'}}</text>
+          <text class="toggle-text">{{brandColumnExpanded ? '收起' : '品牌'}}</text>
+        </view>
+        <view class="palette-close" bindtap="closeColorPalette">✕</view>
+      </view>
+      
+      <view class="palette-body" wx:if="{{!isSearching}}">
+        <view class="palette-column brand-series-column {{brandColumnExpanded ? 'expanded' : 'collapsed'}}">
+          <view class="column-header">品牌 & 色卡</view>
+          <scroll-view scroll-y class="column-scroll">
+            <view class="brand-group {{expandedBrands[item.id] ? 'expanded' : ''}}" wx:for="{{brands}}" wx:key="id">
+              <view class="brand-header" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="toggleBrandExpand">
+                <view class="brand-info">
+                  <view class="brand-name">{{item.name}}</view>
+                  <view class="brand-count">{{item.seriesCount}} 个色卡</view>
+                </view>
+                <view class="brand-arrow">▶</view>
+              </view>
+              <view class="series-list" wx:if="{{expandedBrands[item.id]}}">
+                <view class="series-card {{selectedSeries && selectedSeries.id === series.id ? 'selected' : ''}}" wx:for="{{item.seriesList}}" wx:key="id" wx:for-item="series" data-id="{{series.id}}" data-name="{{series.name}}" bindtap="selectSeries">
+                  <view class="series-info">
+                    <view class="series-name">{{series.name}}</view>
+                    <view class="series-count">{{series.colors}} 色</view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+        
+        <view class="palette-column color-column {{brandColumnExpanded ? 'narrow' : 'wide'}}">
+          <view class="column-header">颜色</view>
+          <scroll-view scroll-y class="column-scroll" wx:if="{{(selectedSeries && groupedColors.length > 0) || recentColors.length > 0}}">
+            <view class="recent-section" wx:if="{{recentColors.length > 0}}">
+              <view class="section-header">
+                <text class="section-title">最近使用</text>
+                <text class="section-count">{{recentColors.length}} 色</text>
+              </view>
+              <view class="color-grid {{brandColumnExpanded ? 'grid-7' : 'grid-10'}}">
+                <view class="color-item" wx:for="{{recentColors}}" wx:key="hex" data-hex="{{item.hex}}" data-code="{{item.code}}" data-series="{{item.series}}" bindtap="selectColor">
+                  <view class="color-circle" style="background-color: {{item.hex}};"></view>
+                  <text class="color-code">{{item.code}}</text>
+                </view>
+              </view>
+              <view class="section-divider" wx:if="{{selectedSeries && groupedColors.length > 0}}"></view>
+            </view>
+            
+            <view class="color-section" wx:for="{{groupedColors}}" wx:key="name" wx:if="{{selectedSeries && groupedColors.length > 0}}">
+              <view class="section-header" data-series="{{item.name}}" bindtap="toggleSeriesExpand">
+                <text class="section-title">{{item.name}}</text>
+                <text class="section-count">{{item.colors.length}} 色</text>
+                <text class="section-toggle">{{item.expanded ? '收起' : '展开'}}</text>
+              </view>
+              <view class="color-grid {{brandColumnExpanded ? 'grid-7' : 'grid-10'}}" wx:if="{{item.expanded}}">
+                <view class="color-item" wx:for="{{item.colors}}" wx:key="code" wx:for-item="color" 
+                      data-hex="{{color.hex}}" 
+                      data-code="{{color.code}}" 
+                      data-series="{{color.series}}" 
+                      bindtap="selectColor">
+                  <view class="color-circle" style="background-color: {{color.hex}};"></view>
+                  <text class="color-code">{{color.code}}</text>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+          <view class="column-empty" wx:if="{{!selectedSeries && groupedColors.length === 0 && recentColors.length === 0}}">
+            <text class="empty-text">请选择品牌和色卡</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="palette-body search-body" wx:if="{{isSearching}}">
+        <view class="search-results" wx:if="{{searchResults.length > 0}}">
+          <view class="search-result-count">找到 {{searchResults.length}} 个结果</view>
+          <view class="search-result-card" wx:for="{{searchResults}}" wx:key="code" data-hex="{{item.hex}}" data-code="{{item.code}}" data-series="{{item.series}}" bindtap="selectColor">
+            <view class="result-color" style="background-color: {{item.hex}};"></view>
+            <view class="result-info">
+              <view class="result-code">{{item.code}}</view>
+              <view class="result-detail">{{item.brand}} · {{item.seriesId}} · {{item.series}} · {{item.hex}}</view>
+            </view>
+            <view class="result-action">点击选择</view>
+          </view>
+        </view>
+        <view class="search-empty" wx:elif="{{searchKeyword}}">
+          <text class="search-empty-icon">🔍</text>
+          <text class="search-empty-text">未找到相关颜色</text>
+          <text class="search-empty-tip">请尝试其他关键词</text>
+        </view>
+        <view class="search-empty" wx:else>
+          <text class="search-empty-icon">🔍</text>
+          <text class="search-empty-text">输入色号开始搜索</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="settings-mask" wx:if="{{showSettings}}" bindtap="closeSettings" catchtouchmove="preventTouchMove">
+    <view class="settings-panel" catchtap="preventClose">
+      <view class="settings-header">
+        <text class="settings-title">设置</text>
+        <view class="settings-close" bindtap="closeSettings">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+      
+      <scroll-view class="settings-body" scroll-y style="height: 600rpx;">
+        <!-- 显示设置 - iOS 风格分组 -->
+        <view class="ios-section">
+          <view class="ios-section-header">显示</view>
+          <view class="ios-group">
+            <view class="ios-cell {{showGridLines ? 'active' : ''}}" bindtap="toggleGridLines">
+              <view class="ios-cell-icon" style="background: #007aff;">
+                <text class="ios-icon-text">▦</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">网格线</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showGridLines ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+            <view class="ios-cell {{showCenterCross ? 'active' : ''}}" bindtap="toggleCenterCross">
+              <view class="ios-cell-icon" style="background: #ff9500;">
+                <text class="ios-icon-text">✚</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">十字线</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showCenterCross ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+            <view class="ios-cell {{showMiniMap ? 'active' : ''}}" bindtap="toggleMiniMapSwitch">
+              <view class="ios-cell-icon" style="background: #af52de;">
+                <text class="ios-icon-text">🗺</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">小地图</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showMiniMap ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+            <view class="ios-cell {{showAreaBorder ? 'active' : ''}}" bindtap="toggleAreaBorder">
+              <view class="ios-cell-icon" style="background: #007aff;">
+                <text class="ios-icon-text">▢</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">区域边框</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showAreaBorder ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+            <view class="ios-cell {{showColorCodes ? 'active' : ''}}" bindtap="toggleColorCodes">
+              <view class="ios-cell-icon" style="background: #34c759;">
+                <text class="ios-icon-text">🏷</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">色号显示</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showColorCodes ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 拼豆区域边框颜色 -->
+        <view class="ios-section" wx:if="{{showAreaBorder}}">
+          <view class="ios-section-header">区域边框颜色</view>
+          <view class="ios-group">
+            <view class="ios-cell" bindtap="openBorderColorPicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">颜色</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-color-dot" style="background-color: {{areaBorderColors[areaBorderColor]}};"></view>
+                <text class="ios-cell-value">{{areaBorderColorNames[areaBorderColor]}}</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 网格线颜色 -->
+        <view class="ios-section">
+          <view class="ios-section-header">网格线颜色</view>
+          <view class="ios-group">
+            <view class="ios-cell" bindtap="openColorPicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">颜色</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-color-dot" style="background-color: {{gridColors[gridLineColor]}};"></view>
+                <text class="ios-cell-value">{{gridLineColorName}}</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 拼豆形状 -->
+        <view class="ios-section">
+          <view class="ios-section-header">拼豆形状</view>
+          <view class="ios-group">
+            <view class="ios-cell" bindtap="openShapePicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">形状</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <text class="ios-cell-value">{{beadShapeName}}</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 拼豆区域尺寸 -->
+        <view class="ios-section">
+          <view class="ios-section-header">拼豆区域</view>
+          <view class="ios-group">
+            <view class="ios-cell" bindtap="openSizePicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">尺寸</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <text class="ios-cell-value">{{gridWidth}} × {{gridHeight}}</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 辅助线 -->
+        <view class="ios-section">
+          <view class="ios-section-header">辅助线</view>
+          <view class="ios-group">
+            <view class="ios-cell {{showAuxiliaryLines ? 'active' : ''}}" bindtap="toggleAuxiliaryLines">
+              <view class="ios-cell-icon" style="background: #ff9500;">
+                <text class="ios-icon-text">┅</text>
+              </view>
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">显示辅助线</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-toggle {{showAuxiliaryLines ? 'on' : ''}}">
+                  <view class="ios-toggle-knob"></view>
+                </view>
+              </view>
+            </view>
+            <view class="ios-cell" bindtap="openIntervalPicker" wx:if="{{showAuxiliaryLines}}">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">间隔</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <text class="ios-cell-value">{{gridCycleInterval}} 格</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 高亮样式设置 -->
+        <view class="ios-section">
+          <view class="ios-section-header">高亮样式</view>
+          <view class="ios-group">
+            <view class="ios-cell" bindtap="openHighlightStylePicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">高亮类型</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <text class="ios-cell-value">{{highlightStyle.type === 'fill' ? '填充' : highlightStyle.type === 'border' ? '边框' : '填充+边框'}}</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+            <view class="ios-cell" bindtap="openHighlightColorPicker">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">高亮颜色</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <view class="ios-color-dot" style="background-color: {{highlightStyle.fillColor}};"></view>
+                <text class="ios-cell-value">选择颜色</text>
+                <text class="ios-chevron">›</text>
+              </view>
+            </view>
+            <view class="ios-cell" wx:if="{{highlightStyle.type === 'fill' || highlightStyle.type === 'both'}}">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">填充透明度</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <slider class="ios-slider" min="0.05" max="0.3" step="0.05" value="{{highlightStyle.fillOpacity}}" bindchange="onHighlightOpacityChange" show-value />
+              </view>
+            </view>
+            <view class="ios-cell" wx:if="{{highlightStyle.type === 'border' || highlightStyle.type === 'both'}}">
+              <view class="ios-cell-content">
+                <text class="ios-cell-title">边框粗细</text>
+              </view>
+              <view class="ios-cell-accessory">
+                <slider class="ios-slider" min="1" max="5" step="1" value="{{highlightStyle.borderWidth}}" bindchange="onHighlightBorderWidthChange" show-value />
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="ios-footer">
+          <text class="ios-footer-text">拼豆模式设置</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+  
+  <!-- 颜色选择器 -->
+  <view class="picker-mask" wx:if="{{showColorPicker}}" bindtap="closeColorPicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">选择颜色</text>
+        <view class="picker-close" bindtap="closeColorPicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="color-grid">
+          <view class="color-item {{gridLineColor === 'light' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="light">
+            <view class="color-circle" style="background-color: #e5e5ea; border: 1rpx solid #d1d1d6;"></view>
+            <text class="color-text">浅灰</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'dark' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="dark">
+            <view class="color-circle" style="background-color: #c7c7cc;"></view>
+            <text class="color-text">深灰</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'blue' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="blue">
+            <view class="color-circle" style="background-color: #007aff;"></view>
+            <text class="color-text">蓝色</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'green' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="green">
+            <view class="color-circle" style="background-color: #34c759;"></view>
+            <text class="color-text">绿色</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'pink' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="pink">
+            <view class="color-circle" style="background-color: #ff2d55;"></view>
+            <text class="color-text">粉色</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'purple' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="purple">
+            <view class="color-circle" style="background-color: #af52de;"></view>
+            <text class="color-text">紫色</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'orange' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="orange">
+            <view class="color-circle" style="background-color: #ff9500;"></view>
+            <text class="color-text">橙色</text>
+          </view>
+          <view class="color-item {{gridLineColor === 'red' ? 'selected' : ''}}" bindtap="selectGridLineColor" data-color="red">
+            <view class="color-circle" style="background-color: #ff3b30;"></view>
+            <text class="color-text">红色</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 边框颜色选择器 -->
+  <view class="picker-mask" wx:if="{{showBorderColorPicker}}" bindtap="closeBorderColorPicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">选择边框颜色</text>
+        <view class="picker-close" bindtap="closeBorderColorPicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="color-grid">
+          <view class="color-item {{areaBorderColor === 'blue' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="blue">
+            <view class="color-circle" style="background-color: #007aff;"></view>
+            <text class="color-text">蓝色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'green' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="green">
+            <view class="color-circle" style="background-color: #34c759;"></view>
+            <text class="color-text">绿色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'pink' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="pink">
+            <view class="color-circle" style="background-color: #ff2d55;"></view>
+            <text class="color-text">粉色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'purple' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="purple">
+            <view class="color-circle" style="background-color: #af52de;"></view>
+            <text class="color-text">紫色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'orange' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="orange">
+            <view class="color-circle" style="background-color: #ff9500;"></view>
+            <text class="color-text">橙色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'red' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="red">
+            <view class="color-circle" style="background-color: #ff3b30;"></view>
+            <text class="color-text">红色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'gray' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="gray">
+            <view class="color-circle" style="background-color: #8e8e93;"></view>
+            <text class="color-text">灰色</text>
+          </view>
+          <view class="color-item {{areaBorderColor === 'black' ? 'selected' : ''}}" bindtap="selectBorderColor" data-color="black">
+            <view class="color-circle" style="background-color: #1c1c1e;"></view>
+            <text class="color-text">黑色</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 高亮颜色选择器 -->
+  <view class="picker-mask" wx:if="{{showHighlightColorPicker}}" bindtap="closeHighlightColorPicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">选择高亮颜色</text>
+        <view class="picker-close" bindtap="closeHighlightColorPicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="color-grid">
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#007aff">
+            <view class="color-circle" style="background-color: #007aff;"></view>
+            <text class="color-text">蓝色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#34c759">
+            <view class="color-circle" style="background-color: #34c759;"></view>
+            <text class="color-text">绿色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#ff2d55">
+            <view class="color-circle" style="background-color: #ff2d55;"></view>
+            <text class="color-text">粉色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#af52de">
+            <view class="color-circle" style="background-color: #af52de;"></view>
+            <text class="color-text">紫色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#ff9500">
+            <view class="color-circle" style="background-color: #ff9500;"></view>
+            <text class="color-text">橙色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#ff3b30">
+            <view class="color-circle" style="background-color: #ff3b30;"></view>
+            <text class="color-text">红色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#8e8e93">
+            <view class="color-circle" style="background-color: #8e8e93;"></view>
+            <text class="color-text">灰色</text>
+          </view>
+          <view class="color-item" bindtap="selectHighlightColor" data-color="#1c1c1e">
+            <view class="color-circle" style="background-color: #1c1c1e;"></view>
+            <text class="color-text">黑色</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 高亮样式类型选择器 -->
+  <view class="picker-mask" wx:if="{{showHighlightStylePicker}}" bindtap="closeHighlightStylePicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">选择高亮类型</text>
+        <view class="picker-close" bindtap="closeHighlightStylePicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="style-options">
+          <view class="style-option {{highlightStyle.type === 'fill' ? 'selected' : ''}}" bindtap="selectHighlightStyle" data-type="fill">
+            <view class="style-preview style-preview-fill"></view>
+            <text class="style-label">填充</text>
+          </view>
+          <view class="style-option {{highlightStyle.type === 'border' ? 'selected' : ''}}" bindtap="selectHighlightStyle" data-type="border">
+            <view class="style-preview style-preview-border"></view>
+            <text class="style-label">边框</text>
+          </view>
+          <view class="style-option {{highlightStyle.type === 'both' ? 'selected' : ''}}" bindtap="selectHighlightStyle" data-type="both">
+            <view class="style-preview style-preview-both"></view>
+            <text class="style-label">填充 + 边框</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 形状选择器 -->
+  <view class="picker-mask" wx:if="{{showShapePicker}}" bindtap="closeShapePicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">选择形状</text>
+        <view class="picker-close" bindtap="closeShapePicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="shape-list">
+          <view class="shape-option {{beadShape === 'square' ? 'selected' : ''}}" bindtap="selectShape" data-shape="square">
+            <view class="shape-preview square"></view>
+            <text class="shape-name">方形</text>
+          </view>
+          <view class="shape-option {{beadShape === 'circle' ? 'selected' : ''}}" bindtap="selectShape" data-shape="circle">
+            <view class="shape-preview circle"></view>
+            <text class="shape-name">圆形</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 尺寸选择器 -->
+  <view class="picker-mask" wx:if="{{showSizePicker}}" bindtap="closeSizePicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">拼豆区域尺寸</text>
+        <view class="picker-close" bindtap="closeSizePicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="size-presets">
+          <view class="size-preset {{gridWidth === 16 && gridHeight === 16 ? 'selected' : ''}}" bindtap="selectSize" data-w="16" data-h="16">16 × 16</view>
+          <view class="size-preset {{gridWidth === 29 && gridHeight === 29 ? 'selected' : ''}}" bindtap="selectSize" data-w="29" data-h="29">29 × 29</view>
+          <view class="size-preset {{gridWidth === 32 && gridHeight === 32 ? 'selected' : ''}}" bindtap="selectSize" data-w="32" data-h="32">32 × 32</view>
+          <view class="size-preset {{gridWidth === 48 && gridHeight === 48 ? 'selected' : ''}}" bindtap="selectSize" data-w="48" data-h="48">48 × 48</view>
+          <view class="size-preset {{gridWidth === 64 && gridHeight === 64 ? 'selected' : ''}}" bindtap="selectSize" data-w="64" data-h="64">64 × 64</view>
+        </view>
+        <view class="size-custom">
+          <text class="custom-label">自定义</text>
+          <view class="custom-inputs">
+            <view class="input-group">
+              <text class="input-label">宽</text>
+              <input class="size-input" type="number" value="{{gridWidth}}" bindinput="onWidthInput" />
+            </view>
+            <text class="input-separator">×</text>
+            <view class="input-group">
+              <text class="input-label">高</text>
+              <input class="size-input" type="number" value="{{gridHeight}}" bindinput="onHeightInput" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 间隔选择器 -->
+  <view class="picker-mask" wx:if="{{showIntervalPicker}}" bindtap="closeIntervalPicker">
+    <view class="picker-panel" catchtap="preventClose">
+      <view class="picker-header">
+        <text class="picker-title">标记线间隔</text>
+        <view class="picker-close" bindtap="closeIntervalPicker">✕</view>
+      </view>
+      <view class="picker-body">
+        <view class="interval-options">
+          <view class="interval-option {{gridCycleInterval === 5 ? 'selected' : ''}}" bindtap="selectInterval" data-value="5">
+            <text class="interval-number">5</text>
+            <text class="interval-unit">格</text>
+          </view>
+          <view class="interval-option {{gridCycleInterval === 10 ? 'selected' : ''}}" bindtap="selectInterval" data-value="10">
+            <text class="interval-number">10</text>
+            <text class="interval-unit">格</text>
+          </view>
+          <view class="interval-option {{gridCycleInterval === 15 ? 'selected' : ''}}" bindtap="selectInterval" data-value="15">
+            <text class="interval-number">15</text>
+            <text class="interval-unit">格</text>
+          </view>
+        </view>
+        <view class="interval-slider-section">
+          <text class="slider-label">自定义</text>
+          <slider class="interval-slider" min="3" max="20" value="{{gridCycleInterval}}" show-value block-size="20" activeColor="#007aff" backgroundColor="#f2f2f7" bindchange="onIntervalChange"/>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 导入图片弹窗 -->
+  <view class="import-image-mask" wx:if="{{showImportImage}}" bindtap="closeImportImage" catchtouchmove="preventTouchMove">
+    <view class="import-image-panel" catchtap="preventClose">
+      <view class="import-header">
+        <text class="import-title">📷 导入图片生成</text>
+        <view class="import-close" bindtap="closeImportImage">✕</view>
+      </view>
+      
+      <scroll-view class="import-body" scroll-y>
+        <!-- 图片选择区域 -->
+        <view class="import-section">
+          <view class="section-title">选择图片</view>
+          <view class="image-picker" bindtap="chooseImage">
+            <image wx:if="{{importImageSrc}}" class="preview-image" src="{{importImageSrc}}" mode="aspectFit" />
+            <view wx:else class="image-placeholder">
+              <text class="placeholder-icon">🖼️</text>
+              <text class="placeholder-text">点击选择图片</text>
+            </view>
+          </view>
+          <view wx:if="{{importImageWidth > 0}}" class="image-info">
+            <text class="info-text">原图尺寸: {{importImageWidth}} × {{importImageHeight}}</text>
+          </view>
+        </view>
+
+        <!-- 品牌选择 -->
+        <view class="import-section">
+          <view class="section-title">拼豆品牌</view>
+          <picker mode="selector" range="{{brands}}" range-key="name" value="{{importBrandIndex}}" bindchange="onImportBrandChange">
+            <view class="brand-picker">
+              <text class="brand-name">{{importBrandName || 'MARD'}}</text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 基础尺寸 -->
+        <view class="import-section">
+          <view class="section-title">尺寸设置</view>
+          <view class="size-slider-container">
+            <text class="size-label">短边尺寸 (格)</text>
+            <slider class="size-slider" min="16" max="64" value="{{importBaseSize}}" show-value block-size="20" activeColor="#007aff" backgroundColor="#f2f2f7" bindchange="onImportBaseSizeChange"/>
+          </view>
+        </view>
+
+        <!-- 预览尺寸 -->
+        <view class="import-section" wx:if="{{importImageWidth > 0}}">
+          <view class="section-title">生成尺寸</view>
+          <view class="preview-size">
+            <text class="size-value">{{importPreviewWidth}} × {{importPreviewHeight}} 格</text>
+          </view>
+        </view>
+
+        <!-- 处理进度 -->
+        <view class="import-section" wx:if="{{isProcessing}}">
+          <view class="section-title">处理中...</view>
+          <progress class="process-progress" percent="{{processProgress}}" activeColor="#007aff" backgroundColor="#f2f2f7" stroke-width="8" />
+        </view>
+      </scroll-view>
+
+      <!-- 底部按钮 -->
+      <view class="import-footer">
+        <view class="import-btn cancel-btn" bindtap="closeImportImage">取消</view>
+        <view class="import-btn confirm-btn {{isProcessing ? 'disabled' : ''}}" bindtap="confirmImportImage">
+          {{isProcessing ? '处理中...' : '确认导入'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 隐藏的Canvas用于图片处理 -->
+  <canvas type="2d" id="importCanvas" style="position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px;"></canvas>
+  
+  <!-- 选区操作菜单 -->
+  <view class="selection-menu-mask" wx:if="{{selectionMenuVisible}}" bindtap="closeSelectionMenu">
+    <view class="selection-menu" catchtap="preventClose" style="left: {{selectionMenuX}}px; top: {{selectionMenuY}}px;">
+      <view class="selection-menu-item" bindtap="onSelectionCopy">
+        <text class="menu-icon">📋</text>
+        <text class="menu-text">复制</text>
+      </view>
+      <view class="selection-menu-item" bindtap="onSelectionCut">
+        <text class="menu-icon">✂️</text>
+        <text class="menu-text">剪切</text>
+      </view>
+      <view class="selection-menu-item" bindtap="onSelectionDelete">
+        <text class="menu-icon">🗑️</text>
+        <text class="menu-text">删除</text>
+      </view>
+      <view class="selection-menu-item" bindtap="onSelectionClear">
+        <text class="menu-icon">✖️</text>
+        <text class="menu-text">取消选区</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 导出弹窗 -->
+  <view class="export-modal-mask" wx:if="{{showExportModal}}" bindtap="closeExportModal">
+    <view class="export-modal" catchtap="preventClose">
+      <view class="export-header">
+        <text class="export-title">导出拼豆作品</text>
+        <view class="export-close" bindtap="closeExportModal">✕</view>
+      </view>
+      
+      <scroll-view class="export-content" scroll-y>
+        <!-- 预览区域 -->
+        <view class="export-preview-section">
+          <view class="preview-header">
+            <text class="preview-title">预览</text>
+            <view class="preview-zoom-controls">
+              <view class="zoom-btn" bindtap="onPreviewZoomOut">−</view>
+              <text class="zoom-scale">{{exportPreviewScale}}%</text>
+              <view class="zoom-btn" bindtap="onPreviewZoomIn">+</view>
+              <view class="zoom-btn reset-btn" bindtap="onPreviewZoomReset">重置</view>
+            </view>
+          </view>
+          <scroll-view class="preview-container" scroll-x scroll-y enhanced show-scrollbar="{{false}}">
+            <view class="preview-scroll-content" style="min-width: 100%; min-height: 300rpx;">
+              <image 
+                class="preview-image" 
+                src="{{exportPreviewUrl}}" 
+                mode="widthFix" 
+                style="width: {{exportPreviewScale}}%; transform: scale({{exportPreviewScale / 100}}); transform-origin: top left;"
+                wx:if="{{exportPreviewUrl}}" 
+              />
+              <view class="preview-placeholder" wx:else>
+                <text>生成预览中...</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+        
+        <!-- 工具选项 -->
+        <view class="export-tools-section">
+          <view class="tool-row">
+            <view class="tool-item {{exportShowGrid ? 'active' : ''}}" bindtap="onExportToggleGrid" data-value="{{!exportShowGrid}}">
+              <view class="tool-icon">#</view>
+              <text class="tool-label">网格</text>
+            </view>
+            <view class="tool-item {{exportShowRuler ? 'active' : ''}}" bindtap="onExportToggleRuler" data-value="{{!exportShowRuler}}">
+              <view class="tool-icon">📏</view>
+              <text class="tool-label">标尺</text>
+            </view>
+            <view class="tool-item {{exportShowColorCode ? 'active' : ''}}" bindtap="onExportToggleColorCode" data-value="{{!exportShowColorCode}}">
+              <view class="tool-icon">A1</view>
+              <text class="tool-label">色号</text>
+            </view>
+            <view class="tool-item {{exportShowHexCode ? 'active' : ''}}" bindtap="onExportToggleHexCode" data-value="{{!exportShowHexCode}}">
+              <view class="tool-icon">HEX</view>
+              <text class="tool-label">HEX</text>
+            </view>
+          </view>
+          
+          <!-- 色号字体大小 -->
+          <view class="font-size-section" wx:if="{{exportShowColorCode || exportShowHexCode}}">
+            <text class="font-size-label">字体大小</text>
+            <view class="font-size-options">
+              <view class="font-size-chip {{exportFontSize === 'small' ? 'active' : ''}}" bindtap="onExportSetFontSize" data-size="small">小</view>
+              <view class="font-size-chip {{exportFontSize === 'medium' ? 'active' : ''}}" bindtap="onExportSetFontSize" data-size="medium">中</view>
+              <view class="font-size-chip {{exportFontSize === 'large' ? 'active' : ''}}" bindtap="onExportSetFontSize" data-size="large">大</view>
+            </view>
+          </view>
+          
+          <!-- 辅助网格选项 -->
+          <view class="aux-grid-section" wx:if="{{exportShowGrid}}">
+            <text class="aux-label">辅助粗线</text>
+            <view class="aux-options">
+              <view class="aux-chip {{exportAuxGridIndex === 0 ? 'active' : ''}}" bindtap="onExportSetAuxGrid" data-index="0">无</view>
+              <view class="aux-chip {{exportAuxGridIndex === 1 ? 'active' : ''}}" bindtap="onExportSetAuxGrid" data-index="1">5格</view>
+              <view class="aux-chip {{exportAuxGridIndex === 2 ? 'active' : ''}}" bindtap="onExportSetAuxGrid" data-index="2">10格</view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 颜色统计 -->
+        <view class="export-stats-section" wx:if="{{exportStatsList.length > 0}}">
+          <view class="stats-header">
+            <text class="stats-title">颜色统计</text>
+            <text class="stats-total">共 {{exportStatsTotal}} 个豆子</text>
+          </view>
+          <view class="stats-grid">
+            <view class="stats-item" wx:for="{{exportStatsList}}" wx:key="color">
+              <view class="stats-color-block" style="background-color: {{item.color}};"></view>
+              <view class="stats-info">
+                <view class="stats-count">{{item.count}} 个 ({{item.percentage}}%)</view>
+                <view class="stats-brand" wx:if="{{item.brandInfo}}">{{item.brandInfo.brandName}} {{item.brandInfo.code}}</view>
+                <view class="stats-hex" wx:if="{{exportShowHexCode}}">{{item.color}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <!-- 底部按钮 -->
+      <view class="export-footer">
+        <view class="export-btn cancel-btn" bindtap="closeExportModal">取消</view>
+        <view class="export-btn confirm-btn {{isExporting ? 'disabled' : ''}}" bindtap="onSaveExportImage">
+          {{isExporting ? '导出中...' : '保存高清图'}}
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 隐藏的Canvas用于导出 -->
+  <canvas type="2d" id="exportCanvas" style="position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px;"></canvas>
+  <!-- 隐藏的Canvas用于发布预览 -->
+  <canvas canvas-id="publishPreviewCanvas" style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"></canvas>
+  
+  <!-- 发布弹窗 -->
+  <view class="publish-modal {{showPublishModal ? 'show' : ''}}" catchtap="closePublishModal">
+    <view class="publish-content" catchtap="preventClose">
+      <view class="publish-header">
+        <text class="publish-title">发布作品</text>
+        <view class="publish-close" catchtap="closePublishModal">×</view>
+      </view>
+      
+      <view class="publish-preview">
+        <image class="publish-preview-img" src="{{publishPreviewUrl}}" mode="aspectFit" wx:if="{{publishPreviewUrl}}"></image>
+        <view class="publish-preview-placeholder" wx:else>
+          <text>作品预览</text>
+        </view>
+      </view>
+      
+      <view class="publish-form">
+        <view class="publish-field">
+          <text class="publish-label">作品标题 <text class="required">*</text></text>
+          <input class="publish-input" placeholder="给你的作品起个名字吧" value="{{publishTitle}}" bindinput="onPublishTitleInput" maxlength="30" />
+        </view>
+        
+        <view class="publish-field">
+          <text class="publish-label">作品描述</text>
+          <textarea class="publish-textarea" placeholder="介绍一下你的作品（可选）" value="{{publishDescription}}" bindinput="onPublishDescInput" maxlength="200" auto-height />
+        </view>
+        
+        <view class="publish-field publish-switch-field">
+          <text class="publish-label">公开作品</text>
+          <switch checked="{{publishIsPublic}}" bindchange="onPublishPublicChange" color="#007AFF" />
+        </view>
+      </view>
+      
+      <view class="publish-actions">
+        <view class="publish-btn cancel-btn" catchtap="closePublishModal">取消</view>
+        <view class="publish-btn confirm-btn {{isPublishing ? 'disabled' : ''}}" bindtap="onConfirmPublish">
+          {{isPublishing ? '发布中...' : '发布'}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
