@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "添加图纸",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

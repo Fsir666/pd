@@ -83,5 +83,6 @@
     "connectSocket": 60000,
     "uploadFile": 60000,
     "downloadFile": 60000
-  }
+  },
+  "__usePrivacyCheck__": true
 }

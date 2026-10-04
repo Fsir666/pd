@@ -1,0 +1,27 @@
+<view wx:if="{{showPopup}}" class="pp-mask" catchtouchmove="preventMove">
+  <view class="pp-dialog">
+    <view class="pp-title">用户隐私保护提示</view>
+    <view class="pp-body">
+      <view class="pp-text">
+        感谢你使用本小程序。我们将依据《个人信息保护法》《数据安全法》等法律法规处理你的个人信息。
+      </view>
+      <view class="pp-text">
+        在使用涉及相册、摄像头等相关功能前，请你先阅读并同意
+        <text class="pp-link" bindtap="openPrivacyContract">《用户隐私保护指引》</text>
+        。
+      </view>
+      <view class="pp-text pp-dim">
+        你也可以在「我的」页面随时查看和管理该指引。
+      </view>
+    </view>
+    <view class="pp-actions">
+      <button class="pp-btn pp-btn-cancel" bindtap="handleDisagree">不同意</button>
+      <button
+        id="agree-btn"
+        class="pp-btn pp-btn-confirm"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="handleAgree"
+      >同意并继续</button>
+    </view>
+  </view>
+</view>

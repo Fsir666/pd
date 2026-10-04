@@ -143,3 +143,4 @@
     <view class="action-btn" bindtap="onStartBuild">拼一下</view>
   </view>
 </view>
+<privacy-popup />

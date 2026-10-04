@@ -180,3 +180,4 @@
     <view class="safe-area-bottom"></view>
   </view>
 </view>
+<privacy-popup />

@@ -42,3 +42,4 @@
     <button class="submit-btn" type="primary" bindtap="submitTemplate" loading="{{loading}}">提交图纸</button>
   </view>
 </view>
+<privacy-popup />

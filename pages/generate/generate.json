@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "生成像素图",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "照片转卡通",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

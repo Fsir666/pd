@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "智能抠图",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

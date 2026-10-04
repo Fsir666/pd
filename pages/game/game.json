@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "开始拼豆",
-  "disableScroll": false
+  "disableScroll": false,
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

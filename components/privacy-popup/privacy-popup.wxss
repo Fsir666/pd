@@ -1,0 +1,80 @@
+.pp-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.pp-dialog {
+  width: 600rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 48rpx 40rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.pp-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 28rpx;
+}
+
+.pp-body {
+  margin-bottom: 36rpx;
+}
+
+.pp-text {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #4a4a4a;
+  margin-bottom: 14rpx;
+}
+
+.pp-dim {
+  color: #9a9a9a;
+  font-size: 25rpx;
+}
+
+.pp-link {
+  color: #07c160;
+  font-weight: 500;
+}
+
+.pp-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.pp-btn {
+  flex: 1;
+  height: 84rpx;
+  line-height: 84rpx;
+  border-radius: 42rpx;
+  font-size: 30rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.pp-btn::after {
+  border: none;
+}
+
+.pp-btn-cancel {
+  background: #f2f2f2;
+  color: #666666;
+}
+
+.pp-btn-confirm {
+  background: #07c160;
+  color: #ffffff;
+  font-weight: 500;
+}
