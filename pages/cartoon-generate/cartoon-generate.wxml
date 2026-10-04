@@ -8,7 +8,7 @@
     <view class="glass-card">
       <text class="title">生成 Q 版拼豆卡通图</text>
       <text class="subtitle">选择比例与清晰度，提交后自动生成</text>
-      <text class="cost-note">本次将消耗 10 豆豆</text>
+      <text class="cost-note">本次将消耗 10 豆币</text>
 
       <view class="form-section">
         <text class="section-title">图片比例</text>
@@ -35,7 +35,7 @@
       </view>
 
       <button class="btn-primary" bindtap="onSubmit" disabled="{{isGenerating || !src}}">
-        {{isGenerating ? '生成中...' : '提交生成（10豆豆）'}}
+        {{isGenerating ? '生成中...' : '提交生成（10豆币）'}}
       </button>
     </view>
 
@@ -60,7 +60,7 @@
     <view class="generating-card">
       <view class="generating-spinner"></view>
       <text class="generating-title">正在生成卡通图</text>
-      <text class="generating-sub">本次将消耗 10 豆豆 · 一般 20～90 秒完成</text>
+      <text class="generating-sub">本次将消耗 10 豆币 · 一般 20～90 秒完成</text>
       <text class="generating-sub">请耐心等待，生成完成会自动展示结果</text>
     </view>
   </view>

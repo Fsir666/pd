@@ -34,7 +34,7 @@
       <view class="stats-row" wx:if="{{isLogged}}">
         <view class="stat-widget" hover-class="hover-scale" bindtap="openCoins">
           <text class="stat-num">{{userInfo.coins}}</text>
-          <text class="stat-label">豆豆</text>
+          <text class="stat-label">豆币</text>
           <view class="stat-icon-bg coin-bg">💰</view>
         </view>
         <view class="stat-widget" hover-class="hover-scale">
@@ -196,7 +196,7 @@
 
   <view class="auth-modal-mask" wx:if="{{showCoinsModal}}">
     <view class="auth-modal glass-card">
-      <view class="auth-title">豆豆</view>
+      <view class="auth-title">豆币</view>
       <view class="coin-balance">{{userInfo.coins}}</view>
       <view class="coin-sub">余额</view>
       <view class="coin-sub" wx:if="{{walletToday}}">{{walletToday}} · 连签 {{walletStreak}} 天</view>
@@ -209,8 +209,8 @@
 
       <view class="coin-help">
         <view class="coin-help-title">使用说明</view>
-        <view class="coin-help-text">- 抠图：5 豆豆/次</view>
-        <view class="coin-help-text">- 转卡通：10 豆豆/次</view>
+        <view class="coin-help-text">- 抠图：5 豆币/次</view>
+        <view class="coin-help-text">- 转卡通：10 豆币/次</view>
         <view class="coin-help-text">- 获取方式：签到、每日任务、分享奖励、邀请奖励</view>
       </view>
 
@@ -268,7 +268,7 @@
           <button class="invite-copy" bindtap="copyInviteCode">复制</button>
         </view>
         <text class="invite-tip">分享任意作品即可自动带上邀请码</text>
-        <text class="invite-reward">邀请奖励：你 +{{inviterReward}} 豆豆 · 好友 +{{inviteeReward}} 豆豆</text>
+        <text class="invite-reward">邀请奖励：你 +{{inviterReward}} 豆币 · 好友 +{{inviteeReward}} 豆币</text>
         <text class="invite-tip">已邀请 {{invitedCount}} 人</text>
         <text class="invite-tip" wx:if="{{invitedBy}}">已绑定邀请人</text>
       </view>

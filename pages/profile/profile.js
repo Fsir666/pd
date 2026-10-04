@@ -274,7 +274,7 @@ Page({
       const extra = rewardEnergy > 0 ? `，体力+${rewardEnergy}` : ''
       const bonus = bonusCoins > 0 ? `（连签奖励+${bonusCoins}）` : ''
       const s = streak > 0 ? ` 连签${streak}天` : ''
-      wx.showToast({ title: `豆豆+${rewardCoins}${bonus}${extra}${s}`, icon: 'none' })
+      wx.showToast({ title: `豆币+${rewardCoins}${bonus}${extra}${s}`, icon: 'none' })
     }).catch((e) => {
       wx.hideLoading()
       wx.showToast({ title: (e && e.message) ? e.message : '签到失败', icon: 'none' })

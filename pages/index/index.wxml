@@ -86,7 +86,7 @@ module.exports = {
         <view class="status-item">
           <text class="icon">💰</text>
           <text class="value">{{userInfo.coins}}</text>
-          <text class="label">豆豆</text>
+          <text class="label">豆币</text>
         </view>
         <view class="status-item">
           <text class="icon">⚡</text>

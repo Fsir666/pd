@@ -29,14 +29,14 @@
         </view>
       </view>
 
-      <button class="btn-primary" bindtap="onChooseImage">上传图片(5豆豆)</button>
+      <button class="btn-primary" bindtap="onChooseImage">上传图片(5豆币)</button>
     </view>
 
     <!-- 处理状态 -->
     <view class="processing-section glass-card" wx:if="{{isProcessing}}">
       <view class="loading-spinner"></view>
       <text class="processing-text">正在抠图处理中...</text>
-      <text class="processing-sub">本次将消耗 5 豆豆 · 一般 10～30 秒完成</text>
+      <text class="processing-sub">本次将消耗 5 豆币 · 一般 10～30 秒完成</text>
       <text class="processing-sub">请保持页面打开，处理完成会自动展示结果</text>
     </view>
 

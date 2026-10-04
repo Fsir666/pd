@@ -116,7 +116,7 @@ exports.main = async (event, context) => {
         _openid: openid,
         delta: 100,
         balanceAfter: 100,
-        title: '新用户初始豆豆',
+        title: '新用户初始豆币',
         type: 'init',
         meta: {},
         day: (() => {

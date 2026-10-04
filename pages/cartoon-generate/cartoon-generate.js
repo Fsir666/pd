@@ -100,8 +100,8 @@ Page({
         const coins = e.data && typeof e.data.coins === 'number' ? e.data.coins : 0
         const need = e.data && typeof e.data.need === 'number' ? e.data.need : 0
         wx.showModal({
-          title: '豆豆不足',
-          content: `本次需要 ${need} 豆豆，你现在只有 ${coins}。`,
+          title: '豆币不足',
+          content: `本次需要 ${need} 豆币，你现在只有 ${coins}。`,
           confirmText: '去签到',
           success: (res) => {
             if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' })

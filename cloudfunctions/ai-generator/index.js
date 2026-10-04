@@ -79,7 +79,7 @@ async function changeCoins({ openid, delta, type, title, meta }) {
       return {
         ok: false,
         code: 10001,
-        msg: '豆豆不足',
+        msg: '豆币不足',
         data: {
           coins,
           need: -d
@@ -114,7 +114,7 @@ async function changeCoins({ openid, delta, type, title, meta }) {
 async function consumeCoins({ openid, cost, type, title, meta }) {
   const c = typeof cost === 'number' && Number.isFinite(cost) ? Math.max(0, Math.trunc(cost)) : 0
   if (!c) return { ok: true, coins: null, cost: 0 }
-  const res = await changeCoins({ openid, delta: -c, type: type || 'consume', title: title || '豆豆消耗', meta })
+  const res = await changeCoins({ openid, delta: -c, type: type || 'consume', title: title || '豆币消耗', meta })
   if (!res || !res.ok) return res
   return { ok: true, coins: res.coins, cost: c }
 }
@@ -514,7 +514,7 @@ exports.main = async (event, context) => {
         meta: { action: 'createDoubaoTask' }
       })
       if (!pay || !pay.ok) {
-        return { code: pay && pay.code ? pay.code : -1, msg: (pay && pay.msg) ? pay.msg : '豆豆不足', data: (pay && pay.data) ? pay.data : {} }
+        return { code: pay && pay.code ? pay.code : -1, msg: (pay && pay.msg) ? pay.msg : '豆币不足', data: (pay && pay.data) ? pay.data : {} }
       }
 
       const now = Date.now();
@@ -679,7 +679,7 @@ exports.main = async (event, context) => {
       const openid = wxContext.OPENID
       const pay = await consumeCoins({ openid, cost: COIN_COSTS.matting, type: 'consume', title: '抠图消耗', meta: { action: 'matting' } })
       if (!pay || !pay.ok) {
-        return { code: pay && pay.code ? pay.code : -1, msg: (pay && pay.msg) ? pay.msg : '豆豆不足', data: (pay && pay.data) ? pay.data : {} }
+        return { code: pay && pay.code ? pay.code : -1, msg: (pay && pay.msg) ? pay.msg : '豆币不足', data: (pay && pay.data) ? pay.data : {} }
       }
 
       let refunded = false
