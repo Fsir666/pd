@@ -13,6 +13,18 @@
 
 const VERSIONS = [
   {
+    version: '1.0.10',
+    date: '2026-10-05',
+    time: '20:48',
+    tag: 'fix',
+    title: '修复底部导航小白条单点跳动两次',
+    items: [
+      'tabBar 组件创建时按当前页面路径初始化选中态，进入/返回不再从首位滑过',
+      'setSelected 增加「已选中则跳过」保护，消除重复动画',
+      '顺带记录 cursor 宽度无过渡、tabBar 配置重复等潜在优化点'
+    ]
+  },
+  {
     version: '1.0.9',
     date: '2026-10-05',
     time: '20:41',

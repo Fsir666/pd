@@ -25,6 +25,32 @@ Component({
     
     this.setData({ isDevtools: !!(sysInfo && sysInfo.platform === 'devtools') });
 
+    // 根据当前页面路径初始化选中态：避免进入/返回 tab 页时小白条从首位滑过（解决“跳动两次”）
+    try {
+      const pages = getCurrentPages();
+      const cur = pages[pages.length - 1];
+      const route = cur && (cur.route || cur.__route__ || '');
+      const idx = this.data.list.findIndex(t => {
+        const p = t.pagePath.replace(/^\//, '');
+        return route === p || route.indexOf(p) >= 0;
+      });
+      if (idx >= 0) {
+        const tabCenterPercent = idx * 25 + 12.5;
+        const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
+        this.setData({
+          selected: idx,
+          cursorLeft: cursorLeftPercent + '%',
+          cursorWidth: '120rpx',
+          hoverIndex: -1,
+          isDragging: true // 首帧关闭过渡，直接定位到正确位置
+        });
+        // 下一帧恢复过渡，保证后续点击动画正常
+        setTimeout(() => this.setData({ isDragging: false }), 60);
+      }
+    } catch (e) {
+      // 拿不到页面栈时，交给各页面 onShow 的 setSelected 兜底
+    }
+
     this._startX = 0;
     this._startTime = 0;
     this._switchTimer = null;
@@ -36,6 +62,7 @@ Component({
 
   methods: {
     setSelected(index) {
+      if (this.data.selected === index) return; // 已选中则跳过，避免重复动画
       const tabCenterPercent = index * 25 + 12.5;
       const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
       this.setData({
