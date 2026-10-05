@@ -12,6 +12,14 @@ page {
     Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
     sans-serif;
   box-sizing: border-box;
+
+  /* 页面进入淡入：让 tab 切换 / 二级页跳转更丝滑，不再硬切白闪（纯透明度，不影响 fixed 浮层） */
+  animation: pageEnter 0.3s ease both;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .container {

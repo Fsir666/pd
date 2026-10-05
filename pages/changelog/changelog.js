@@ -13,6 +13,18 @@
 
 const VERSIONS = [
   {
+    version: '1.0.12',
+    date: '2026-10-05',
+    time: '21:08',
+    tag: 'opt',
+    title: '页面跳转全局淡入，切换更丝滑',
+    items: [
+      'app.wxss 给 page 增加 0.3s 透明度淡入动画，tab 切换与二级页跳转不再硬切白闪',
+      '采用纯透明度方案，避免影响自定义 tabBar 等 position:fixed 浮层定位',
+      '配合导航小白条顺滑滑动，整体过渡更连贯'
+    ]
+  },
+  {
     version: '1.0.11',
     date: '2026-10-05',
     time: '21:03',
