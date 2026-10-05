@@ -58,7 +58,7 @@
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   border-radius: 48rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.92);
-  transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.25s ease;
   z-index: 2;
   box-shadow:
     0 8rpx 24rpx rgba(0, 0, 0, 0.10),

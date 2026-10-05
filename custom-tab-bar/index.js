@@ -5,6 +5,7 @@ Component({
     cursorWidth: '120rpx',
     isDragging: false,
     hoverIndex: -1,
+    initialized: false, // 是否已首次定位：首次定位关闭过渡，杜绝“从首页位再滑一次”
     isDevtools: false,
     list: [
       { pagePath: "/pages/index/index", text: "首页" },
@@ -42,7 +43,8 @@ Component({
           cursorLeft: cursorLeftPercent + '%',
           cursorWidth: '120rpx',
           hoverIndex: -1,
-          isDragging: true // 首帧关闭过渡，直接定位到正确位置
+          isDragging: true, // 首帧关闭过渡，直接定位到正确位置
+          initialized: true
         });
         // 下一帧恢复过渡，保证后续点击动画正常
         setTimeout(() => this.setData({ isDragging: false }), 60);
@@ -65,12 +67,20 @@ Component({
       if (this.data.selected === index) return; // 已选中则跳过，避免重复动画
       const tabCenterPercent = index * 25 + 12.5;
       const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
+      // 首次定位（initialized=false）：关闭过渡直接跳到位，避免“从首页位再滑一次”
+      const isInitial = !this.data.initialized;
       this.setData({
         selected: index,
         cursorLeft: cursorLeftPercent + '%',
         cursorWidth: '120rpx',
-        hoverIndex: -1
+        hoverIndex: -1,
+        isDragging: isInitial,
+        initialized: true
       });
+      if (isInitial) {
+        // 下一帧恢复过渡，保证后续点击切换动画正常
+        setTimeout(() => this.setData({ isDragging: false }), 60);
+      }
     },
 
     switchTab(index) {
@@ -101,7 +111,7 @@ Component({
       this._switchTimer = setTimeout(() => {
         this._switchTimer = null;
         wx.switchTab({ url: urls[index] });
-      }, 200);
+      }, 150);
     },
 
     handleTabStart(e) {
@@ -210,7 +220,7 @@ Component({
                '/pages/square/square',
                '/pages/profile/profile'
              ][newTab] });
-           }, 200);
+           }, 150);
         }
       }
     },

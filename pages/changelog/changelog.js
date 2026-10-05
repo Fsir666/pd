@@ -13,6 +13,19 @@
 
 const VERSIONS = [
   {
+    version: '1.0.11',
+    date: '2026-10-05',
+    time: '21:03',
+    tag: 'fix',
+    title: '彻底修复小白条单点跳动两次',
+    items: [
+      '根因：页面 onShow 的 setSelected 早于组件 attached 定位，用初始位触发了一次带过渡滑动',
+      '新增 initialized 标志：首次定位一律关闭过渡直接跳到位，无论 onShow/attached 谁先跑都不会再滑',
+      '小白条拉伸回弹增加宽度过渡，拖动结束不再瞬跳',
+      '切换延迟 200ms 收敛到 150ms，点击跟手更顺'
+    ]
+  },
+  {
     version: '1.0.10',
     date: '2026-10-05',
     time: '20:48',
