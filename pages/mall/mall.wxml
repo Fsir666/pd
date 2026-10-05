@@ -85,8 +85,8 @@ module.exports = {
         </view>
       </scroll-view>
 
-      <!-- Permanent Action Banner (Formerly Empty State) -->
-      <view class="empty-state">
+      <!-- 空态：仅当社区列表为空时显示（不再用 mock 假数据兜底） -->
+      <view class="empty-state" wx:if="{{communityList.length === 0}}">
         <view class="empty-card">
           <view class="empty-hero">
             <view class="empty-icon">✨</view>

@@ -75,11 +75,7 @@ Page({
     }).catch(err => {
       wx.hideLoading();
       console.error('Failed to load community posts', err);
-      // Fallback Mock Data if DB fails or empty (for demo purposes)
-      if (!this.data.communityList.length) {
-        const mockData = this.generateMockData();
-        this.processWaterfallData(mockData);
-      }
+      // 不再用 mock 假数据兜底：读不到就保持空态，避免误导用户以为已有内容
     });
   },
 
