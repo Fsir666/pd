@@ -113,6 +113,14 @@ Page({
     });
   },
 
+  // 版本概览（更新日志）
+  goToChangelog() {
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({
+      url: '/pages/changelog/changelog'
+    });
+  },
+
   goToMyWorks() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({

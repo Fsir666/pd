@@ -135,6 +135,20 @@
       </view>
     </view>
 
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToChangelog" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-purple">
+            <text class="menu-icon">🚀</text>
+          </view>
+          <text class="item-title">版本概览</text>
+        </view>
+        <view class="item-right">
+          <text class="icon-chevron"></text>
+        </view>
+      </view>
+    </view>
+
     <!-- 退出登录 (独立 Destructive Action) -->
     <view class="logout-section" wx:if="{{isLogged}}">
       <button class="logout-btn" bindtap="onLogoutTap" hover-class="hover-scale">退出登录</button>

@@ -1,0 +1,31 @@
+<view class="page-container">
+  <view class="page-header">
+    <text class="header-icon">🚀</text>
+    <text class="header-title">版本概览</text>
+    <text class="header-desc">当前版本 v{{currentVersion}}　·　共 {{versions.length}} 次更新</text>
+  </view>
+
+  <view class="timeline">
+    <view class="version-card" wx:for="{{versions}}" wx:key="version">
+      <view class="card-dot"></view>
+      <view class="card-head">
+        <view class="head-left">
+          <text class="version-no">v{{item.version}}</text>
+          <text class="version-tag {{item.tagCls}}">{{item.tagText}}</text>
+        </view>
+        <text class="version-date">{{item.date}}</text>
+      </view>
+      <view class="version-title">{{item.title}}</view>
+      <view class="version-items">
+        <view class="item-row" wx:for="{{item.items}}" wx:for-item="line" wx:key="*this">
+          <text class="item-dot">·</text>
+          <text class="item-text">{{line}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-footer">
+    <text class="footer-text">每次更新都会记录在这里～</text>
+  </view>
+</view>

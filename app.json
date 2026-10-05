@@ -12,6 +12,7 @@
     "pages/warehouse/manage/manage",
     "pages/bead-mode/bead-mode",
     "pages/profile/profile",
+    "pages/changelog/changelog",
     "pages/follow-list/follow-list",
     "pages/user-profile/user-profile",
     "pages/template-detail/template-detail",

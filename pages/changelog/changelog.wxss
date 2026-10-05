@@ -1,0 +1,146 @@
+.page-container {
+  min-height: 100vh;
+  background: #F2F2F7;
+  padding: 30rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+/* ---------- 头部 ---------- */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 36rpx;
+}
+
+.header-icon {
+  font-size: 72rpx;
+  line-height: 1;
+}
+
+.header-title {
+  margin-top: 18rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.header-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #8E8E93;
+}
+
+/* ---------- 时间线 ---------- */
+.timeline {
+  position: relative;
+  padding-left: 34rpx;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 9rpx;
+  top: 24rpx;
+  bottom: 24rpx;
+  width: 2rpx;
+  background: #E0E0E5;
+}
+
+.version-card {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-dot {
+  position: absolute;
+  left: -33rpx;
+  top: 36rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #AF52DE;
+  border: 4rpx solid #F2F2F7;
+}
+
+.card-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.head-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.version-no {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.version-tag {
+  margin-left: 14rpx;
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  color: #FFFFFF;
+}
+
+.tag-new { background: #AF52DE; }
+.tag-fix { background: #FF3B30; }
+.tag-opt { background: #007AFF; }
+
+.version-date {
+  font-size: 24rpx;
+  color: #8E8E93;
+}
+
+.version-title {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #1C1C1E;
+  font-weight: 500;
+}
+
+.version-items {
+  margin-top: 14rpx;
+}
+
+.item-row {
+  display: flex;
+  flex-direction: row;
+  margin-top: 8rpx;
+}
+
+.item-dot {
+  width: 24rpx;
+  color: #AF52DE;
+  font-size: 28rpx;
+  line-height: 40rpx;
+}
+
+.item-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #48484A;
+  line-height: 40rpx;
+}
+
+/* ---------- 底部 ---------- */
+.page-footer {
+  margin-top: 20rpx;
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 24rpx;
+  color: #C7C7CC;
+}
