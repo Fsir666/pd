@@ -743,14 +743,8 @@ Page({
     const { avatarUrl, nickName, phone } = this.data.registerForm;
     
     // 1. 必填项单独校验与提醒
-    if (!avatarUrl) {
-      wx.showToast({
-        title: '请选择头像',
-        icon: 'error' // 使用 error 图标更醒目
-      });
-      return;
-    }
-    
+    // 头像改为选填：chooseAvatar 受隐私指引声明影响可能点击无响应，
+    // 未选择头像时直接使用默认头像（前端展示有 fallback），不阻塞注册
     if (!nickName || nickName.trim() === '') {
       wx.showToast({
         title: '请填写昵称',

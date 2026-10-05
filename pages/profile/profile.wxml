@@ -150,7 +150,7 @@
       <view class="auth-title">完善个人信息</view>
       <view class="auth-form">
         <view class="form-item">
-          <text class="form-label">头像</text>
+          <text class="form-label">头像（选填）</text>
           <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
             <image class="auth-avatar" src="{{registerForm.avatarUrl || '/images/avatars/avatar_1.svg'}}"></image>
           </button>
