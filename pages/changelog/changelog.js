@@ -5,6 +5,7 @@
  * 字段说明：
  *   version  版本号（与上传时的版本号一致）
  *   date     发布日期 YYYY-MM-DD
+ *   time     发布时间 HH:mm（按实际上传时刻填写）
  *   tag      标签：new=大版本 / fix=修复 / opt=优化
  *   title    一句话标题
  *   items    本次更新的具体内容（字符串数组）
@@ -12,19 +13,33 @@
 
 const VERSIONS = [
   {
+    version: '1.0.7',
+    date: '2026-10-05',
+    time: '15:43',
+    tag: 'opt',
+    title: '更新时间精确到分钟',
+    items: [
+      '版本概览每条记录都能看到具体的几点几分',
+      '顶部同步显示当前版本的发布时间',
+      '更新时间线样式，日期与时间上下排列更好读'
+    ]
+  },
+  {
     version: '1.0.6',
     date: '2026-10-05',
+    time: '15:25',
     tag: 'new',
     title: '新增版本概览',
     items: [
       '「我的」页面新增「版本概览」入口',
-      '按时间线展示每次更新的内容和日期',
+      '按时间线展示每次更新的内容与发布时间',
       '以后每次更新都会第一时间记录在这里'
     ]
   },
   {
     version: '1.0.5',
     date: '2026-10-05',
+    time: '13:55',
     tag: 'fix',
     title: '头像更换不再卡住',
     items: [
@@ -36,6 +51,7 @@ const VERSIONS = [
   {
     version: '1.0.4',
     date: '2026-10-05',
+    time: '12:36',
     tag: 'fix',
     title: '注册流程打通',
     items: [
@@ -46,6 +62,7 @@ const VERSIONS = [
   {
     version: '1.0.3',
     date: '2026-10-05',
+    time: '12:26',
     tag: 'fix',
     title: '云服务全面恢复',
     items: [
@@ -57,6 +74,7 @@ const VERSIONS = [
   {
     version: '1.0.2',
     date: '2026-10-05',
+    time: '02:18',
     tag: 'opt',
     title: '虚拟货币更名',
     items: [
@@ -67,6 +85,7 @@ const VERSIONS = [
   {
     version: '1.0.1',
     date: '2026-10-05',
+    time: '00:21',
     tag: 'opt',
     title: '隐私合规升级',
     items: [
@@ -77,6 +96,7 @@ const VERSIONS = [
   {
     version: '1.0.0',
     date: '2026-10-05',
+    time: '00:05',
     tag: 'new',
     title: '云端发布通道打通',
     items: [
@@ -87,6 +107,7 @@ const VERSIONS = [
   {
     version: '1.0',
     date: '2026-03-20',
+    time: '11:41',
     tag: 'new',
     title: '悠米拼豆首个版本上线',
     items: [
@@ -104,7 +125,8 @@ const TAG_MAP = {
 Page({
   data: {
     versions: [],
-    currentVersion: ''
+    currentVersion: '',
+    currentTime: ''
   },
 
   onLoad() {
@@ -112,9 +134,11 @@ Page({
       const t = TAG_MAP[v.tag] || TAG_MAP.opt
       return Object.assign({}, v, { tagText: t.text, tagCls: t.cls })
     })
+    const first = versions.length ? versions[0] : null
     this.setData({
       versions,
-      currentVersion: versions.length ? versions[0].version : ''
+      currentVersion: first ? first.version : '',
+      currentTime: first ? first.date + ' ' + first.time : ''
     })
   },
 

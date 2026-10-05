@@ -2,7 +2,8 @@
   <view class="page-header">
     <text class="header-icon">🚀</text>
     <text class="header-title">版本概览</text>
-    <text class="header-desc">当前版本 v{{currentVersion}}　·　共 {{versions.length}} 次更新</text>
+    <text class="header-desc">当前版本 v{{currentVersion}}</text>
+    <text class="header-desc">发布于 {{currentTime}}　·　共 {{versions.length}} 次更新</text>
   </view>
 
   <view class="timeline">
@@ -13,7 +14,10 @@
           <text class="version-no">v{{item.version}}</text>
           <text class="version-tag {{item.tagCls}}">{{item.tagText}}</text>
         </view>
-        <text class="version-date">{{item.date}}</text>
+        <view class="head-right">
+          <text class="version-date">{{item.date}}</text>
+          <text class="version-time">{{item.time}}</text>
+        </view>
       </view>
       <view class="version-title">{{item.title}}</view>
       <view class="version-items">

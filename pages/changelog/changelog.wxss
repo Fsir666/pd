@@ -98,9 +98,22 @@
 .tag-fix { background: #FF3B30; }
 .tag-opt { background: #007AFF; }
 
+.head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .version-date {
   font-size: 24rpx;
   color: #8E8E93;
+}
+
+.version-time {
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  color: #AF52DE;
+  font-weight: 500;
 }
 
 .version-title {
