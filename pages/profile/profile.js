@@ -524,12 +524,66 @@ Page({
     });
   },
 
-  // 选择头像
+  // 选择头像（兼容保留，open-type="chooseAvatar" 未声明隐私时无响应，已改用下方 pickAvatar）
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
     this.setData({
       'registerForm.avatarUrl': avatarUrl
     });
+  },
+
+  // 头像选择：相册选图 / 内置头像轮换
+  // 说明：open-type="chooseAvatar" 依赖后台隐私指引声明，部分情况下点击无响应，
+  // 这里改用 wx.chooseMedia（隐私指引已声明「选中的照片或视频信息」）+ 内置头像兜底
+  pickAvatar(formKey, current) {
+    const presets = [
+      '/images/avatars/avatar_1.svg',
+      '/images/avatars/avatar_2.svg',
+      '/images/avatars/avatar_3.svg',
+      '/images/avatars/avatar_4.svg',
+      '/images/avatars/avatar_5.svg',
+      '/images/avatars/avatar_6.svg'
+    ];
+
+    wx.showActionSheet({
+      itemList: ['从相册选一张', '换个内置头像'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sizeType: ['compressed'],
+            sourceType: ['album', 'camera'],
+            success: (r) => {
+              const f = r && r.tempFiles && r.tempFiles[0];
+              if (f && f.tempFilePath) {
+                this.setData({ [formKey + '.avatarUrl']: f.tempFilePath });
+              }
+            },
+            fail: (err) => {
+              console.error('选择图片失败', err);
+              wx.showToast({ title: '选图失败，可换内置头像', icon: 'none' });
+            }
+          });
+        } else if (res.tapIndex === 1) {
+          const idx = presets.indexOf(current);
+          const next = presets[(idx + 1 + presets.length) % presets.length];
+          this.setData({ [formKey + '.avatarUrl']: next });
+        }
+      },
+      fail: () => {}
+    });
+  },
+
+  // 注册弹窗：点头像
+  onRegisterAvatarTap() {
+    this.pickAvatar('registerForm', this.data.registerForm.avatarUrl);
+  },
+
+  // 编辑资料弹窗：点头像
+  onEditAvatarTap() {
+    const cur = this.data.editForm.avatarUrl || (this.data.userInfo && this.data.userInfo.avatarUrl) || '';
+    this.pickAvatar('editForm', cur);
   },
 
   // 输入昵称

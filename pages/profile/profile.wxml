@@ -151,9 +151,9 @@
       <view class="auth-form">
         <view class="form-item">
           <text class="form-label">头像（选填）</text>
-          <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <view class="avatar-wrapper" bindtap="onRegisterAvatarTap">
             <image class="auth-avatar" src="{{registerForm.avatarUrl || '/images/avatars/avatar_1.svg'}}"></image>
-          </button>
+          </view>
         </view>
         <view class="form-item">
           <text class="form-label">昵称</text>
@@ -176,9 +176,9 @@
       <view class="auth-form">
         <view class="form-item">
           <text class="form-label">头像</text>
-          <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onEditChooseAvatar">
+          <view class="avatar-wrapper" bindtap="onEditAvatarTap">
             <image class="auth-avatar" src="{{editForm.avatarUrl || userInfo.avatarUrl || '/images/avatars/avatar_1.svg'}}"></image>
-          </button>
+          </view>
         </view>
         <view class="form-item">
           <text class="form-label">昵称</text>
