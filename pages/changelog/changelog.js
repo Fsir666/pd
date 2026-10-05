@@ -13,6 +13,18 @@
 
 const VERSIONS = [
   {
+    version: '1.0.9',
+    date: '2026-10-05',
+    time: '20:41',
+    tag: 'fix',
+    title: '修复占位图缺失导致满屏裂图',
+    items: [
+      '补充 default-avatar / empty-box / placeholder / share-cover 四张缺失占位图',
+      '修复图片加载失败时反复触发 error 的兜底逻辑',
+      '无头像用户、空态页、分享封面不再显示裂图'
+    ]
+  },
+  {
     version: '1.0.8',
     date: '2026-10-05',
     time: '17:33',

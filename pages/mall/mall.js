@@ -352,16 +352,12 @@ Page({
     const { list, index } = e.currentTarget.dataset;
     const listKey = list === 'left' ? 'leftList' : 'rightList';
     const currentList = this.data[listKey];
-    
-    if (currentList[index]) {
-      // 设置默认图片或占位图
-      currentList[index].imageUrl = '/images/placeholder.png'; // 假设有个占位图，或者使用网络图片
-      // 或者直接移除该项，防止空白
-      // currentList.splice(index, 1);
-      
-      this.setData({
-        [listKey]: currentList
-      });
+    const item = currentList[index];
+
+    // 已是占位图则跳过，避免加载失败时反复触发 error
+    if (item && item.imageUrl !== '/images/placeholder.png') {
+      item.imageUrl = '/images/placeholder.png';
+      this.setData({ [listKey]: currentList });
     }
   },
 
