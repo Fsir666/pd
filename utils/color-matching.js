@@ -330,15 +330,22 @@ function processImageToBeads(imageData, srcWidth, srcHeight, paletteColors, base
 
   const paletteLabCache = buildPaletteLabCache(paletteColors);
 
+  const w = outputSize.width;
+  const h = outputSize.height;
   const result = {
-    width: outputSize.width,
-    height: outputSize.height,
-    beads: []
+    width: w,
+    height: h,
+    beads: [],
+    srcGrid: null
   };
 
-  for (let y = 0; y < outputSize.height; y++) {
-    for (let x = 0; x < outputSize.width; x++) {
-      const color = downsampled[y * outputSize.width + x];
+  // 构造降采样源数据的 RGBA 缓冲，供上层后处理管线（去噪/锐化/抖动）使用
+  const srcGrid = new Uint8ClampedArray(w * h * 4);
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y * w + x;
+      const color = downsampled[idx];
       const matchedColor = findClosestColor(color.r, color.g, color.b, paletteLabCache);
 
       result.beads.push({
@@ -346,9 +353,15 @@ function processImageToBeads(imageData, srcWidth, srcHeight, paletteColors, base
         y: y,
         color: matchedColor
       });
+
+      srcGrid[idx * 4] = color.r;
+      srcGrid[idx * 4 + 1] = color.g;
+      srcGrid[idx * 4 + 2] = color.b;
+      srcGrid[idx * 4 + 3] = 255;
     }
   }
 
+  result.srcGrid = srcGrid;
   return result;
 }
 

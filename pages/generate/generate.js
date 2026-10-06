@@ -37,7 +37,15 @@ Page({
     statsList: [],
     exportW: 0,
     exportH: 0,
-    isSaving: false
+    isSaving: false,
+    presetOptions: [
+      { key: 'auto', label: '智能' },
+      { key: 'clear', label: '清晰' },
+      { key: 'real', label: '写实' },
+      { key: 'pixel', label: '像素' },
+      { key: 'vibe', label: '氛围' },
+      { key: 'custom', label: '自定义' }
+    ]
   },
 
   onLoad(options) {
@@ -214,7 +222,7 @@ Page({
             this._updateBrandSeriesOptions(nextSelected);
             if (this.data.isGenerated) {
               if (this.data.imageUrl) {
-                if (this._gridBaseData && this._gridSrcCols && this._gridSrcRows) {
+                if ((this._gridBaseData || this._gridSrcData) && this._gridSrcCols && this._gridSrcRows) {
                   this._rebuildFromGridSrc();
                 } else {
                   // Only show loading if we are about to process
@@ -603,6 +611,46 @@ Page({
           wx.showLoading({ title: '正在生成...' });
           this.processImage(this.data.imageUrl);
         }
+      }
+    });
+  },
+
+  // ===== 高级参数面板 =====
+  onToggleAdvanced() {
+    this.setData({ showAdvanced: !this.data.showAdvanced });
+  },
+
+  onPresetTap(e) {
+    const presetKey = e.currentTarget.dataset.preset;
+    if (!presetKey || presetKey === this.data.presetKey) return;
+    const next = { presetKey };
+    if (presetKey !== 'custom') {
+      const d = this._defaultsForPreset(presetKey, this.data.gridSize);
+      next.ditherValue = d.ditherValue;
+      next.detailValue = d.detailValue;
+      next.sampleMode = d.sampleMode;
+    }
+    this.setData(next, () => {
+      if (this.data.isGenerated && (this._gridBaseData || this._gridSrcData) && this._gridSrcCols && this._gridSrcRows) {
+        this._rebuildFromGridSrc();
+      }
+    });
+  },
+
+  onDitherChange(e) {
+    const ditherValue = Math.max(0, Math.min(100, parseInt(e.detail.value, 10) || 0));
+    this.setData({ ditherValue, presetKey: 'custom' }, () => {
+      if (this.data.isGenerated && (this._gridBaseData || this._gridSrcData) && this._gridSrcCols && this._gridSrcRows) {
+        this._rebuildFromGridSrc();
+      }
+    });
+  },
+
+  onDetailChange(e) {
+    const detailValue = Math.max(0, Math.min(100, parseInt(e.detail.value, 10) || 0));
+    this.setData({ detailValue, presetKey: 'custom' }, () => {
+      if (this.data.isGenerated && (this._gridBaseData || this._gridSrcData) && this._gridSrcCols && this._gridSrcRows) {
+        this._rebuildFromGridSrc();
       }
     });
   },
@@ -1063,33 +1111,32 @@ Page({
       
       console.log('processImageToBeads result:', result);
       
-      // 5. 保存结果数据
-      this._pixelCols = result.width;
-      this._pixelRows = result.height;
-      this._pixelData = this._buildPixelDataFromBeads(result.beads, result.width, result.height);
-      this._pixelHexes = this._buildPixelHexesFromBeads(result.beads);
-      this._isPixelArt = false;
-      
+      // 5. 保存网格源数据，接通后处理管线（去噪/锐化/抖动/描边）
+      const gw = result.width;
+      const gh = result.height;
+      this._gridSrcData = result.srcGrid; // RGBA 缓冲
+      this._gridSrcCols = gw;
+      this._gridSrcRows = gh;
+      this._gridBaseData = null;
+      // 像素图识别：输入已是像素图时跳过模糊类后处理，保护硬边
+      this._isPixelArt = this._guessIsPixelArt(imageData.data, sampleWidth, sampleHeight);
+
       // 6. 更新显示尺寸
       const systemInfo = wx.getSystemInfoSync();
       const maxW = systemInfo.windowWidth - 80;
-      
+
       this.setData({
-        processWidth: result.width,
-        processHeight: result.height,
+        processWidth: gw,
+        processHeight: gh,
         displayW: maxW,
         displayH: maxW,
         generatedImagePath: ''
-      });
-      
-      // 7. 计算统计数据
-      this._computeStatsFromPixels();
-      
-      // 8. 标记为已生成并重绘
-      this.setData({ isGenerated: true }, () => {
-        this.redrawCanvas({ exportNow: true });
-        this._scheduleExport();
-        wx.hideLoading();
+      }, () => {
+        // 走与调参一致的完整后处理管线，首次出图即清晰（不再"先丑后调"）
+        this.setData({ isGenerated: true }, () => {
+          this._rebuildFromGridSrc();
+          wx.hideLoading();
+        });
       });
       
     } catch (err) {

@@ -124,6 +124,32 @@
       </scroll-view>
     </view>
 
+    <!-- 高级参数卡片（生成后显示） -->
+    <view class="settings-card glass-card" wx:if="{{isGenerated}}">
+      <view class="card-header" bindtap="onToggleAdvanced">
+        <text class="card-title">高级参数</text>
+        <view class="value-badge">{{showAdvanced ? '收起' : '展开'}}</view>
+      </view>
+      <block wx:if="{{showAdvanced}}">
+        <view class="sub-label">风格预设</view>
+        <scroll-view scroll-x class="brand-scroll" show-scrollbar="{{false}}">
+          <view class="brand-scroll-inner">
+            <view class="ios-chip {{presetKey === item.key ? 'active' : ''}}" wx:for="{{presetOptions}}" wx:key="key" bindtap="onPresetTap" data-preset="{{item.key}}">
+              <text>{{item.label}}</text>
+            </view>
+          </view>
+        </scroll-view>
+        <view class="sub-label">抖动强度 {{ditherValue}}</view>
+        <view class="slider-container">
+          <slider min="0" max="100" step="1" value="{{ditherValue}}" activeColor="#007AFF" backgroundColor="#E5E5EA" block-size="24" bindchange="onDitherChange"/>
+        </view>
+        <view class="sub-label">细节锐化 {{detailValue}}</view>
+        <view class="slider-container">
+          <slider min="0" max="100" step="1" value="{{detailValue}}" activeColor="#007AFF" backgroundColor="#E5E5EA" block-size="24" bindchange="onDetailChange"/>
+        </view>
+      </block>
+    </view>
+
     <!-- 功能介绍卡片 -->
     <view class="intro-card glass-card">
       <view class="intro-content">
