@@ -149,7 +149,7 @@ Page({
       if (r && r.code === 1001) {
         // 每日额度用完
         this.rollbackLike(newLikes);
-        wx.showToast({ title: r.msg || '今天的点赞额度已用完', icon: 'none', duration: 2000 });
+        wx.showToast({ title: r.msg || '这个作品你今天已经点满 100 次啦', icon: 'none', duration: 2000 });
         return;
       }
       if (r && r.code !== 0) {

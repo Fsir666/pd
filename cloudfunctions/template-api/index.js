@@ -647,20 +647,7 @@ exports.main = async (event, context) => {
       // 获取东八区日期字符串 YYYY-MM-DD
       const dateStr = new Date(now.getTime() + 8 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-      // 每日上限：同一用户每天最多给 100 个「不同作品」点赞
-      // （同一作品当天重复点赞只 +1 计数，不额外占用额度）
-      const DAILY_LIKE_LIMIT = 100;
-      const todayLikes = await db.collection('template_likes')
-        .where({ _openid: wxContext.OPENID, date: dateStr })
-        .get()
-        .catch(() => ({ data: [] }));
-      const likedTodayIds = new Set((todayLikes.data || []).map(r => r.templateId));
-      const isNewTargetToday = !likedTodayIds.has(templateId);
-      if (isNewTargetToday && likedTodayIds.size >= DAILY_LIKE_LIMIT) {
-        return { code: 1001, msg: `今天的点赞额度已用完（每天最多给 ${DAILY_LIKE_LIMIT} 个作品点赞），明天再来吧` };
-      }
-
-      // 查询今日点赞记录
+      // 查询今日该作品的点赞记录（同一人 × 同一作品 × 当天）
       const likeRecord = await db.collection('template_likes')
         .where({
           templateId,
@@ -669,14 +656,20 @@ exports.main = async (event, context) => {
         })
         .get();
 
+      // 单作品每日上限：同一个人每天对「同一个作品」最多点赞 100 次
+      // （点两个作品就是各 100 次，额度按作品独立计算）
+      const DAILY_LIKE_LIMIT = 100;
       if (likeRecord.data.length > 0) {
         const record = likeRecord.data[0];
-        // 移除每日上限限制
-        // if (record.count >= 500) {
-        //   return { code: 1001, msg: 'Daily limit reached (500 likes)' };
-        // }
-        
-        // 更新记录
+        const curCount = typeof record.count === 'number' ? record.count : 0;
+        if (curCount >= DAILY_LIKE_LIMIT) {
+          return { code: 1001, msg: `这个作品你今天已经点满 ${DAILY_LIKE_LIMIT} 次啦，明天再来吧` };
+        }
+      }
+
+      if (likeRecord.data.length > 0) {
+        const record = likeRecord.data[0];
+        // 更新记录（上限已在上面校验过）
         await db.collection('template_likes').doc(record._id).update({
           data: {
             count: _.inc(1),
