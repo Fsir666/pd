@@ -1,5 +1,5 @@
 page {
-  background-color: #F2F2F7;
+  background-color: var(--ym-bg, #FBF7F2);
 }
 
 .page-container {
@@ -19,13 +19,13 @@ page {
 .icon-wrapper {
   width: 120rpx;
   height: 120rpx;
-  background: #fff;
+  background: var(--ym-surface, #FFFDFB);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.05);
+  box-shadow: 0 8rpx 24rpx rgba(74, 58, 62, 0.06);
 }
 
 .header-icon {
@@ -35,21 +35,22 @@ page {
 .header-title {
   font-size: 40rpx;
   font-weight: 700;
-  color: #1C1C1E;
+  color: var(--ym-text, #4A3A3E);
   margin-bottom: 12rpx;
 }
 
 .header-desc {
   font-size: 28rpx;
-  color: #8E8E93;
+  color: var(--ym-text-sub, #9B8A8C);
 }
 
 /* Menu Group */
 .menu-group {
-  background: #FFFFFF;
-  border-radius: 24rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border-radius: var(--ym-r-lg, 26rpx);
   overflow: hidden;
   margin-bottom: 60rpx;
+  box-shadow: 0 2rpx 12rpx rgba(74, 58, 62, 0.05);
 }
 
 .menu-item {
@@ -57,12 +58,12 @@ page {
   justify-content: space-between;
   align-items: center;
   padding: 32rpx;
-  background: #FFFFFF;
+  background: var(--ym-surface, #FFFDFB);
   position: relative;
 }
 
 .menu-item:active {
-  background: #F2F2F7;
+  background: var(--ym-primary-wash, #F6E9E4);
 }
 
 .menu-item:not(:last-child)::after {
@@ -72,23 +73,23 @@ page {
   left: 32rpx;
   right: 0;
   height: 1rpx;
-  background: #E5E5EA;
+  background: var(--ym-line, #F0E4DC);
 }
 
 .item-title {
   font-size: 30rpx;
-  color: #1C1C1E;
+  color: var(--ym-text, #4A3A3E);
 }
 
 .item-arrow {
-  color: #C7C7CC;
+  color: var(--ym-text-faint, #C2B4B4);
   font-size: 32rpx;
 }
 
 /* Button */
 .contact-btn {
-  background: #007AFF;
-  color: #fff;
+  background: linear-gradient(135deg, #D4607A, #E07A8E);
+  color: #FFFFFF;
   border-radius: 50rpx;
   padding: 24rpx 0;
   display: flex;
@@ -96,7 +97,7 @@ page {
   justify-content: center;
   font-size: 32rpx;
   font-weight: 600;
-  box-shadow: 0 10rpx 30rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 10rpx 30rpx rgba(212, 96, 122, 0.3);
 }
 
 .contact-btn::after {

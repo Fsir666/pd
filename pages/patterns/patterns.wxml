@@ -1,0 +1,24 @@
+<view class="page">
+  <view class="ambient">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+  </view>
+
+  <view class="header">
+    <view class="header-title">图纸库</view>
+    <view class="header-sub">{{list.length}} 张原创图纸 · 免费拿去拼</view>
+  </view>
+
+  <view class="grid">
+    <view class="card" wx:for="{{list}}" wx:key="key" bindtap="openDetail" data-key="{{item.key}}">
+      <view class="thumb-wrap">
+        <image class="thumb" src="{{item.thumb}}" mode="aspectFit"></image>
+      </view>
+      <view class="card-name">{{item.name}}</view>
+      <view class="card-meta">{{item.w}}×{{item.h}} · {{item.beadCount}} 颗</view>
+    </view>
+  </view>
+
+  <view class="footer-tip">图纸均为本站原创，可放心使用 · 持续更新中</view>
+  <view class="safe-bottom"></view>
+</view>

@@ -9,23 +9,24 @@ Page({
     isLogged: false,
     isRefreshing: false,
     banners: [
-      { id: 1, color: '#FFD700', text: '新手拼豆指南' },
-      { id: 2, color: '#87CEEB', text: '本周热门图纸' },
-      { id: 3, color: '#FF69B4', text: '拼豆作品大赛' }
+      { id: 1, color: '#D89A5C', text: '新手拼豆指南' },
+      { id: 2, color: '#7A9E7E', text: '本周热门图纸' },
+      { id: 3, color: '#D4607A', text: '拼豆作品大赛' }
     ],
     hotTemplates: [], // Keep for compatibility if needed
     leftTemplates: [],
     rightTemplates: [],
     // Unified small tools list for scroll view
     allSmallTools: [
-      { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#54A0FF', animClass: 'wiggle', size: 'small' },
-      { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#FF6B6B', animClass: 'spin-slow', size: 'small' },
-      { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#20BF6B', animClass: 'pulse', size: 'small' },
-      { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#AF52DE', animClass: 'breathe', size: 'small' },
-      { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#FF9F43', animClass: 'pulse' },
-      { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#5F27CD', animClass: 'bounce' },
-      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#48DBFB', animClass: 'float' },
-      { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#54A0FF', animClass: 'wiggle' }
+      { id: 13, title: '图纸库', desc: '免费图纸', icon: '📐', color: '#D4607A', animClass: 'bounce', size: 'small' },
+      { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#7A9E7E', animClass: 'wiggle', size: 'small' },
+      { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#D4607A', animClass: 'spin-slow', size: 'small' },
+      { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#94B08F', animClass: 'pulse', size: 'small' },
+      { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#D89A5C', animClass: 'breathe', size: 'small' },
+      { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#E0A458', animClass: 'pulse' },
+      { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#B49AC4', animClass: 'bounce' },
+      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#7FA8C4', animClass: 'float' },
+      { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#9AAB8E', animClass: 'wiggle' }
     ],
     isToolsExpanded: false,
     currentTab: 0,
@@ -382,6 +383,9 @@ Page({
         break;
       case 12: // AI生成拼豆图
         wx.navigateTo({ url: '/pages/developer/mock-template/mock-template' });
+        break;
+      case 13: // 图纸库
+        wx.navigateTo({ url: '/pages/patterns/patterns' });
         break;
       default:
         wx.showToast({ title: '功能开发中...', icon: 'none' });

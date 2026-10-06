@@ -2,6 +2,8 @@
 const cloud = require('wx-server-sdk')
 const crypto = require('crypto')
 const https = require('https')
+const fs = require('fs')
+const path = require('path')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 
@@ -322,6 +324,116 @@ const SEED_DATA = [
     price: 0
   }
 ];
+
+// 把内置图纸库（pattern-presets）作为「冯」(userId 47012803) 的社区作品发布。
+// 增量幂等：按固定 _id = seed_<key> 检查是否已发布，只补发缺失的；新增图案后重跑即可自动补发，不会重复。
+async function seedPresetsToUser() {
+  const SEED_FLAG_ID = 'seed_presets_v1';
+  const TARGET_USER_ID = '47012803';
+  const CLOUD_PATH_PREFIX = 'seed-presets/';
+
+  const userRes = await db
+    .collection('users')
+    .where({ userId: TARGET_USER_ID })
+    .limit(1)
+    .get()
+    .catch(() => ({ data: [] }));
+  const targetUser = userRes && userRes.data && userRes.data[0];
+  if (!targetUser || !targetUser._openid) {
+    return { code: -1, msg: `找不到 userId=${TARGET_USER_ID} 的用户，无法发布` };
+  }
+  const openid = targetUser._openid;
+  const userInfo = {
+    userId: targetUser.userId || '',
+    userDocId: targetUser._id || '',
+    nickName: targetUser.nickName || '悠米拼豆',
+    avatarUrl: targetUser.avatarUrl || '',
+    openid
+  };
+
+  const presets = require('./presets.json');
+  const imagesDir = path.join(__dirname, 'images');
+  const results = [];
+  let seeded = 0;
+  let skipped = 0;
+
+  for (const p of presets) {
+    const docId = 'seed_' + p.key;
+    // 已发布过则跳过（增量补发，避免重复）
+    const exist = await db.collection('templates').doc(docId).get().catch(() => null);
+    if (exist && exist.data) {
+      skipped++;
+      continue;
+    }
+
+    const imgFile = path.join(imagesDir, p.key + '.png');
+    if (!fs.existsSync(imgFile)) {
+      results.push({ key: p.key, ok: false, reason: 'no image' });
+      continue;
+    }
+    let fileID;
+    try {
+      const buf = fs.readFileSync(imgFile);
+      const up = await cloud.uploadFile({ cloudPath: CLOUD_PATH_PREFIX + p.key + '.png', fileContent: buf });
+      fileID = up.fileID;
+    } catch (e) {
+      results.push({ key: p.key, ok: false, reason: 'upload fail: ' + (e && e.message ? e.message : e) });
+      continue;
+    }
+
+    const title = p.name || p.key;
+    const tagText = p.tags && p.tags.length ? '（' + p.tags.join('·') + '）' : '';
+    const desc = `原创拼豆图纸${tagText}，${p.w}×${p.h} 共 ${p.beadCount} 颗，MARD 品牌色号，可商用。`;
+    try {
+      await db.collection('templates').doc(docId).set({
+        data: {
+          title,
+          author: userInfo.nickName || '匿名用户',
+          imageUrl: fileID,
+          description: desc,
+          likeCount: 0,
+          collectCount: 0,
+          heat: 0,
+          price: 0,
+          isUserWork: true,
+          isPublic: true,
+          saveTimestamp: Date.now(),
+          userInfo,
+          board: p.board || null,
+          spec: { gridSize: p.w, cols: p.w, rows: p.h, beadCount: p.beadCount },
+          tags: p.tags || [],
+          createTime: db.serverDate(),
+          updateTime: db.serverDate(),
+          _openid: openid
+        }
+      });
+      await db.collection('community_posts').doc(docId).set({
+        data: {
+          content: title,
+          imageUrl: fileID,
+          author: userInfo.nickName || '匿名用户',
+          authorAvatar: userInfo.avatarUrl || '',
+          likes: 0,
+          templateId: docId,
+          tags: p.tags || [],
+          createTime: db.serverDate(),
+          updateTime: db.serverDate(),
+          _openid: openid
+        }
+      });
+      seeded++;
+      results.push({ key: p.key, ok: true });
+    } catch (e) {
+      results.push({ key: p.key, ok: false, reason: 'write fail: ' + (e && e.message ? e.message : e) });
+    }
+  }
+
+  await db.collection('config').doc(SEED_FLAG_ID).set({
+    data: { done: true, time: db.serverDate(), seeded, skipped, total: presets.length }
+  }).catch(() => {});
+
+  return { code: 0, msg: 'seed done', seeded, skipped, total: presets.length, results };
+}
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -1186,7 +1298,7 @@ exports.main = async (event, context) => {
       try {
         const result = await db.collection('templates').where({
             _openid: openid
-        }).orderBy('createTime', 'desc').get();
+        }).orderBy('createTime', 'desc').limit(100).get();
         
         return {
             code: 0,
@@ -1274,6 +1386,10 @@ exports.main = async (event, context) => {
         data: { id: templateId },
         msg: 'success'
       };
+    }
+
+    if (action === 'seedPresets') {
+      return await seedPresetsToUser();
     }
 
     if (action === 'trackAchievement') {

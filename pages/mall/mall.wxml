@@ -76,45 +76,55 @@ module.exports = {
 
       <scroll-view class="chip-scroll" scroll-x show-scrollbar="false">
         <view class="chip-row">
-          <view class="chip {{feedSort === 'new' ? 'active' : ''}}" bindtap="onFeedSortTap" data-key="new">最新</view>
-          <view class="chip {{feedSort === 'hot' ? 'active' : ''}}" bindtap="onFeedSortTap" data-key="hot">热门</view>
-          <view class="chip">可爱</view>
-          <view class="chip">动漫</view>
-          <view class="chip">像素风</view>
-          <view class="chip">节日</view>
+          <view class="chip {{!feedTag && feedSort === 'new' ? 'active' : ''}}" bindtap="onFeedSortTap" data-key="new">最新</view>
+          <view class="chip {{!feedTag && feedSort === 'hot' ? 'active' : ''}}" bindtap="onFeedSortTap" data-key="hot">热门</view>
+          <view class="chip {{feedTag === '可爱' ? 'active' : ''}}" bindtap="onFeedTagTap" data-tag="可爱">可爱</view>
+          <view class="chip {{feedTag === '动漫' ? 'active' : ''}}" bindtap="onFeedTagTap" data-tag="动漫">动漫</view>
+          <view class="chip {{feedTag === '像素风' ? 'active' : ''}}" bindtap="onFeedTagTap" data-tag="像素风">像素风</view>
+          <view class="chip {{feedTag === '节日' ? 'active' : ''}}" bindtap="onFeedTagTap" data-tag="节日">节日</view>
         </view>
       </scroll-view>
 
-      <!-- 空态：仅当社区列表为空时显示（不再用 mock 假数据兜底） -->
-      <view class="empty-state" wx:if="{{communityList.length === 0}}">
+      <!-- 空态：仅当筛选后两类内容都为空时显示（图纸默认铺满，正常不会触发） -->
+      <view class="empty-state" wx:if="{{feedCount === 0}}">
         <view class="empty-card">
           <view class="empty-hero">
             <view class="empty-icon">✨</view>
             <view class="empty-texts">
-              <view class="empty-title">还没有灵感内容</view>
-              <view class="empty-desc">先做一张作品发布到这里，让大家看到你的拼豆！</view>
+              <view class="empty-title">{{feedTag ? '「' + feedTag + '」下还没有内容' : '还没有灵感内容'}}</view>
+              <view class="empty-desc">{{feedTag ? '换个分类看看，或者你来发第一张～' : '先做一张作品发布到这里，让大家看到你的拼豆！'}}</view>
             </view>
           </view>
           <view class="empty-actions">
             <button class="primary-btn" bindtap="onCreateTap">开始创作</button>
             <button class="ghost-btn" bindtap="onGenerateTap">图片转像素</button>
           </view>
+          <view class="empty-reset" wx:if="{{feedTag}}" bindtap="onFeedTagTap" data-tag="{{feedTag}}">取消「{{feedTag}}」筛选</view>
         </view>
       </view>
 
-      <view wx:if="{{communityList.length > 0}}">
-        <view class="section-row">
-          <text class="section-title">今日灵感</text>
-          <text class="section-sub">{{communityList.length}} 条</text>
-        </view>
-
-        <!-- Waterfall Layout -->
-        <view class="waterfall-container">
-          <!-- Left Column -->
-          <view class="waterfall-column">
-            <view class="card-item" 
-                  wx:for="{{leftList}}" 
-                  wx:key="_id"
+      <!-- 统一信息流：图纸 + 今日灵感作品 混排在一起显示 -->
+      <view class="waterfall-container" wx:if="{{feedCount > 0}}">
+        <!-- Left Column -->
+        <view class="waterfall-column">
+          <block wx:for="{{feedLeft}}" wx:key="_id">
+            <!-- 图纸卡片 -->
+            <view class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
+                  bindtap="openPattern" data-key="{{item.key}}">
+              <view class="card-media">
+                <image class="card-img card-img-square" src="{{item.thumb}}" mode="aspectFill" lazy-load></image>
+                <view class="feed-badge">图纸</view>
+              </view>
+              <view class="card-info">
+                <text class="card-title">{{item.name}}</text>
+                <view class="card-meta">
+                  <text class="feed-tag-label" wx:if="{{item.tags.length}}">{{item.tags[0]}}</text>
+                  <text class="bead-count">{{item.beadCount}} 颗</text>
+                </view>
+              </view>
+            </view>
+            <!-- 作品卡片 -->
+            <view class="card-item" wx:elif="{{item.type === 'post'}}"
                   bindtap="goToDetail"
                   data-id="{{item._id}}"
                   data-title="{{item.content || '未命名'}}"
@@ -140,13 +150,37 @@ module.exports = {
                 </view>
               </view>
             </view>
-          </view>
+            <!-- 查看全部图纸入口 -->
+            <view class="card-item feed-more" wx:else bindtap="openPatternList">
+              <view class="feed-more-inner">
+                <view class="feed-more-icon">🧩</view>
+                <view class="feed-more-text">查看全部图纸</view>
+                <view class="feed-more-arrow">›</view>
+              </view>
+            </view>
+          </block>
+        </view>
 
-          <!-- Right Column -->
-          <view class="waterfall-column">
-            <view class="card-item" 
-                  wx:for="{{rightList}}" 
-                  wx:key="_id"
+        <!-- Right Column -->
+        <view class="waterfall-column">
+          <block wx:for="{{feedRight}}" wx:key="_id">
+            <!-- 图纸卡片 -->
+            <view class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
+                  bindtap="openPattern" data-key="{{item.key}}">
+              <view class="card-media">
+                <image class="card-img card-img-square" src="{{item.thumb}}" mode="aspectFill" lazy-load></image>
+                <view class="feed-badge">图纸</view>
+              </view>
+              <view class="card-info">
+                <text class="card-title">{{item.name}}</text>
+                <view class="card-meta">
+                  <text class="feed-tag-label" wx:if="{{item.tags.length}}">{{item.tags[0]}}</text>
+                  <text class="bead-count">{{item.beadCount}} 颗</text>
+                </view>
+              </view>
+            </view>
+            <!-- 作品卡片 -->
+            <view class="card-item" wx:elif="{{item.type === 'post'}}"
                   bindtap="goToDetail"
                   data-id="{{item._id}}"
                   data-title="{{item.content || '未命名'}}"
@@ -172,7 +206,15 @@ module.exports = {
                 </view>
               </view>
             </view>
-          </view>
+            <!-- 查看全部图纸入口 -->
+            <view class="card-item feed-more" wx:else bindtap="openPatternList">
+              <view class="feed-more-inner">
+                <view class="feed-more-icon">🧩</view>
+                <view class="feed-more-text">查看全部图纸</view>
+                <view class="feed-more-arrow">›</view>
+              </view>
+            </view>
+          </block>
         </view>
       </view>
       

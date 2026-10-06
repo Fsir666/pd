@@ -29,7 +29,7 @@
 .orb-1 {
   width: 500rpx;
   height: 500rpx;
-  background: #54A0FF; /* Blue for Matting */
+  background: #E0909A; /* warm rose for Matting */
   top: -100rpx;
   right: -100rpx;
 }
@@ -126,7 +126,7 @@
   width: 92%;
   max-width: 560rpx;
   margin: 0 auto;
-  background: linear-gradient(135deg, #0A84FF, #54A0FF);
+  background: linear-gradient(135deg, #D4607A, #E07A8E);
   color: white;
   border-radius: 999rpx;
   height: 92rpx;
@@ -137,7 +137,7 @@
   font-size: 28rpx;
   font-weight: 800;
   border: none;
-  box-shadow: 0 14rpx 34rpx rgba(0, 122, 255, 0.28);
+  box-shadow: 0 14rpx 34rpx rgba(212, 96, 122, 0.28);
   letter-spacing: 0.6rpx;
   white-space: nowrap;
   overflow: hidden;
@@ -158,8 +158,8 @@
 .loading-spinner {
   width: 60rpx;
   height: 60rpx;
-  border: 6rpx solid rgba(0, 122, 255, 0.1);
-  border-top-color: #007AFF;
+  border: 6rpx solid rgba(212, 96, 122, 0.1);
+  border-top-color: #D4607A;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 30rpx;
@@ -207,9 +207,9 @@
 
 .btn-reupload {
   font-size: 26rpx;
-  color: #007AFF;
+  color: #D4607A;
   padding: 10rpx 24rpx;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(212, 96, 122, 0.1);
   border-radius: 30rpx;
 }
 

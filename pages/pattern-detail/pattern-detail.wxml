@@ -1,0 +1,34 @@
+<view class="page">
+  <view class="sheet-card">
+    <view class="sheet-head">
+      <view class="sheet-head-main">
+        <view class="sheet-title">{{p.name}}</view>
+        <view class="sheet-sub">{{p.w}}×{{p.h}} 粒 · {{p.beadCount}} 颗 · {{p.colors}} 个色号</view>
+      </view>
+      <view class="fav-btn {{isFav ? 'on' : ''}}" bindtap="toggleFav">
+        <text class="fav-icon">{{isFav ? '⭐' : '☆'}}</text>
+        <text>{{isFav ? '已收藏' : '收藏'}}</text>
+      </view>
+    </view>
+    <canvas type="2d" id="patternCanvas" class="canvas"
+            style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+    <view class="sheet-tip">格子里的字母就是色号，空白格不用放珠子</view>
+  </view>
+
+  <view class="list-card">
+    <view class="list-title">这版要用的珠子</view>
+    <view class="row" wx:for="{{rows}}" wx:key="code">
+      <view class="swatch" style="background: {{item.hex}}"></view>
+      <view class="code">{{item.code}}</view>
+      <view class="hex">{{item.hex}}</view>
+      <view class="count">{{item.count}} 颗</view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="btn btn-ghost" bindtap="copyList">复制采购单</view>
+    <view class="btn btn-primary" bindtap="saveImage">保存图纸</view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

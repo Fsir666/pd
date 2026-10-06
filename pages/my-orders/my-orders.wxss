@@ -1,6 +1,6 @@
 .intro-container {
   min-height: 100vh;
-  background-color: #F2F4F8;
+  background-color: var(--ym-bg, #FBF7F2);
   display: flex;
   flex-direction: column;
   padding-bottom: 40rpx;
@@ -17,12 +17,12 @@
 .icon-bg {
   width: 160rpx;
   height: 160rpx;
-  background: #fff;
+  background: var(--ym-surface, #FFFDFB);
   border-radius: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 20rpx 40rpx rgba(84, 160, 255, 0.15);
+  box-shadow: 0 20rpx 40rpx rgba(212, 96, 122, 0.12);
   margin-bottom: 30rpx;
 }
 
@@ -33,13 +33,13 @@
 .app-title {
   font-size: 48rpx;
   font-weight: 800;
-  color: #333;
+  color: var(--ym-text, #4A3A3E);
   margin-bottom: 10rpx;
 }
 
 .app-subtitle {
   font-size: 28rpx;
-  color: #888;
+  color: var(--ym-text-sub, #9B8A8C);
   letter-spacing: 2rpx;
   text-transform: uppercase;
 }
@@ -51,12 +51,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05);
-  border-radius: 32rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border: 1px solid var(--ym-line, #F0E4DC);
+  box-shadow: 0 10rpx 40rpx rgba(74, 58, 62, 0.06);
+  border-radius: var(--ym-r-xl, 32rpx);
 }
 
 .feature-card {
@@ -69,7 +67,7 @@
 .feature-icon-box {
   width: 100rpx;
   height: 100rpx;
-  border-radius: 24rpx;
+  border-radius: var(--ym-r-md, 20rpx);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,13 +88,13 @@
 .feature-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--ym-text, #4A3A3E);
   margin-bottom: 8rpx;
 }
 
 .feature-desc {
   font-size: 26rpx;
-  color: #666;
+  color: var(--ym-text-sub, #9B8A8C);
   line-height: 1.4;
 }
 
@@ -110,38 +108,38 @@
 }
 
 .enter-btn {
-  background: linear-gradient(135deg, #54A0FF, #2E86DE);
-  color: #fff;
+  background: linear-gradient(135deg, #D4607A, #E07A8E);
+  color: #FFFFFF;
   font-size: 34rpx;
   font-weight: 600;
   padding: 0;
   height: 100rpx;
   line-height: 100rpx;
   border-radius: 50rpx;
-  box-shadow: 0 10rpx 30rpx rgba(84, 160, 255, 0.3);
+  box-shadow: 0 10rpx 30rpx rgba(212, 96, 122, 0.3);
   transition: all 0.3s;
 }
 
 .enter-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 5rpx 15rpx rgba(84, 160, 255, 0.2);
+  box-shadow: 0 5rpx 15rpx rgba(212, 96, 122, 0.2);
 }
 
 .testpay-btn {
-  background: rgba(255, 255, 255, 0.8);
-  color: #2E86DE;
+  background: var(--ym-surface, #FFFDFB);
+  color: var(--ym-primary, #D4607A);
   font-size: 32rpx;
   font-weight: 600;
   padding: 0;
   height: 96rpx;
   line-height: 96rpx;
   border-radius: 48rpx;
-  border: 1px solid rgba(46, 134, 222, 0.25);
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(212, 96, 122, 0.25);
+  box-shadow: 0 10rpx 30rpx rgba(74, 58, 62, 0.06);
   transition: all 0.3s;
 }
 
 .testpay-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 5rpx 15rpx rgba(74, 58, 62, 0.04);
 }

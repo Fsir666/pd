@@ -1,12 +1,12 @@
 .container {
-  background-color: #f8f8f8;
+  background-color: #FBF7F2;
   min-height: 100vh;
 }
 
 /* 1. 顶部大图与视差 */
 .hero-image {
   width: 100%;
-  height: 65vh;
+  height: 62vh;
   display: block;
   will-change: transform;
 }
@@ -14,19 +14,22 @@
 .back-btn {
   position: fixed;
   left: 30rpx;
-  width: 70rpx;
-  height: 70rpx;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 253, 251, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1rpx solid rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
+  box-shadow: 0 8rpx 24rpx rgba(176, 138, 128, 0.18);
 }
 
 .back-icon {
-  color: #fff;
+  color: #4A3A3E;
   font-size: 40rpx;
   font-weight: bold;
 }
@@ -35,11 +38,13 @@
 .content-card {
   position: relative;
   margin-top: -60rpx;
-  background: #fff;
+  background: #FFFDFB;
   border-radius: 40rpx 40rpx 0 0;
   padding: 40rpx;
   min-height: 40vh;
-  box-shadow: 0 -10rpx 30rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -10rpx 30rpx rgba(176, 138, 128, 0.10);
+  border: 1rpx solid #F0E4DC;
+  border-bottom: none;
 }
 
 .card-header {
@@ -48,10 +53,11 @@
 
 .title {
   font-size: 44rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15rpx;
+  font-weight: 800;
+  color: #4A3A3E;
+  margin-bottom: 18rpx;
   display: block;
+  letter-spacing: -0.4px;
 }
 
 .tags-container {
@@ -61,23 +67,25 @@
 
 .tag {
   font-size: 24rpx;
-  color: #999;
-  background: #f0f0f0;
-  padding: 4rpx 20rpx;
-  border-radius: 20rpx;
+  color: #A8455C;
+  background: #F6E9E4;
+  padding: 6rpx 22rpx;
+  border-radius: 999rpx;
   margin-right: 15rpx;
+  margin-bottom: 12rpx;
+  font-weight: 600;
 }
 
 .primary-actions {
   display: flex;
   gap: 20rpx;
-  margin-bottom: 26rpx;
+  margin-bottom: 30rpx;
 }
 
 .primary-btn {
   flex: 1;
-  height: 86rpx;
-  border-radius: 46rpx;
+  height: 90rpx;
+  border-radius: 26rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,15 +94,15 @@
 }
 
 .primary-remix {
-  background: linear-gradient(135deg, #ff8c42, #ff6b00);
-  color: #fff;
-  box-shadow: 0 10rpx 26rpx rgba(255, 107, 0, 0.22);
+  background: linear-gradient(135deg, #D4607A, #C2576E);
+  color: #FFFDFB;
+  box-shadow: 0 12rpx 30rpx rgba(212, 96, 122, 0.30);
 }
 
 .primary-copy {
-  background: rgba(17, 17, 20, 0.06);
-  color: rgba(29, 29, 31, 0.86);
-  border: 1rpx solid rgba(0, 0, 0, 0.06);
+  background: #E9F0E8;
+  color: #4C6B4E;
+  border: 1rpx solid rgba(122, 158, 126, 0.30);
 }
 
 .primary-btn:active {
@@ -105,18 +113,22 @@
 /* 作者信息 */
 .author-info {
   display: flex;
-  align-items: flex-start; /* 改为顶部对齐，适应多行内容 */
-  padding: 20rpx 0;
+  align-items: flex-start;
+  padding: 24rpx;
   margin-bottom: 30rpx;
+  background: #FBF7F2;
+  border-radius: 26rpx;
+  border: 1rpx solid #F0E4DC;
 }
 
 .avatar {
-  width: 80rpx;
-  height: 80rpx;
+  width: 84rpx;
+  height: 84rpx;
   border-radius: 50%;
   margin-right: 20rpx;
-  background: #eee;
+  background: #E4D5CB;
   flex-shrink: 0;
+  border: 1rpx solid #F0E4DC;
 }
 
 .author-meta {
@@ -125,8 +137,8 @@
 
 .nickname {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #4A3A3E;
   display: block;
   margin-bottom: 15rpx;
 }
@@ -136,33 +148,35 @@
   align-items: center;
   justify-content: space-between;
   gap: 16rpx;
-  margin-bottom: 14rpx;
+  margin-bottom: 16rpx;
 }
 
 .follower-text {
   font-size: 24rpx;
-  color: rgba(29, 29, 31, 0.58);
+  color: #9B8A8C;
   font-weight: 600;
 }
 
 .follow-btn {
-  height: 54rpx;
-  padding: 0 22rpx;
+  height: 56rpx;
+  padding: 0 26rpx;
   border-radius: 999rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24rpx;
   font-weight: 800;
-  background: rgba(17, 17, 20, 0.06);
-  color: rgba(29, 29, 31, 0.78);
-  border: 1rpx solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #D4607A, #C2576E);
+  color: #FFFDFB;
+  box-shadow: 0 8rpx 22rpx rgba(212, 96, 122, 0.28);
+  border: none;
 }
 
 .follow-btn.following {
-  background: rgba(255, 107, 0, 0.10);
-  color: #ff6b00;
-  border-color: rgba(255, 107, 0, 0.18);
+  background: #F6E9E4;
+  color: #A8455C;
+  box-shadow: none;
+  border: 1rpx solid rgba(212, 96, 122, 0.25);
 }
 
 .follow-btn.disabled {
@@ -173,7 +187,7 @@
   transform: scale(0.96);
 }
 
-/* 作者栏操作按钮 */
+/* 作者栏操作按钮（点赞 / 收藏） */
 .author-actions {
   display: flex;
   gap: 20rpx;
@@ -185,21 +199,22 @@
   height: 60rpx;
   padding: 0 24rpx;
   border-radius: 30rpx;
-  background: #f5f5f5;
+  background: #F5EDE6;
+  border: 1rpx solid #F0E4DC;
   transition: all 0.2s;
 }
 
 .action-pill:active {
   transform: scale(0.95);
-  background: #ebebeb;
+  background: #E4D5CB;
 }
 
 .action-pill.active {
-  background: #fff0f0; /* 激活态浅红背景 */
+  background: #F6E9E4;
 }
 
 .collect-pill.active {
-  background: #fff8e1; /* 收藏激活态浅黄背景 */
+  background: #F7EEDF;
 }
 
 .action-pill .icon {
@@ -210,22 +225,22 @@
 .action-pill .count, 
 .action-pill .label {
   font-size: 26rpx;
-  color: #666;
-  font-weight: 500;
+  color: #7A6A6E;
+  font-weight: 600;
 }
 
 .like-pill.active .count {
-  color: #ff4d4f;
+  color: #D4607A;
 }
 
 .collect-pill.active .label {
-  color: #ffc107;
+  color: #D89A5C;
 }
 
 .description {
   font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
+  color: #7A6A6E;
+  line-height: 1.7;
   margin-bottom: 40rpx;
   text-align: justify;
 }
@@ -255,17 +270,18 @@
 .recommend-card {
   display: inline-block;
   width: 280rpx;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  background: #FFFDFB;
+  box-shadow: 0 6rpx 20rpx rgba(176, 138, 128, 0.12);
+  border: 1rpx solid #F0E4DC;
   flex-shrink: 0;
 }
 
 .recommend-img {
   width: 280rpx;
   height: 280rpx;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, #F6E9E4 0%, #E9F0E8 100%);
   display: block;
 }
 
@@ -279,7 +295,7 @@
 .recommend-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1c1c1e;
+  color: #4A3A3E;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -290,7 +306,7 @@
 
 .recommend-sub {
   font-size: 24rpx;
-  color: #8e8e93;
+  color: #9B8A8C;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -300,16 +316,17 @@
 /* 4. 评论区 */
 .section-container {
   margin-bottom: 40rpx;
-  padding-top: 30rpx;
-  border-top: 1rpx solid #f2f2f2;
+  padding-top: 36rpx;
+  border-top: 1rpx solid #F0E4DC;
 }
 
 .section-title {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
+  font-weight: 800;
+  color: #4A3A3E;
+  margin-bottom: 24rpx;
   display: block;
+  letter-spacing: -0.4px;
 }
 
 .comment-header {
@@ -327,16 +344,17 @@
 
 .tab {
   font-size: 26rpx;
-  color: #999;
-}
-
-.tab.active {
-  color: #333;
+  color: #9B8A8C;
   font-weight: 600;
 }
 
+.tab.active {
+  color: #D4607A;
+  font-weight: 800;
+}
+
 .divider {
-  color: #eee;
+  color: #E4D5CB;
   font-size: 20rpx;
 }
 
@@ -355,7 +373,8 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: #eee;
+  background: #E4D5CB;
+  flex-shrink: 0;
 }
 
 .comment-main {
@@ -370,25 +389,25 @@
 
 .user-nickname {
   font-size: 26rpx;
-  font-weight: 600;
-  color: #555;
+  font-weight: 700;
+  color: #4A3A3E;
 }
 
 .comment-time {
   font-size: 22rpx;
-  color: #ccc;
+  color: #C2B4B4;
 }
 
 .comment-text {
   font-size: 28rpx;
-  color: #444;
-  line-height: 1.5;
+  color: #4A3A3E;
+  line-height: 1.6;
   margin-bottom: 15rpx;
 }
 
 .comment-img {
   width: 240rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   display: block;
 }
 
@@ -411,41 +430,37 @@
 .particle {
   position: absolute;
   font-size: 48rpx;
-  /* 使用 CSS 变量控制持续时间，默认 1s */
   animation: gravity var(--duration, 1s) ease-out forwards;
   pointer-events: none;
 }
 
 @keyframes gravity {
   0% {
-    /* 初始状态：原点，透明度0，无旋转 */
     transform: translate(0, 0) scale(0.5) rotate(0deg);
     opacity: 0;
   }
   10% {
-    /* 快速出现，开始起跳 */
     opacity: 1;
   }
   40% {
-    /* 到达最高点：X轴偏移，Y轴高度由变量控制，旋转完成约 40% */
     transform: translate(var(--tx, 0), var(--ty, -180rpx)) scale(1.2) rotate(calc(var(--rot) * 0.4));
     opacity: 1;
   }
   100% {
-    /* 落地：大幅度下落，完全旋转 */
     transform: translate(calc(var(--tx, 0) * 2), 1500rpx) scale(1) rotate(var(--rot));
-    opacity: 1; /* 保持不透明，直到掉出屏幕 */
+    opacity: 1;
   }
 }
 
-/* 5. 底部固定栏 (Glass Style) */
+/* 5. 底部固定栏 (Cream Glass) */
 .bottom-action-bar {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 253, 251, 0.86);
   backdrop-filter: blur(20px);
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1rpx solid #F0E4DC;
   z-index: 200;
 }
 
@@ -464,7 +479,7 @@
   width: 100%;
   height: 100%;
   border-radius: 12rpx;
-  border: 1rpx solid #eee;
+  border: 1rpx solid #F0E4DC;
 }
 
 .delete-btn {
@@ -473,7 +488,7 @@
   right: -15rpx;
   width: 36rpx;
   height: 36rpx;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(74, 58, 62, 0.5);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -488,24 +503,25 @@
   align-items: center;
   padding: 16rpx 24rpx;
   gap: 16rpx;
-  background: #fff;
+  background: transparent;
 }
 
 .input-container {
   flex: 1;
   height: 80rpx;
-  background: #f5f5f7;
+  background: #F5EDE6;
   border-radius: 40rpx;
   display: flex;
   align-items: center;
   padding: 0 24rpx;
   position: relative;
+  border: 1rpx solid #F0E4DC;
 }
 
 .main-input {
   flex: 1;
   font-size: 28rpx;
-  color: #1c1c1e;
+  color: #4A3A3E;
 }
 
 .camera-btn {
@@ -522,91 +538,89 @@
 .send-btn-inline {
   margin-left: 16rpx;
   padding: 10rpx 24rpx;
-  background: linear-gradient(135deg, #007AFF, #0055D5);
+  background: linear-gradient(135deg, #D4607A, #C2576E);
   border-radius: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 6rpx 18rpx rgba(212, 96, 122, 0.30);
   transition: all 0.2s ease;
 }
 
 .send-btn-inline:active {
   transform: scale(0.95);
-  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.3);
 }
 
 .send-btn-inline .send-text {
   font-size: 26rpx;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: #FFFDFB;
   line-height: 1;
 }
 
-/* 右侧工具栏 */
+/* 右侧工具栏（评论 / 点赞 / 收藏 / 分享） */
 .toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 12rpx;
 }
 
-.action-btn {
-  width: 72rpx;
-  height: 72rpx;
+.tool-pill {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #f5f5f7;
+  gap: 4rpx;
+  height: 64rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  background: #F5EDE6;
+  border: 1rpx solid #F0E4DC;
   transition: all 0.2s ease;
-  box-sizing: border-box;
 }
 
-.action-btn .icon {
+.tool-pill .icon {
   font-size: 32rpx;
   line-height: 1;
 }
 
-.action-btn.liked {
-  background: rgba(255, 59, 48, 0.1);
+.tool-pill .tcount {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #7A6A6E;
 }
 
-.action-btn.collected {
-  background: rgba(255, 204, 0, 0.15);
+.tool-pill.liked {
+  background: #F6E9E4;
+  border-color: rgba(212, 96, 122, 0.25);
 }
 
-.action-btn:active {
-  transform: scale(0.92);
-  background: #e8e8ed;
+.tool-pill.liked .tcount {
+  color: #D4607A;
 }
 
-button.action-btn.share-action {
+.tool-pill.collected {
+  background: #F7EEDF;
+  border-color: rgba(216, 154, 92, 0.25);
+}
+
+.tool-pill.collected .tcount {
+  color: #D89A5C;
+}
+
+.tool-pill:active {
+  transform: scale(0.94);
+}
+
+button.tool-pill.share-pill {
   margin: 0;
   padding: 0;
   border: none;
-  background: #f5f5f7;
+  background: #F5EDE6;
   line-height: 1;
-  width: 72rpx;
-  height: 72rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
   box-sizing: border-box;
 }
 
-button.action-btn.share-action::after {
+button.tool-pill.share-pill::after {
   border: none;
-}
-
-button.action-btn.share-action:active {
-  transform: scale(0.92);
-  background: #e8e8ed;
-}
-
-button.action-btn.share-action:active {
-  transform: scale(0.92);
-  background: #e8e8ed;
 }
 
 /* 安全区域 */

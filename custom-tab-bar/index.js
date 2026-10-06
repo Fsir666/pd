@@ -1,7 +1,11 @@
+// 白条宽度占 tabBar 容器的百分比：120rpx / 750rpx 设计宽 ÷ 容器 90% 宽
+// 这个比例与屏幕尺寸无关，写成常量，避免依赖 getSystemInfoSync 才算出正确 left
+const CURSOR_WIDTH_PERCENT = (120 / 750 / 0.9) * 100; // ≈ 17.7778
+
 Component({
   data: {
     selected: 0,
-    cursorLeft: '0%',
+    cursorLeft: '3.61%', // 首页（第 0 项）的正确初始位置，避免首帧停在 0% 偏左
     cursorWidth: '120rpx',
     isDragging: false,
     hoverIndex: -1,
@@ -16,15 +20,7 @@ Component({
   },
 
   attached() {
-    const sysInfo = wx.getSystemInfoSync();
-    this.windowWidth = sysInfo.windowWidth;
-    this.tabBarWidth = this.windowWidth * 0.9;
-    this.tabBarLeft = this.windowWidth * 0.05;
-    
-    const cursorWidthPx = (120 / 750) * this.windowWidth;
-    this.cursorWidthPercent = (cursorWidthPx / this.tabBarWidth) * 100;
-    
-    this.setData({ isDevtools: !!(sysInfo && sysInfo.platform === 'devtools') });
+    this._ensureMetrics();
 
     // 根据当前页面路径初始化选中态：避免进入/返回 tab 页时小白条从首位滑过（解决“跳动两次”）
     try {
@@ -36,18 +32,8 @@ Component({
         return route === p || route.indexOf(p) >= 0;
       });
       if (idx >= 0) {
-        const tabCenterPercent = idx * 25 + 12.5;
-        const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
-        this.setData({
-          selected: idx,
-          cursorLeft: cursorLeftPercent + '%',
-          cursorWidth: '120rpx',
-          hoverIndex: -1,
-          isDragging: true, // 首帧关闭过渡，直接定位到正确位置
-          initialized: true
-        });
-        // 下一帧恢复过渡，保证后续点击动画正常
-        setTimeout(() => this.setData({ isDragging: false }), 60);
+        // 无论 selected 是否已是该值，都要重新定位一次，保证 left 是算出来的而不是初始值
+        this.setSelected(idx);
       }
     } catch (e) {
       // 拿不到页面栈时，交给各页面 onShow 的 setSelected 兜底
@@ -60,18 +46,47 @@ Component({
 
   detached() {
     if (this._switchTimer) clearTimeout(this._switchTimer);
+    if (this._initTimer) clearTimeout(this._initTimer);
   },
 
   methods: {
-    setSelected(index) {
-      if (this.data.selected === index) return; // 已选中则跳过，避免重复动画
+    // 只在拖拽计算（px 坐标）时需要屏幕宽度；left 的百分比换算不依赖它
+    _ensureMetrics() {
+      if (this.cursorWidthPercent != null && this.windowWidth) return;
+      let sysInfo = null;
+      try {
+        sysInfo = wx.getSystemInfoSync();
+      } catch (e) {
+        sysInfo = null;
+      }
+      this.windowWidth = (sysInfo && sysInfo.windowWidth) || this.windowWidth || 375;
+      this.tabBarWidth = this.windowWidth * 0.9;
+      this.tabBarLeft = this.windowWidth * 0.05;
+      this.cursorWidthPercent = CURSOR_WIDTH_PERCENT;
+      if (sysInfo) {
+        this.setData({ isDevtools: sysInfo.platform === 'devtools' });
+      }
+    },
+
+    _cursorLeftFor(index) {
+      this._ensureMetrics();
       const tabCenterPercent = index * 25 + 12.5;
-      const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
+      let left = tabCenterPercent - this.cursorWidthPercent / 2;
+      if (Number.isNaN(left)) left = 0;
+      if (left < 0) left = 0;
+      return left + '%';
+    },
+
+    setSelected(index) {
+      this._ensureMetrics();
+      // 关键：未首次定位时必须放行。否则首页 setSelected(0) 会因 selected 已是 0 被跳过，
+      // 白条一直停在初始 left，看起来比正确位置偏左。
+      if (this.data.selected === index && this.data.initialized) return;
       // 首次定位（initialized=false）：关闭过渡直接跳到位，避免“从首页位再滑一次”
       const isInitial = !this.data.initialized;
       this.setData({
         selected: index,
-        cursorLeft: cursorLeftPercent + '%',
+        cursorLeft: this._cursorLeftFor(index),
         cursorWidth: '120rpx',
         hoverIndex: -1,
         isDragging: isInitial,
@@ -79,7 +94,11 @@ Component({
       });
       if (isInitial) {
         // 下一帧恢复过渡，保证后续点击切换动画正常
-        setTimeout(() => this.setData({ isDragging: false }), 60);
+        if (this._initTimer) clearTimeout(this._initTimer);
+        this._initTimer = setTimeout(() => {
+          this._initTimer = null;
+          this.setData({ isDragging: false });
+        }, 60);
       }
     },
 
@@ -96,16 +115,14 @@ Component({
       if (this._switchTimer) clearTimeout(this._switchTimer);
 
       wx.vibrateShort({ type: 'light' });
-      
-      const tabCenterPercent = index * 25 + 12.5;
-      const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
-      
+
       this.setData({
         isDragging: false,
         selected: index,
-        cursorLeft: cursorLeftPercent + '%',
+        cursorLeft: this._cursorLeftFor(index),
         cursorWidth: '120rpx',
-        hoverIndex: -1
+        hoverIndex: -1,
+        initialized: true
       });
 
       this._switchTimer = setTimeout(() => {
@@ -115,6 +132,7 @@ Component({
     },
 
     handleTabStart(e) {
+      this._ensureMetrics();
       this._startX = e.touches[0].clientX;
       this._startY = e.touches[0].clientY;
       this._startTime = Date.now();
@@ -128,6 +146,7 @@ Component({
     },
 
     handleTabDrag(e) {
+      this._ensureMetrics();
       if (!this.windowWidth) return;
       
       const clientX = e.touches[0].clientX;
@@ -198,15 +217,13 @@ Component({
         this.switchTab(newTab);
       } else {
         const prevTab = this.data.selected;
-        const tabCenterPercent = newTab * 25 + 12.5;
-        const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
-        
         this.setData({
           isDragging: false,
           selected: newTab,
-          cursorLeft: cursorLeftPercent + '%',
+          cursorLeft: this._cursorLeftFor(newTab),
           cursorWidth: '120rpx',
-          hoverIndex: -1
+          hoverIndex: -1,
+          initialized: true
         });
         
         if (prevTab !== newTab) {
@@ -227,12 +244,9 @@ Component({
   
     handleTabCancel() {
       const tab = this.data.selected;
-      const tabCenterPercent = tab * 25 + 12.5;
-      const cursorLeftPercent = tabCenterPercent - (this.cursorWidthPercent / 2);
-      
       this.setData({
         isDragging: false,
-        cursorLeft: cursorLeftPercent + '%',
+        cursorLeft: this._cursorLeftFor(tab),
         cursorWidth: '120rpx',
         hoverIndex: -1
       });

@@ -76,7 +76,7 @@ module.exports = {
     <view slot="refresher" class="custom-refresher" prop="{{isRefreshing}}" change:prop="{{refresh.onStatusChange}}">
       <view class="refresh-content">
         <view class="refresh-icon {{isRefreshing ? 'rotating' : ''}}">👾</view>
-        <text class="refresh-text">Loading...</text>
+        <text class="refresh-text">下拉刷新…</text>
       </view>
     </view>
 
@@ -128,7 +128,7 @@ module.exports = {
               <view class="toolbox-feature-row">
                 <view class="tool-feature tool-feature--primary" bindtap="onToolTap" data-id="1">
                   <view class="tool-feature-top">
-                    <view class="tool-feature-icon tool-icon pulse" style="color: #FF9F43">🖼️</view>
+                    <view class="tool-feature-icon tool-icon pulse" style="color: #D89A5C">🖼️</view>
                   </view>
                   <view class="tool-feature-text">
                     <text class="tool-feature-title">图片转像素</text>
@@ -137,7 +137,7 @@ module.exports = {
                 </view>
                 <view class="tool-feature tool-feature--secondary" bindtap="onToolTap" data-id="9">
                   <view class="tool-feature-top">
-                    <view class="tool-feature-icon tool-icon wiggle" style="color: #FF9F43">🪄</view>
+                    <view class="tool-feature-icon tool-icon wiggle" style="color: #D89A5C">🪄</view>
                   </view>
                   <view class="tool-feature-text">
                     <text class="tool-feature-title">照片转卡通</text>

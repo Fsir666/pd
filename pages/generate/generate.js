@@ -34,6 +34,8 @@ Page({
     statsSortMode: 'count',
     statsTotalBeads: 0,
     statsTotalColors: 0,
+    beadBoards: 0,
+    beadTip: '',
     statsList: [],
     exportW: 0,
     exportH: 0,
@@ -1228,6 +1230,8 @@ Page({
       this.setData({
         statsTotalBeads: 0,
         statsTotalColors: 0,
+        beadBoards: 0,
+        beadTip: '',
         statsList: []
       });
       return;
@@ -1279,9 +1283,38 @@ Page({
     }
     this._brandStatsRaw = brandStatsRaw;
 
-    this.setData({ statsTotalBeads: total }, () => {
+    this.setData({
+      statsTotalBeads: total,
+      beadBoards: this._computeBoards(cols, rows),
+      beadTip: this._computeBeadTip(total, cols, rows)
+    }, () => {
       this._applyBrandStats();
     });
+  },
+
+  /**
+   * 估算需要多少块 29×29 标准方板
+   * 拼豆玩家按"方板"备料，比单看颗数更能判断工作量
+   */
+  _computeBoards(cols, rows) {
+    const BOARD = 29;
+    if (!cols || !rows) return 0;
+    return Math.ceil(cols / BOARD) * Math.ceil(rows / BOARD);
+  },
+
+  /**
+   * 超过预算时给一句省钱建议
+   */
+  _computeBeadTip(total, cols, rows) {
+    const maxSide = Math.max(cols || 0, rows || 0);
+    if (!total || !maxSide) return '';
+    if (maxSide >= 80) {
+      return '偏大啦，缩到 64 粒能省不少珠子～';
+    }
+    if (total >= 6000) {
+      return '珠子用量偏高，新手建议先看小图';
+    }
+    return '';
   },
 
   _applyBrandStats() {

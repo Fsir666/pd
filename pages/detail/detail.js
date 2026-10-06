@@ -42,6 +42,7 @@ Page({
     commentImage: '', // 当前选中的评论配图
     activeTab: 0, // 0:最新, 1:最热
     comments: [],
+    allComments: [], // 原始评论（按排序方式派生 comments）
     
     // 5. 粒子特效
     particleList: []
@@ -86,54 +87,87 @@ Page({
   // 获取作品详情
   fetchWorkDetails(id) {
     wx.showLoading({ title: '加载中...' });
-    db.collection('templates').doc(id).get().then(res => {
-      const data = res.data;
-      
-      // 处理作者信息
-      let authorObj = { nickname: '未知作者', avatar: '/images/default-avatar.png' };
-      
-      // 优先使用 userInfo 字段 (包含完整的头像和昵称)
-      if (data.userInfo && (data.userInfo.avatarUrl || data.userInfo.nickName)) {
-        authorObj.nickname = data.userInfo.nickName || data.author || '未知作者';
-        authorObj.avatar = data.userInfo.avatarUrl || '/images/default-avatar.png';
-      } 
-      // 兼容旧数据格式
-      else if (typeof data.author === 'string') {
-        authorObj.nickname = data.author;
-      } else if (typeof data.author === 'object') {
-        authorObj = data.author;
+
+    // 把云端数据映射到页面字段（source: 'template' | 'post'）
+    const applyData = (data, source) => {
+      if (!data) {
+        wx.hideLoading();
+        wx.showToast({ title: '内容不存在或已删除', icon: 'none' });
+        return;
       }
 
-      // 处理标签 (从 difficulty, size, time 等字段构建)
+      let authorObj = { nickname: '未知作者', avatar: '/images/default-avatar.png' };
+      let title = '';
+      let imageUrl = '';
+      let description = '暂无描述';
       let tags = [];
-      if (data.difficulty) tags.push(`难度: ${data.difficulty}`);
-      if (data.size) tags.push(data.size);
-      if (data.time) tags.push(data.time);
-      if (data.tags && Array.isArray(data.tags)) tags = tags.concat(data.tags);
+      let board = null;
+      let spec = null;
+      let likes = 0;
+
+      if (source === 'post') {
+        // 社区帖（community_posts）：标题=content，点赞数在 likes 字段
+        title = data.content || '未命名作品';
+        imageUrl = data.imageUrl || '';
+        description = data.description || '暂无描述';
+        authorObj.nickname = data.author || '未知作者';
+        authorObj.avatar = data.authorAvatar || '/images/default-avatar.png';
+        likes = data.likes || 0;
+        if (Array.isArray(data.tags)) tags = data.tags.slice();
+      } else {
+        // 模板（templates）
+        if (data.userInfo && (data.userInfo.avatarUrl || data.userInfo.nickName)) {
+          authorObj.nickname = data.userInfo.nickName || data.author || '未知作者';
+          authorObj.avatar = data.userInfo.avatarUrl || '/images/default-avatar.png';
+        } else if (typeof data.author === 'string') {
+          authorObj.nickname = data.author;
+        } else if (typeof data.author === 'object') {
+          authorObj = data.author;
+        }
+        if (data.difficulty) tags.push(`难度: ${data.difficulty}`);
+        if (data.size) tags.push(data.size);
+        if (data.time) tags.push(data.time);
+        if (data.tags && Array.isArray(data.tags)) tags = tags.concat(data.tags);
+        title = data.title;
+        imageUrl = data.imageUrl;
+        description = data.description || '暂无描述';
+        board = data.board || null;
+        spec = data.spec || null;
+        likes = data.heat || data.likeCount || 0;
+      }
 
       this.setData({
-        title: data.title,
-        imageUrl: data.imageUrl,
-        description: data.description || '暂无描述',
-        tags: tags,
+        title,
+        imageUrl,
+        description,
+        tags,
         author: authorObj,
         authorOpenid: data._openid || (data.userInfo && data.userInfo.openid) || '',
-        board: data.board || null,
-        spec: data.spec || null,
+        board,
+        spec,
         stats: {
-          likes: data.heat || 0,
-          collects: 0, // 暂无字段
-          views: 0 // 暂无浏览量字段
+          likes,
+          collects: 0,
+          views: 0
         }
       });
       wx.hideLoading();
       this.fetchAuthorProfile();
       this.fetchRecommendations();
-    }).catch(err => {
-      console.error('获取作品详情失败', err);
-      wx.hideLoading();
-      wx.showToast({ title: '加载失败', icon: 'none' });
-    });
+    };
+
+    // 先读模板；读不到（社区帖没有对应模板）再兜底读 community_posts，确保页面一定能打开
+    db.collection('templates').doc(id).get()
+      .then(res => applyData(res.data, 'template'))
+      .catch(() => {
+        db.collection('community_posts').doc(id).get()
+          .then(res => applyData(res.data, 'post'))
+          .catch(err => {
+            console.error('获取作品详情失败', err);
+            wx.hideLoading();
+            wx.showToast({ title: '加载失败', icon: 'none' });
+          });
+      });
   },
 
   fetchAuthorProfile() {
@@ -261,11 +295,21 @@ Page({
       });
 
       this.setData({
-        comments: comments
-      });
+        comments: comments,
+        allComments: comments
+      }, () => this._applyCommentSort());
     }).catch(err => {
       console.error('获取评论失败', err);
     });
+  },
+
+  // 按当前 tab 对评论排序：最新=创建时间倒序（云端已排好），最热=点赞数倒序
+  _applyCommentSort() {
+    const list = (this.data.allComments || []).slice();
+    if (this.data.activeTab === 1) {
+      list.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    }
+    this.setData({ comments: list });
   },
 
   // 返回上一页
@@ -481,7 +525,13 @@ Page({
   // 切换评论排序
   onTabChange(e) {
     const index = e.currentTarget.dataset.index;
-    this.setData({ activeTab: index });
+    if (index === this.data.activeTab) return;
+    this.setData({ activeTab: index }, () => this._applyCommentSort());
+  },
+
+  // 底部「评论」按钮：滚动到评论区
+  focusComment() {
+    wx.pageScrollTo({ selector: '.comment-section', duration: 300 });
   },
 
   // --- 底部栏交互 ---

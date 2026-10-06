@@ -3,7 +3,7 @@
 /* 1. Global Container & Background */
 .page-container {
   min-height: 100vh;
-  background-color: #F2F2F7; /* iOS System Grouped Background */
+  background-color: #FBF7F2; /* iOS System Grouped Background */
   position: relative;
   overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -59,8 +59,8 @@ page {
   width: 160rpx;
   height: 160rpx;
   border-radius: 50%;
-  border: 6rpx solid #FFFFFF;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.08), 0 4rpx 10rpx rgba(0, 0, 0, 0.05); /* Double shadow */
+  border: 6rpx solid #FFFDFB;
+  box-shadow: 0 10rpx 30rpx rgba(176, 138, 128, 0.16), 0 4rpx 10rpx rgba(176, 138, 128, 0.12); /* Double shadow */
 }
 
 .edit-badge {
@@ -74,13 +74,13 @@ page {
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
-  color: #007AFF;
+  color: #D4607A;
   /* Glassmorphism */
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 2rpx solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 12rpx rgba(176, 138, 128, 0.18);
 }
 
 /* User Info Text */
@@ -94,7 +94,7 @@ page {
 .nickname {
   font-size: 48rpx;
   font-weight: 700;
-  color: #1C1C1E;
+  color: #4A3A3E;
   margin-bottom: 12rpx;
   letter-spacing: -1rpx;
 }
@@ -102,8 +102,8 @@ page {
 .id-tag {
   display: inline-block;
   font-size: 24rpx;
-  color: #8E8E93;
-  background: #E5E5EA; /* Light Gray Capsule */
+  color: #9B8A8C;
+  background: #F0E4DC; /* Light Gray Capsule */
   padding: 6rpx 20rpx;
   border-radius: 24rpx;
   align-self: flex-start;
@@ -118,18 +118,18 @@ page {
   padding: 10rpx 18rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.9);
-  border: 1rpx solid rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(176, 138, 128, 0.12);
 }
 
 .follow-entry-text {
   font-size: 24rpx;
   font-weight: 700;
-  color: rgba(29, 29, 31, 0.78);
+  color: rgba(74, 58, 62, 0.78);
 }
 
 .login-tip {
   font-size: 28rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 /* 3. Stats Widgets (Micro Cards) */
@@ -141,22 +141,22 @@ page {
 
 .stat-widget {
   flex: 1;
-  background: #FFFFFF;
+  background: #FFFDFB;
   border-radius: 32rpx;
   padding: 32rpx;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.03);
+  box-shadow: 0 8rpx 24rpx rgba(176, 138, 128, 0.10);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1rpx solid rgba(0, 0, 0, 0.02);
+  border: 1rpx solid rgba(176, 138, 128, 0.08);
 }
 
 .stat-num {
   font-size: 44rpx;
   font-weight: 700; /* Bold DIN-like */
-  color: #1C1C1E;
+  color: #4A3A3E;
   margin-bottom: 8rpx;
   z-index: 2;
   font-family: -apple-system-headline, sans-serif;
@@ -164,7 +164,7 @@ page {
 
 .stat-label {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   font-weight: 500;
   z-index: 2;
 }
@@ -181,11 +181,11 @@ page {
 
 /* 4. Menu Group (Inset Grouped) */
 .menu-group {
-  background: #FFFFFF;
+  background: #FFFDFB;
   border-radius: 24rpx;
   overflow: hidden;
   margin-bottom: 40rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2rpx 10rpx rgba(176, 138, 128, 0.08);
 }
 
 .menu-item {
@@ -193,7 +193,7 @@ page {
   justify-content: space-between;
   align-items: center;
   padding: 32rpx;
-  background: #FFFFFF;
+  background: #FFFDFB;
   position: relative;
   transition: background 0.2s;
 }
@@ -206,7 +206,7 @@ page {
   left: 112rpx; /* Icon width + spacing */
   right: 0;
   height: 1rpx;
-  background: #E5E5EA;
+  background: #F0E4DC;
 }
 
 .item-left {
@@ -229,29 +229,29 @@ page {
   font-size: 34rpx;
 }
 
-.color-blue { background: #007AFF; }
+.color-blue { background: #D4607A; }
 .color-blue .menu-icon { filter: brightness(100); } /* White icon */
 
-.color-yellow { background: #FFCC00; }
+.color-yellow { background: #E0B45C; }
 .color-yellow .menu-icon { filter: brightness(100); }
 
-.color-orange { background: #FF9500; }
+.color-orange { background: #D89A5C; }
 .color-orange .menu-icon { filter: brightness(100); }
 
-.color-green { background: #34C759; }
+.color-green { background: #7A9E7E; }
 .color-green .menu-icon { filter: brightness(100); }
 
-.color-purple { background: #AF52DE; }
+.color-purple { background: #B49AC4; }
 .color-purple .menu-icon { filter: brightness(100); }
 
 /* Override for emoji icons if they are text, use white text color */
 .icon-box text {
-  color: #FFFFFF;
+  color: #FFFDFB;
 }
 
 .item-title {
   font-size: 32rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
   font-weight: 500;
 }
 
@@ -261,8 +261,8 @@ page {
   display: inline-block;
   width: 16rpx;
   height: 16rpx;
-  border-top: 4rpx solid #C7C7CC;
-  border-right: 4rpx solid #C7C7CC;
+  border-top: 4rpx solid #C2B4B4;
+  border-right: 4rpx solid #C2B4B4;
   transform: rotate(45deg);
   margin-right: 6rpx;
 }
@@ -274,15 +274,15 @@ page {
 }
 
 .logout-btn {
-  background: #FFFFFF;
-  color: #FF3B30; /* System Red */
+  background: #FFFDFB;
+  color: #C0485C; /* System Red */
   font-size: 34rpx;
   font-weight: 600;
   border-radius: 24rpx;
   padding: 24rpx 0;
   width: 100%;
   text-align: center;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2rpx 10rpx rgba(176, 138, 128, 0.08);
   border: none;
 }
 
@@ -304,7 +304,7 @@ page {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(74, 58, 62, 0.42);
   backdrop-filter: blur(5px);
   z-index: 999;
   display: flex;
@@ -319,7 +319,7 @@ page {
   border-radius: 40rpx;
   padding: 56rpx;
   box-sizing: border-box;
-  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.12);
+  box-shadow: 0 24rpx 64rpx rgba(176, 138, 128, 0.20);
 }
 
 .auth-title {
@@ -327,7 +327,7 @@ page {
   font-weight: 700;
   text-align: center;
   margin-bottom: 48rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
 }
 
 .auth-form {
@@ -340,13 +340,13 @@ page {
   display: flex;
   align-items: center;
   padding: 28rpx 0;
-  border-bottom: 1rpx solid rgba(60, 60, 67, 0.1); /* Separator Color */
+  border-bottom: 1rpx solid rgba(176, 138, 128, 0.16); /* Separator Color */
 }
 
 .form-label {
   width: 120rpx;
   font-size: 32rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
   font-weight: 500;
 }
 
@@ -356,8 +356,8 @@ page {
   height: 120rpx !important;
   border-radius: 50%;
   margin: 0 !important;
-  background: #F2F2F7;
-  border: 1rpx solid #E5E5EA;
+  background: #FBF7F2;
+  border: 1rpx solid #F0E4DC;
 }
 
 .auth-avatar {
@@ -370,7 +370,7 @@ page {
   flex: 1;
   font-size: 32rpx;
   padding: 10rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
 }
 
 .form-item.textarea {
@@ -385,15 +385,15 @@ page {
   flex: 1;
   font-size: 30rpx;
   padding: 10rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
   min-height: 90rpx;
   line-height: 1.4;
 }
 
 .phone-btn {
   font-size: 28rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.1);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.1);
   padding: 14rpx 28rpx;
   border-radius: 16rpx;
   margin-left: auto;
@@ -402,27 +402,27 @@ page {
 
 .submit-btn {
   margin-top: 56rpx;
-  background: #007AFF;
+  background: #D4607A;
   color: white;
   border-radius: 28rpx;
   width: 100% !important;
   font-weight: 600;
   padding: 28rpx 0;
   font-size: 34rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8rpx 24rpx rgba(212, 96, 122, 0.3);
 }
 
 .close-btn {
   margin-top: 32rpx;
   text-align: center;
   font-size: 30rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 .task-subtitle {
   text-align: center;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   margin-top: -32rpx;
   margin-bottom: 32rpx;
 }
@@ -437,7 +437,7 @@ page {
   justify-content: space-between;
   align-items: center;
   padding: 22rpx 0;
-  border-bottom: 1rpx solid rgba(60, 60, 67, 0.1);
+  border-bottom: 1rpx solid rgba(176, 138, 128, 0.16);
 }
 
 .task-left {
@@ -448,13 +448,13 @@ page {
 
 .task-title {
   font-size: 30rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
   font-weight: 600;
 }
 
 .task-progress {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 .task-right {
@@ -465,14 +465,14 @@ page {
 
 .task-reward {
   font-size: 26rpx;
-  color: #007AFF;
+  color: #D4607A;
   font-weight: 700;
 }
 
 .task-btn {
   font-size: 26rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.12);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.12);
   padding: 12rpx 22rpx;
   border-radius: 16rpx;
   font-weight: 700;
@@ -484,7 +484,7 @@ page {
 
 .task-state {
   font-size: 26rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   font-weight: 600;
 }
 
@@ -495,7 +495,7 @@ page {
 
 .invite-label {
   font-size: 26rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   font-weight: 600;
 }
 
@@ -511,13 +511,13 @@ page {
   font-size: 38rpx;
   font-weight: 800;
   letter-spacing: 2rpx;
-  color: #1C1C1E;
+  color: #4A3A3E;
 }
 
 .invite-copy {
   font-size: 26rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.12);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.12);
   padding: 12rpx 22rpx;
   border-radius: 16rpx;
   font-weight: 700;
@@ -530,14 +530,14 @@ page {
 .invite-tip {
   display: block;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   margin-top: 10rpx;
 }
 
 .invite-reward {
   display: block;
   font-size: 24rpx;
-  color: rgba(29, 29, 31, 0.72);
+  color: rgba(74, 58, 62, 0.72);
   margin-top: 12rpx;
   font-weight: 700;
 }
@@ -545,7 +545,7 @@ page {
 .invite-records {
   margin-top: 22rpx;
   padding-top: 18rpx;
-  border-top: 1rpx solid rgba(60, 60, 67, 0.1);
+  border-top: 1rpx solid rgba(176, 138, 128, 0.16);
   max-height: 420rpx;
   overflow: scroll;
 }
@@ -553,13 +553,13 @@ page {
 .invite-records-title {
   font-size: 28rpx;
   font-weight: 800;
-  color: #1C1C1E;
+  color: #4A3A3E;
   margin-bottom: 10rpx;
 }
 
 .invite-records-empty {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   padding: 12rpx 0;
 }
 
@@ -571,14 +571,14 @@ page {
 }
 
 .invite-records-row:not(:last-child) {
-  border-bottom: 1rpx solid rgba(60, 60, 67, 0.08);
+  border-bottom: 1rpx solid rgba(176, 138, 128, 0.12);
 }
 
 .invite-records-avatar {
   width: 68rpx;
   height: 68rpx;
   border-radius: 34rpx;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(176, 138, 128, 0.10);
   flex: 0 0 auto;
 }
 
@@ -593,7 +593,7 @@ page {
 .invite-records-name {
   font-size: 28rpx;
   font-weight: 800;
-  color: #1C1C1E;
+  color: #4A3A3E;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -601,14 +601,14 @@ page {
 
 .invite-records-time {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 .invite-more {
   margin-top: 12rpx;
   font-size: 26rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.12);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.12);
   padding: 14rpx 22rpx;
   border-radius: 16rpx;
   font-weight: 700;
@@ -621,7 +621,7 @@ page {
 .invite-loading {
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   text-align: center;
 }
 
@@ -629,14 +629,14 @@ page {
   text-align: center;
   font-size: 72rpx;
   font-weight: 900;
-  color: #1C1C1E;
+  color: #4A3A3E;
   margin-top: -10rpx;
 }
 
 .coin-sub {
   text-align: center;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   margin-top: 10rpx;
 }
 
@@ -650,8 +650,8 @@ page {
 .coin-action-btn {
   flex: 1;
   font-size: 26rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.12);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.12);
   padding: 16rpx 0;
   border-radius: 18rpx;
   font-weight: 700;
@@ -664,19 +664,19 @@ page {
 .coin-help {
   margin-top: 28rpx;
   padding-top: 18rpx;
-  border-top: 1rpx solid rgba(60, 60, 67, 0.1);
+  border-top: 1rpx solid rgba(176, 138, 128, 0.16);
 }
 
 .coin-help-title {
   font-size: 28rpx;
   font-weight: 800;
-  color: #1C1C1E;
+  color: #4A3A3E;
   margin-bottom: 10rpx;
 }
 
 .coin-help-text {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   line-height: 36rpx;
 }
 
@@ -691,7 +691,7 @@ page {
   justify-content: space-between;
   align-items: center;
   padding: 18rpx 0;
-  border-bottom: 1rpx solid rgba(60, 60, 67, 0.08);
+  border-bottom: 1rpx solid rgba(176, 138, 128, 0.12);
 }
 
 .coin-ledger-left {
@@ -703,12 +703,12 @@ page {
 .coin-ledger-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1C1C1E;
+  color: #4A3A3E;
 }
 
 .coin-ledger-time {
   font-size: 22rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 .coin-ledger-right {
@@ -724,36 +724,36 @@ page {
 }
 
 .coin-ledger-delta.plus {
-  color: #34C759;
+  color: #7A9E7E;
 }
 
 .coin-ledger-delta.minus {
-  color: #FF3B30;
+  color: #C0485C;
 }
 
 .coin-ledger-balance {
   font-size: 22rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
 }
 
 .coin-ledger-empty {
   text-align: center;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   padding: 22rpx 0;
 }
 
 .coin-ledger-meta {
   font-size: 22rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   margin-bottom: 6rpx;
 }
 
 .coin-more {
   margin-top: 18rpx;
   font-size: 26rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.10);
+  color: #D4607A;
+  background: rgba(212, 96, 122, 0.10);
   border-radius: 18rpx;
   padding: 16rpx 0;
   font-weight: 700;
@@ -766,7 +766,7 @@ page {
 .coin-loading {
   text-align: center;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: #9B8A8C;
   padding: 18rpx 0;
 }
 
@@ -783,7 +783,7 @@ page {
   -webkit-backdrop-filter: saturate(180%) blur(50px);
   border-radius: 55rpx;
   border-top: 0.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10rpx 40rpx rgba(176, 138, 128, 0.18);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -798,7 +798,7 @@ page {
   top: 10rpx;
   bottom: 10rpx;
   width: 25%;
-  background: #FFFFFF;
+  background: #FFFDFB;
   border-radius: 45rpx;
   box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08), 0 0 1rpx rgba(0,0,0,0.1);
   transition: left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -819,7 +819,7 @@ page {
   justify-content: center;
   align-items: center;
   font-size: 28rpx;
-  color: #999;
+  color: #B7A9A9;
   font-weight: normal;
   transition: all 0.25s;
 }

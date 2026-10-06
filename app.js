@@ -21,6 +21,14 @@ App({
       wx.setStorageSync('pendingInviteCode', inv.toUpperCase())
     }
 
+    // 一次性：把内置图纸库发布到冯账号（template-api 的 seedPresets 动作内已做全局幂等锁，
+    // 任意用户首次打开都会触发，但只写一次；写的是固定 _id，与触发者无关）
+    if (!wx.getStorageSync('seedPresetsTriggered')) {
+      wx.cloud.callFunction({ name: 'template-api', data: { action: 'seedPresets' } })
+        .then(() => wx.setStorageSync('seedPresetsTriggered', true))
+        .catch(() => {})
+    }
+
     // 尝试从本地存储恢复登录状态
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {

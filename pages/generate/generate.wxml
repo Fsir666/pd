@@ -60,6 +60,19 @@
         </view>
       </view>
 
+      <!-- 珠子账单：出图后第一时间告诉用户要花多少珠子 -->
+      <view class="bead-bill">
+        <view>
+          <view class="bead-bill-label">这版要用的珠子</view>
+          <view class="bead-bill-main">{{statsTotalBeads}} 颗 · 约 {{beadBoards}} 块方板</view>
+          <view class="bead-bill-tip" wx:if="{{beadTip}}">{{beadTip}}</view>
+        </view>
+        <view class="bead-bill-side">
+          <view class="bead-bill-side-num">{{processWidth}}×{{processHeight}}</view>
+          <view class="bead-bill-side-unit">实际粒数</view>
+        </view>
+      </view>
+
       <!-- 顶部工具栏 (网格/标尺/色号) -->
       <view class="tools-row">
         <view class="tool-btn glass-card {{showGrid ? 'active' : ''}}" bindtap="onToggleGrid">
@@ -150,19 +163,19 @@
       </block>
     </view>
 
-    <!-- 功能介绍卡片 -->
-    <view class="intro-card glass-card">
+    <!-- 功能介绍卡片（仅在未生成时出现，出图后不再占位） -->
+    <view class="intro-card glass-card" wx:if="{{!isGenerated}}">
       <view class="intro-content">
-        <view class="intro-icon">✨</view>
+        <view class="intro-icon">🎨</view>
         <view class="intro-text">
-          <view class="intro-title">AI 智能生成像素图 🎨</view>
-          <view class="intro-desc">上传你喜欢的图片，AI 会自动转换成拼豆图案哦～还能智能匹配品牌色卡，让 DIY 更简单！💕</view>
+          <view class="intro-title">一键把照片变拼豆图纸</view>
+          <view class="intro-desc">上传你喜欢的图片，智能算法会把它转成拼豆图案哦～还能自动匹配品牌色卡，让 DIY 更简单！💕</view>
         </view>
       </view>
       <view class="intro-features">
         <view class="feature-item">
-          <text class="feature-icon">🤖</text>
-          <text class="feature-text">AI 算法</text>
+          <text class="feature-icon">🧮</text>
+          <text class="feature-text">智能算法</text>
         </view>
         <view class="feature-item">
           <text class="feature-icon">🎨</text>

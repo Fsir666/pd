@@ -1,13 +1,18 @@
-/* Global Page Setup */
+/* ============================================================
+   悠米拼豆 · 首页 index
+   视觉体系：奶油手作 S1
+   ============================================================ */
+
+/* ---------- 页面根 ---------- */
 .page-root {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-color: #F2F4F8;
+  background-color: var(--ym-bg, #FBF7F2);
   overflow: hidden;
 }
 
-/* Ambient Diffused Background */
+/* ---------- 背景柔光（暖调） ---------- */
 .ambient-bg {
   position: absolute;
   top: 0;
@@ -21,14 +26,14 @@
 .orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.7;
+  filter: blur(90rpx);
+  opacity: 0.6;
 }
 
 .orb-1 {
   width: 600rpx;
   height: 600rpx;
-  background: #E0C3FC; /* Soft Purple */
+  background: var(--ym-primary-wash, #F6E9E4);
   top: -150rpx;
   left: -100rpx;
   animation: float 10s infinite ease-in-out;
@@ -37,7 +42,7 @@
 .orb-2 {
   width: 500rpx;
   height: 500rpx;
-  background: #FFD1FF; /* Soft Pink */
+  background: var(--ym-honey-wash, #F7EEDF);
   bottom: 10%;
   right: -100rpx;
   animation: float 12s infinite ease-in-out reverse;
@@ -46,7 +51,7 @@
 .orb-3 {
   width: 400rpx;
   height: 400rpx;
-  background: #D4F1F4; /* Soft Blue */
+  background: var(--ym-mint-wash, #E9F0E8);
   top: 40%;
   left: 20%;
   animation: float 15s infinite ease-in-out 2s;
@@ -57,19 +62,15 @@
   50% { transform: translate(20rpx, 30rpx); }
 }
 
-/* Glassmorphism Utilities */
+/* ---------- 卡片基座 ---------- */
 .glass-card {
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.38));
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.68);
-  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
-  border-radius: 32rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border: 2rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.10));
+  border-radius: var(--ym-r-xl, 32rpx);
 }
 
-/* Scroll View & Container */
+/* ---------- 滚动容器 ---------- */
 scroll-view {
   position: relative;
   z-index: 1;
@@ -77,7 +78,7 @@ scroll-view {
 }
 
 .container {
-  padding-bottom: 200rpx;
+  padding-bottom: calc(120rpx + 40rpx + env(safe-area-inset-bottom));
 }
 
 .like-strip {
@@ -88,20 +89,166 @@ scroll-view {
   align-items: center;
 }
 
-/* 工具箱 (Toolbox) */
+/* ---------- 顶部状态栏 ---------- */
+.header-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx;
+  margin: 20rpx auto;
+  z-index: 100;
+  position: sticky;
+  top: 20rpx;
+  width: calc(100% - 48rpx);
+  box-sizing: border-box;
+  background: rgba(255, 253, 251, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 52rpx;
+  box-shadow: 0 8rpx 26rpx rgba(176, 138, 128, 0.14);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  background: var(--ym-bg-sunk, #F5EDE6);
+  padding: 8rpx 22rpx;
+  border-radius: 40rpx;
+}
+
+.status-item .icon {
+  margin-right: 8rpx;
+  font-size: 30rpx;
+}
+
+.status-item .value {
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
+  margin-right: 8rpx;
+  font-size: 28rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-item .label {
+  font-size: 23rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+}
+
+/* ---------- 轮播 ---------- */
+.banner-swiper {
+  height: 300rpx;
+  margin: 30rpx 24rpx;
+  border-radius: var(--ym-r-xl, 32rpx);
+  overflow: hidden;
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.14));
+  transform: translateZ(0);
+}
+
+.banner-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 36rpx;
+  font-weight: 500;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- 开始拼豆 CTA ---------- */
+.game-start-section {
+  padding: 0 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.start-btn-card {
+  background: var(--ym-primary, #D4607A);
+  border: 2rpx solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 16rpx 34rpx rgba(212, 96, 122, 0.30);
+  border-radius: var(--ym-r-xl, 32rpx);
+  padding: 46rpx 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.start-btn-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 8rpx 20rpx rgba(212, 96, 122, 0.22);
+}
+
+.start-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.start-title {
+  font-size: 46rpx;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+  letter-spacing: 2rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.12);
+}
+
+.start-desc {
+  font-size: 25rpx;
+  opacity: 0.92;
+  font-weight: 400;
+}
+
+.start-icon {
+  font-size: 76rpx;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10rpx); }
+}
+
+/* ---------- 区块标题 ---------- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22rpx;
+  padding: 0 10rpx;
+}
+
+.section-title-text {
+  font-size: 31rpx;
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
+  letter-spacing: 0.4rpx;
+}
+
+.section-title {
+  font-size: 31rpx;
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
+}
+
+.section-more {
+  font-size: 23rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+}
+
+/* ---------- 工具箱 ---------- */
 .toolbox-section {
   padding: 0 24rpx 40rpx;
 }
 
 .toolbox-shell {
   padding: 16rpx;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.36));
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.70);
-  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
+  background: var(--ym-surface, #FFFDFB);
+  border: 2rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.10));
+  border-radius: var(--ym-r-xl, 32rpx);
 }
 
 .toolbox-feature-row {
@@ -112,19 +259,16 @@ scroll-view {
 }
 
 .tool-feature {
-  border-radius: 32rpx;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.46));
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  box-shadow: 0 14rpx 40rpx rgba(0, 0, 0, 0.06);
+  border-radius: var(--ym-r-lg, 26rpx);
+  border: 2rpx solid transparent;
+  background: var(--ym-primary-wash, #F6E9E4);
+  box-shadow: none;
   padding: 18rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  transition: transform 0.2s ease;
 }
 
 .tool-feature:active {
@@ -147,11 +291,15 @@ scroll-view {
 
 .tool-feature-icon {
   margin-bottom: 0;
-  width: 92rpx;
-  height: 92rpx;
-  border-radius: 28rpx;
-  font-size: 52rpx;
-  box-shadow: 0 10rpx 26rpx rgba(0, 0, 0, 0.08);
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: var(--ym-r-md, 20rpx);
+  font-size: 48rpx;
+  background: var(--ym-surface-pure, #FFFFFF);
+  box-shadow: 0 6rpx 16rpx rgba(176, 138, 128, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tool-feature-text {
@@ -161,40 +309,26 @@ scroll-view {
 }
 
 .tool-feature-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #1F2328;
+  font-size: 31rpx;
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
   letter-spacing: 0.3rpx;
 }
 
 .tool-feature--secondary .tool-feature-title {
-  font-size: 28rpx;
-  font-weight: 650;
+  font-size: 27rpx;
+  font-weight: 500;
 }
 
 .tool-feature-desc {
   font-size: 22rpx;
-  color: rgba(31, 35, 40, 0.62);
+  color: var(--ym-text-sub, #9B8A8C);
 }
 
 .toolbox-grid.toolbox-grid--compact {
   gap: 16rpx;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-flow: row;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24rpx;
-  padding: 0 10rpx;
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
 }
 
 .toolbox-grid {
@@ -204,31 +338,26 @@ scroll-view {
   grid-auto-flow: dense;
 }
 
-/* Base Card Style */
+/* ---------- 工具小卡 ---------- */
 .tool-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20rpx 10rpx;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.66);
-  border-radius: 32rpx;
+  background: var(--ym-bg-sunk, #F5EDE6);
+  border: 2rpx solid transparent;
+  border-radius: var(--ym-r-lg, 26rpx);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
-  height: 100%; /* Ensure full height in grid */
+  height: 100%;
   box-sizing: border-box;
 }
 
 .toolbox-scroll-container {
   position: relative;
-  height: 480rpx; /* Show roughly 3 rows of items (including feature row) */
+  height: 480rpx;
   overflow: hidden;
   margin-bottom: 20rpx;
 }
@@ -240,7 +369,6 @@ scroll-view {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Small (1x1) */
 .tool-card.size-small {
   grid-column: span 1;
   grid-row: span 1;
@@ -248,24 +376,20 @@ scroll-view {
 
 .tool-card:active {
   transform: scale(0.96);
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.70);
-  box-shadow: 0 8rpx 22rpx rgba(0, 0, 0, 0.05);
+  background: var(--ym-primary-wash, #F6E9E4);
 }
 
-/* Tool Icon Base */
 .tool-icon {
-  font-size: 56rpx;
+  font-size: 50rpx;
   margin-bottom: 16rpx;
-  width: 96rpx;
-  height: 96rpx;
+  width: 88rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  border-radius: 32rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+  background: var(--ym-surface-pure, #FFFFFF);
+  border-radius: var(--ym-r-md, 20rpx);
+  box-shadow: 0 6rpx 16rpx rgba(176, 138, 128, 0.14);
   transition: transform 0.3s ease;
 }
 
@@ -278,23 +402,21 @@ scroll-view {
 
 .tool-title {
   font-size: 24rpx;
-  font-weight: 600;
-  color: #1F2328;
+  font-weight: 400;
+  color: var(--ym-text, #4A3A3E);
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .tool-desc {
   display: none;
 }
 
-/* --- Size Variations --- */
-
-/* Large (2x2) */
+/* --- 尺寸变体 --- */
 .tool-card.size-large {
   grid-column: span 2;
   grid-row: span 2;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  background: var(--ym-surface-pure, #FFFFFF);
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
@@ -302,13 +424,13 @@ scroll-view {
 }
 
 .tool-card.size-large .tool-icon {
-  font-size: 80rpx;
-  width: 140rpx;
-  height: 140rpx;
+  font-size: 72rpx;
+  width: 128rpx;
+  height: 128rpx;
   margin-bottom: 0;
-  border-radius: 40rpx;
-  background: #fff;
-  box-shadow: 0 12rpx 30rpx rgba(0,0,0,0.08);
+  border-radius: var(--ym-r-lg, 26rpx);
+  background: var(--ym-bg-sunk, #F5EDE6);
+  box-shadow: none;
 }
 
 .tool-card.size-large .tool-info {
@@ -316,21 +438,20 @@ scroll-view {
 }
 
 .tool-card.size-large .tool-title {
-  font-size: 34rpx;
-  font-weight: 700;
+  font-size: 32rpx;
+  font-weight: 500;
   margin-bottom: 8rpx;
   text-align: left;
 }
 
 .tool-card.size-large .tool-desc {
   display: block;
-  font-size: 24rpx;
-  color: #888;
+  font-size: 23rpx;
+  color: var(--ym-text-sub, #9B8A8C);
   text-align: left;
   line-height: 1.4;
 }
 
-/* Medium (2x1) */
 .tool-card.size-medium {
   grid-column: span 2;
   grid-row: span 1;
@@ -338,15 +459,15 @@ scroll-view {
   justify-content: flex-start;
   align-items: center;
   padding: 0 24rpx;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--ym-surface-pure, #FFFFFF);
 }
 
 .tool-card.size-medium .tool-icon {
   margin-bottom: 0;
   margin-right: 24rpx;
-  width: 100rpx;
-  height: 100rpx;
-  font-size: 50rpx;
+  width: 92rpx;
+  height: 92rpx;
+  font-size: 46rpx;
   flex-shrink: 0;
 }
 
@@ -357,8 +478,8 @@ scroll-view {
 }
 
 .tool-card.size-medium .tool-title {
-  font-size: 30rpx;
-  font-weight: 600;
+  font-size: 29rpx;
+  font-weight: 400;
   margin-bottom: 6rpx;
   text-align: left;
 }
@@ -366,7 +487,7 @@ scroll-view {
 .tool-card.size-medium .tool-desc {
   display: block;
   font-size: 22rpx;
-  color: #777;
+  color: var(--ym-text-sub, #9B8A8C);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -374,14 +495,7 @@ scroll-view {
   width: 100%;
 }
 
-/* Small (1x1) */
-.tool-card.size-small {
-  grid-column: span 1;
-  grid-row: span 1;
-}
-/* Replaced by above block */
-
-/* 显示全部工具按钮 */
+/* ---------- 全部工具按钮 ---------- */
 .show-all-btn-container {
   margin-top: 0;
 }
@@ -393,19 +507,19 @@ scroll-view {
   justify-content: center;
   align-items: center;
   font-size: 26rpx;
-  color: #666;
-  font-weight: 500;
+  color: var(--ym-text-sub, #9B8A8C);
+  font-weight: 400;
   transition: all 0.2s;
 }
 
 .show-all-btn:active {
   transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--ym-bg-sunk, #F5EDE6);
 }
 
 .arrow-icon {
   margin-left: 10rpx;
-  font-weight: bold;
+  font-weight: 400;
   transform: rotate(90deg);
   display: inline-block;
   transition: transform 0.3s ease;
@@ -425,7 +539,7 @@ scroll-view {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 动态图标动画 Keyframes */
+/* ---------- 图标动画 ---------- */
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
@@ -439,8 +553,8 @@ scroll-view {
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); filter: brightness(100%); }
-  50% { transform: scale(0.85); filter: brightness(110%); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.85); }
 }
 
 @keyframes spin-slow {
@@ -448,182 +562,21 @@ scroll-view {
   100% { transform: rotate(360deg); }
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12rpx); }
-}
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12rpx); }
 }
 
-/* 应用动画 */
 .tool-icon.pulse { animation: pulse 2s infinite ease-in-out; }
 .tool-icon.wiggle { animation: wiggle 1.5s infinite ease-in-out; }
-.tool-icon.breathe { animation: breathe 2s infinite ease-in-out; } /* Faster and stronger */
+.tool-icon.breathe { animation: breathe 2s infinite ease-in-out; }
 .tool-icon.spin-slow { animation: spin-slow 8s infinite linear; }
 .tool-icon.bounce { animation: bounce 2s infinite ease-in-out; }
 .tool-icon.float { animation: float 3s infinite ease-in-out; }
 
-/* iOS 26 悬浮导航栏 (Custom Floating TabBar) - Apple Glass Style */
-/* Removed from here, moved to component */
-
-/* Add padding to prevent content blocking */
-.container {
-  padding-bottom: calc(120rpx + 40rpx + env(safe-area-inset-bottom));
-}
-
-/* 顶部状态栏 */
-.header-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx;
-  margin: 20rpx auto; /* Center horizontally */
-  z-index: 100;
-  position: sticky; 
-  top: 20rpx;
-  width: calc(100% - 48rpx); /* Full width minus margins */
-  box-sizing: border-box;
-  /* Glass Container Style */
-  background: rgba(255, 255, 255, 0.2); /* Very light background */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 44rpx; /* Rounded pill shape */
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.05);
-}
-
-.status-item {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.5); /* Inner pill background */
-  padding: 8rpx 20rpx;
-  border-radius: 32rpx;
-  /* Remove individual borders/shadows if inside glass container, or keep subtle */
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.02); 
-}
-
-.status-item .icon {
-  margin-right: 8rpx;
-  font-size: 32rpx;
-}
-
-.status-item .value {
-  font-weight: 800;
-  color: #333;
-  margin-right: 8rpx;
-}
-
-.status-item .label {
-  font-size: 24rpx;
-  color: #666;
-}
-
-/* 轮播图 */
-.banner-swiper {
-  height: 300rpx;
-  margin: 30rpx 24rpx;
-  border-radius: 32rpx;
-  overflow: hidden;
-  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.08);
-  transform: translateZ(0); /* Fix for iOS overflow radius */
-}
-
-.banner-item {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 36rpx;
-  font-weight: bold;
-  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.2);
-}
-
-/* 开始游戏入口 - Glass Button Upgrade */
-.game-start-section {
-  padding: 0 24rpx;
-  margin-bottom: 40rpx;
-}
-
-.start-btn-card {
-  /* High Saturation Gradient + Glass */
-  background: linear-gradient(135deg, rgba(255, 107, 0, 0.85), rgba(255, 140, 66, 0.85));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20rpx 40rpx rgba(255, 107, 0, 0.3);
-  border-radius: 44rpx;
-  padding: 50rpx 40rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  position: relative;
-  transition: transform 0.1s ease;
-}
-
-.start-btn-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 10rpx 20rpx rgba(255, 107, 0, 0.2);
-}
-
-.start-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.start-title {
-  font-size: 48rpx;
-  font-weight: 800;
-  margin-bottom: 10rpx;
-  letter-spacing: 2rpx;
-  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
-}
-
-.start-desc {
-  font-size: 26rpx;
-  opacity: 0.95;
-  font-weight: 500;
-}
-
-.start-icon {
-  font-size: 80rpx;
-  animation: bounce 2s infinite;
-  filter: drop-shadow(0 4rpx 8rpx rgba(0,0,0,0.2));
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10rpx); }
-}
-
-/* 热度榜单 - Waterfall Layout */
+/* ---------- 热门图纸榜 ---------- */
 .rank-section {
   padding: 0 24rpx 40rpx;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24rpx;
-  padding: 0 10rpx;
-}
-
-.section-title-text {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #1F2328;
-  letter-spacing: 0.4rpx;
-}
-
-.section-more {
-  font-size: 24rpx;
-  color: rgba(31, 35, 40, 0.50);
 }
 
 .rank-list-flex {
@@ -642,14 +595,10 @@ scroll-view {
 .rank-item {
   width: 100%;
   margin-bottom: 24rpx;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 62%),
-    rgba(255, 255, 255, 0.52);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.70);
-  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.06);
-  border-radius: 32rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border: 2rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.10));
+  border-radius: var(--ym-r-xl, 32rpx);
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
@@ -659,57 +608,53 @@ scroll-view {
   transform: scale(0.98);
 }
 
-/* Rank Glow Effects - Subtle borders or shadows */
 .rank-gold {
-  border: 1px solid rgba(255, 215, 0, 0.5);
-  box-shadow: 0 10rpx 30rpx rgba(255, 215, 0, 0.15);
+  border: 2rpx solid rgba(216, 154, 92, 0.55);
+  box-shadow: 0 10rpx 26rpx rgba(216, 154, 92, 0.20);
 }
 
 .rank-silver {
-  border: 1px solid rgba(192, 192, 192, 0.5);
-  box-shadow: 0 10rpx 30rpx rgba(192, 192, 192, 0.15);
+  border: 2rpx solid rgba(196, 186, 178, 0.60);
+  box-shadow: 0 10rpx 26rpx rgba(176, 138, 128, 0.16);
 }
 
 .rank-bronze {
-  border: 1px solid rgba(205, 127, 50, 0.5);
-  box-shadow: 0 10rpx 30rpx rgba(205, 127, 50, 0.15);
+  border: 2rpx solid rgba(190, 140, 112, 0.50);
+  box-shadow: 0 10rpx 26rpx rgba(190, 140, 112, 0.18);
 }
 
-/* Image Area */
 .rank-img-box {
   position: relative;
   width: 100%;
   min-height: 200rpx;
-  background: #f0f0f0;
+  background: var(--ym-bg-sunk, #F5EDE6);
 }
 
 .rank-img-real {
   width: 100%;
-  display: block; /* Remove bottom space */
-  border-radius: 32rpx 32rpx 0 0; /* Optional: if overflow hidden is not enough */
+  display: block;
 }
 
 .rank-img-placeholder {
   width: 100%;
-  height: 300rpx; /* Default height */
+  height: 300rpx;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 80rpx;
-  background: #eee;
+  background: var(--ym-bg-sunk, #F5EDE6);
 }
 
-/* Badge */
 .rank-badge {
   position: absolute;
-  top: 10rpx;
-  left: 10rpx;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 4rpx 12rpx;
-  border-radius: 20rpx;
+  top: 12rpx;
+  left: 12rpx;
+  background: rgba(255, 253, 251, 0.94);
+  padding: 4rpx 14rpx;
+  border-radius: 24rpx;
   font-size: 24rpx;
-  font-weight: bold;
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+  font-weight: 400;
+  box-shadow: 0 4rpx 10rpx rgba(176, 138, 128, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -717,26 +662,25 @@ scroll-view {
 }
 
 .rank-badge.normal {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(74, 58, 62, 0.62);
   color: white;
-  padding: 4rpx 12rpx;
+  padding: 4rpx 14rpx;
 }
 
-/* Content Area */
 .rank-content {
-  padding: 16rpx 20rpx;
+  padding: 18rpx 20rpx;
 }
 
 .rank-title {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 27rpx;
+  font-weight: 400;
+  color: var(--ym-text, #4A3A3E);
   margin-bottom: 12rpx;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .rank-footer {
@@ -752,7 +696,7 @@ scroll-view {
 
 .rank-author {
   font-size: 22rpx;
-  color: #888;
+  color: var(--ym-text-sub, #9B8A8C);
   max-width: 150rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -762,9 +706,9 @@ scroll-view {
 .rank-heat {
   display: flex;
   align-items: center;
-  color: #FF6B00;
+  color: var(--ym-primary, #D4607A);
   font-size: 22rpx;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .heat-icon {
@@ -772,7 +716,7 @@ scroll-view {
   margin-right: 4rpx;
 }
 
-/* Custom Refresher */
+/* ---------- 下拉刷新 ---------- */
 .custom-refresher {
   width: 100vw;
   height: 200rpx;
@@ -804,6 +748,6 @@ scroll-view {
 }
 
 .refresh-text {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 23rpx;
+  color: var(--ym-text-sub, #9B8A8C);
 }

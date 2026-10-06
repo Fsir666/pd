@@ -1,6 +1,6 @@
 .page-container {
   min-height: 100vh;
-  background: #F2F2F7;
+  background: var(--ym-bg, #FBF7F2);
   padding: 30rpx 24rpx 60rpx;
   box-sizing: border-box;
 }
@@ -22,13 +22,13 @@
   margin-top: 18rpx;
   font-size: 40rpx;
   font-weight: 600;
-  color: #1C1C1E;
+  color: var(--ym-text, #4A3A3E);
 }
 
 .header-desc {
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #8E8E93;
+  color: var(--ym-text-sub, #9B8A8C);
 }
 
 /* ---------- 时间线 ---------- */
@@ -44,16 +44,16 @@
   top: 24rpx;
   bottom: 24rpx;
   width: 2rpx;
-  background: #E0E0E5;
+  background: var(--ym-line-strong, #E4D5CB);
 }
 
 .version-card {
   position: relative;
-  background: #FFFFFF;
-  border-radius: 20rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border-radius: var(--ym-r-md, 20rpx);
   padding: 28rpx 28rpx 30rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2rpx 12rpx rgba(74, 58, 62, 0.05);
 }
 
 .card-dot {
@@ -63,8 +63,8 @@
   width: 20rpx;
   height: 20rpx;
   border-radius: 50%;
-  background: #AF52DE;
-  border: 4rpx solid #F2F2F7;
+  background: var(--ym-primary, #D4607A);
+  border: 4rpx solid var(--ym-bg, #FBF7F2);
 }
 
 .card-head {
@@ -83,7 +83,7 @@
 .version-no {
   font-size: 32rpx;
   font-weight: 600;
-  color: #1C1C1E;
+  color: var(--ym-text, #4A3A3E);
 }
 
 .version-tag {
@@ -94,9 +94,9 @@
   color: #FFFFFF;
 }
 
-.tag-new { background: #AF52DE; }
-.tag-fix { background: #FF3B30; }
-.tag-opt { background: #007AFF; }
+.tag-new { background: var(--ym-primary, #D4607A); }
+.tag-fix { background: #E0795C; }
+.tag-opt { background: var(--ym-honey, #D89A5C); }
 
 .head-right {
   display: flex;
@@ -106,20 +106,20 @@
 
 .version-date {
   font-size: 24rpx;
-  color: #8E8E93;
+  color: var(--ym-text-sub, #9B8A8C);
 }
 
 .version-time {
   margin-top: 4rpx;
   font-size: 24rpx;
-  color: #AF52DE;
+  color: var(--ym-primary, #D4607A);
   font-weight: 500;
 }
 
 .version-title {
   margin-top: 16rpx;
   font-size: 28rpx;
-  color: #1C1C1E;
+  color: var(--ym-text, #4A3A3E);
   font-weight: 500;
 }
 
@@ -135,7 +135,7 @@
 
 .item-dot {
   width: 24rpx;
-  color: #AF52DE;
+  color: var(--ym-primary, #D4607A);
   font-size: 28rpx;
   line-height: 40rpx;
 }
@@ -143,7 +143,7 @@
 .item-text {
   flex: 1;
   font-size: 26rpx;
-  color: #48484A;
+  color: #5C4A4E;
   line-height: 40rpx;
 }
 
@@ -155,5 +155,5 @@
 
 .footer-text {
   font-size: 24rpx;
-  color: #C7C7CC;
+  color: var(--ym-text-faint, #C2B4B4);
 }

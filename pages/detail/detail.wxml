@@ -164,13 +164,18 @@
       
       <!-- 右侧工具栏 -->
       <view class="toolbar-actions">
-        <view class="action-btn {{isLiked ? 'liked' : ''}}" bindtap="onLike">
-          <text class="icon">{{isLiked ? '❤️' : '🤍'}}</text>
+        <view class="tool-pill comment-pill" bindtap="focusComment">
+          <text class="icon">💬</text>
+          <text class="tcount">{{comments.length}}</text>
         </view>
-        <view class="action-btn {{isCollected ? 'collected' : ''}}" bindtap="onCollect">
+        <view class="tool-pill {{isLiked ? 'liked' : ''}}" bindtap="onLike">
+          <text class="icon">{{isLiked ? '❤️' : '🤍'}}</text>
+          <text class="tcount">{{stats.likes}}</text>
+        </view>
+        <view class="tool-pill {{isCollected ? 'collected' : ''}}" bindtap="onCollect">
           <text class="icon">{{isCollected ? '⭐' : '☆'}}</text>
         </view>
-        <button class="action-btn share-action" open-type="share">
+        <button class="tool-pill share-pill" open-type="share">
           <text class="icon">🔗</text>
         </button>
       </view>

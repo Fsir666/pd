@@ -1,7 +1,7 @@
 /* Modern iOS Style Community Page */
 .page-container {
   min-height: 100vh;
-  background-color: #F2F2F7; /* iOS System Grouped Background */
+  background-color: #FBF7F2; /* iOS System Grouped Background */
   position: relative;
   overflow: hidden;
 }
@@ -26,7 +26,7 @@
 .orb-1 {
   width: 560rpx;
   height: 560rpx;
-  background: #E0C3FC;
+  background: #F6E9E4;
   top: -200rpx;
   left: -140rpx;
   animation: float 10s infinite ease-in-out;
@@ -35,7 +35,7 @@
 .orb-2 {
   width: 520rpx;
   height: 520rpx;
-  background: #D4F1F4;
+  background: #E9F0E8;
   top: 260rpx;
   right: -180rpx;
   animation: float 12s infinite ease-in-out reverse;
@@ -44,7 +44,7 @@
 .orb-3 {
   width: 460rpx;
   height: 460rpx;
-  background: #FFD1FF;
+  background: #F7EEDF;
   bottom: 6%;
   left: 18%;
   animation: float 15s infinite ease-in-out 2s;
@@ -62,7 +62,7 @@
   left: 0;
   width: 100%;
   height: 400rpx;
-  background: linear-gradient(180deg, #E0E0EB 0%, rgba(242, 242, 247, 0) 100%);
+  background: linear-gradient(180deg, #E4D5CB 0%, rgba(251,247,242,0) 100%);
   z-index: 0;
   pointer-events: none;
 }
@@ -103,12 +103,12 @@
   justify-content: center;
   font-size: 24rpx;
   font-weight: 800;
-  color: rgba(29, 29, 31, 0.88);
-  background: rgba(255, 255, 255, 0.55);
+  color: rgba(74,58,62,0.88);
+  background: rgba(255,255,255,0.55);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(255,255,255,0.7);
+  box-shadow: 0 8rpx 24rpx rgba(176,138,128,0.10);
 }
 
 .header-search-btn:active {
@@ -132,18 +132,18 @@
   justify-content: center;
   font-size: 24rpx;
   font-weight: 700;
-  color: #FF6B00;
-  background: rgba(255, 255, 255, 0.55);
+  color: #D4607A;
+  background: rgba(255,255,255,0.55);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(255,255,255,0.7);
+  box-shadow: 0 8rpx 24rpx rgba(176,138,128,0.10);
   flex-shrink: 0;
 }
 
 .page-subtitle {
   font-size: 28rpx;
-  color: #888;
+  color: #9B8A8C;
   font-weight: 500;
   margin-top: 8rpx;
   display: block;
@@ -166,19 +166,19 @@
   border-radius: 999rpx;
   font-size: 24rpx;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.62);
-  background: rgba(255, 255, 255, 0.48);
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
+  color: rgba(74,58,62,0.62);
+  background: rgba(255,255,255,0.48);
+  border: 1rpx solid rgba(255,255,255,0.7);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   white-space: nowrap;
 }
 
 .chip.active {
-  color: #111;
-  background: rgba(255, 255, 255, 0.74);
-  border-color: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10rpx 28rpx rgba(0, 0, 0, 0.06);
+  color: #FFFDFB;
+  background: linear-gradient(135deg, #D4607A 0%, #C2576E 100%);
+  border-color: rgba(212,96,122,0.35);
+  box-shadow: 0 10rpx 28rpx rgba(212,96,122,0.28);
 }
 
 .user-search {
@@ -194,20 +194,20 @@
   height: 64rpx;
   font-size: 28rpx;
   font-weight: 600;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
 }
 
 .user-search-clear {
   height: 64rpx;
   padding: 0 16rpx;
   border-radius: 999rpx;
-  background: rgba(17, 17, 20, 0.06);
+  background: rgba(176,138,128,0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26rpx;
   font-weight: 700;
-  color: rgba(29, 29, 31, 0.74);
+  color: rgba(74,58,62,0.74);
 }
 
 .user-search-results {
@@ -218,7 +218,7 @@
 .user-search-title {
   font-size: 28rpx;
   font-weight: 900;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
   margin-bottom: 10rpx;
 }
 
@@ -227,7 +227,7 @@
   padding: 18rpx 6rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: rgba(29, 29, 31, 0.56);
+  color: rgba(74,58,62,0.56);
 }
 
 .user-row-item {
@@ -238,14 +238,14 @@
 }
 
 .user-row-item + .user-row-item {
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid rgba(176,138,128,0.10);
 }
 
 .user-avatar {
   width: 72rpx;
   height: 72rpx;
   border-radius: 22rpx;
-  background: rgba(17, 17, 20, 0.06);
+  background: rgba(176,138,128,0.10);
   flex: 0 0 auto;
 }
 
@@ -260,7 +260,7 @@
 .user-row-name {
   font-size: 28rpx;
   font-weight: 900;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -269,7 +269,7 @@
 .user-row-bio {
   font-size: 24rpx;
   font-weight: 600;
-  color: rgba(29, 29, 31, 0.52);
+  color: rgba(74,58,62,0.52);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -279,8 +279,8 @@
   height: 56rpx;
   padding: 0 20rpx;
   border-radius: 999rpx;
-  background: rgba(255, 106, 0, 1);
-  color: #fff;
+  background: rgba(212,96,122,1);
+  color: #FFFDFB;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,8 +290,8 @@
 }
 
 .follow-btn.following {
-  background: rgba(17, 17, 20, 0.08);
-  color: rgba(29, 29, 31, 0.78);
+  background: rgba(74,58,62,0.08);
+  color: rgba(74,58,62,0.78);
 }
 
 .search-overlay {
@@ -300,7 +300,7 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0,0,0,0.18);
   z-index: 999;
   padding: calc(env(safe-area-inset-top) + 18rpx) 18rpx 18rpx;
   box-sizing: border-box;
@@ -319,7 +319,7 @@
   align-items: center;
   gap: 12rpx;
   padding: 14rpx 16rpx;
-  border-bottom: 1rpx solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1rpx solid rgba(176,138,128,0.12);
 }
 
 .search-input {
@@ -327,7 +327,7 @@
   height: 64rpx;
   font-size: 28rpx;
   font-weight: 700;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
 }
 
 .search-clear,
@@ -335,13 +335,13 @@
   height: 64rpx;
   padding: 0 16rpx;
   border-radius: 999rpx;
-  background: rgba(17, 17, 20, 0.06);
+  background: rgba(176,138,128,0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26rpx;
   font-weight: 800;
-  color: rgba(29, 29, 31, 0.74);
+  color: rgba(74,58,62,0.74);
 }
 
 .search-results {
@@ -356,7 +356,7 @@
   padding: 26rpx 6rpx;
   font-size: 26rpx;
   font-weight: 700;
-  color: rgba(29, 29, 31, 0.56);
+  color: rgba(74,58,62,0.56);
 }
 
 .search-section {
@@ -364,13 +364,13 @@
 }
 
 .search-section + .search-section {
-  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+  border-top: 1rpx solid rgba(176,138,128,0.12);
 }
 
 .search-section-title {
   font-size: 28rpx;
   font-weight: 900;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
   padding: 6rpx 6rpx 10rpx;
 }
 
@@ -382,14 +382,14 @@
 }
 
 .work-row-item + .work-row-item {
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid rgba(176,138,128,0.10);
 }
 
 .work-thumb {
   width: 96rpx;
   height: 96rpx;
   border-radius: 24rpx;
-  background: rgba(17, 17, 20, 0.06);
+  background: rgba(176,138,128,0.10);
   flex: 0 0 auto;
 }
 
@@ -404,7 +404,7 @@
 .work-row-title {
   font-size: 28rpx;
   font-weight: 900;
-  color: rgba(29, 29, 31, 0.9);
+  color: rgba(74,58,62,0.90);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -421,30 +421,87 @@
 .work-row-like {
   font-size: 24rpx;
   font-weight: 700;
-  color: rgba(29, 29, 31, 0.56);
+  color: rgba(74,58,62,0.56);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.section-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 8rpx 8rpx 18rpx;
+/* 统一信息流：图纸 / 作品 混排卡片 */
+.feed-pattern .card-img-square {
+  width: 100%;
+  height: 320rpx;
+  display: block;
 }
 
-.section-title {
-  font-size: 30rpx;
+.feed-badge {
+  position: absolute;
+  top: 14rpx;
+  left: 14rpx;
+  height: 36rpx;
+  padding: 0 16rpx;
+  border-radius: 999rpx;
+  background: rgba(212,96,122,0.92);
+  color: #FFFDFB;
+  font-size: 20rpx;
   font-weight: 800;
-  color: #1d1d1f;
-  letter-spacing: -0.4px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 12rpx rgba(212,96,122,0.30);
 }
 
-.section-sub {
-  font-size: 24rpx;
-  color: rgba(29, 29, 31, 0.5);
+.feed-tag-label {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #A8455C;
+  background: rgba(212,96,122,0.10);
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+}
+
+.bead-count {
+  font-size: 22rpx;
+  color: #B7A9A9;
   font-weight: 600;
 }
+
+.feed-more {
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28rpx;
+  border: 1rpx solid rgba(255,255,255,0.7);
+  box-shadow: 0 10rpx 34rpx rgba(176,138,128,0.12);
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+
+.feed-more-inner {
+  height: 200rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+}
+
+.feed-more-icon {
+  font-size: 52rpx;
+}
+
+.feed-more-text {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #A8455C;
+}
+
+.feed-more-arrow {
+  font-size: 34rpx;
+  color: #A8455C;
+  margin-top: -8rpx;
+}
+
+/* 以下为历史样式，已随「图纸库」独立板块下线而停用（保留以免误删关联） */
+
 
 /* Waterfall Layout */
 .waterfall-container {
@@ -461,14 +518,14 @@
 
 /* Glass Card Style */
 .card-item {
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255,255,255,0.62);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 28rpx;
   overflow: hidden;
   margin-bottom: 24rpx;
-  box-shadow: 0 10rpx 34rpx rgba(0, 0, 0, 0.06);
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10rpx 34rpx rgba(176,138,128,0.12);
+  border: 1rpx solid rgba(255,255,255,0.7);
   transition: transform 0.2s;
 }
 
@@ -483,7 +540,7 @@
 .card-img {
   width: 100%;
   display: block;
-  background-color: #eee;
+  background-color: #F0E4DC;
 }
 
 .card-media-overlay {
@@ -503,7 +560,7 @@
 .card-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: #4A3A3E;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -517,7 +574,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 22rpx;
-  color: #666;
+  color: #7A6A6E;
 }
 
 .author-info {
@@ -530,19 +587,19 @@
   height: 36rpx;
   border-radius: 50%;
   margin-right: 10rpx;
-  background-color: #eee;
+  background-color: #F0E4DC;
 }
 
 .avatar-placeholder {
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #ddd;
+  background: #E4D5CB;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 20rpx;
-  color: #fff;
+  color: #FFFDFB;
   margin-right: 10rpx;
   font-weight: bold;
 }
@@ -570,12 +627,12 @@
 }
 
 .empty-card {
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255,255,255,0.62);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 32rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 14rpx 44rpx rgba(0, 0, 0, 0.08);
+  border: 1rpx solid rgba(255,255,255,0.75);
+  box-shadow: 0 14rpx 44rpx rgba(176,138,128,0.16);
   padding: 28rpx 26rpx;
 }
 
@@ -593,9 +650,9 @@
   align-items: center;
   justify-content: center;
   font-size: 44rpx;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1rpx solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10rpx 28rpx rgba(0, 0, 0, 0.06);
+  background: rgba(255,255,255,0.7);
+  border: 1rpx solid rgba(255,255,255,0.8);
+  box-shadow: 0 10rpx 28rpx rgba(176,138,128,0.12);
   flex-shrink: 0;
 }
 
@@ -606,7 +663,7 @@
 .empty-title {
   font-size: 32rpx;
   font-weight: 800;
-  color: #1d1d1f;
+  color: #4A3A3E;
   letter-spacing: -0.4px;
 }
 
@@ -614,7 +671,7 @@
   margin-top: 10rpx;
   font-size: 26rpx;
   line-height: 1.55;
-  color: rgba(29, 29, 31, 0.6);
+  color: rgba(74,58,62,0.6);
 }
 
 .empty-actions {
@@ -623,15 +680,24 @@
   gap: 16rpx;
 }
 
+.empty-reset {
+  margin-top: 18rpx;
+  text-align: center;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #A8455C;
+  padding: 12rpx 0;
+}
+
 .primary-btn {
   flex: 1;
   height: 84rpx;
   border-radius: 24rpx;
   font-size: 28rpx;
   font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #FF6B00, #FF8C42);
-  box-shadow: 0 14rpx 34rpx rgba(255, 107, 0, 0.28);
+  color: #FFFDFB;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  box-shadow: 0 14rpx 34rpx rgba(212,96,122,0.28);
   border: none;
   padding: 0;
   display: flex;
@@ -649,9 +715,9 @@
   border-radius: 24rpx;
   font-size: 28rpx;
   font-weight: 800;
-  color: rgba(29, 29, 31, 0.78);
-  background: rgba(255, 255, 255, 0.56);
-  border: 1rpx solid rgba(255, 255, 255, 0.82);
+  color: rgba(74,58,62,0.78);
+  background: rgba(255,255,255,0.56);
+  border: 1rpx solid rgba(255,255,255,0.82);
   padding: 0;
   display: flex;
   align-items: center;
@@ -704,7 +770,7 @@ page {
 
 .refresh-text {
   font-size: 24rpx;
-  color: #999;
+  color: #B7A9A9;
 }
 
 /* iOS 26 悬浮导航栏 (Custom Floating TabBar) - Apple Glass Style */
@@ -715,12 +781,12 @@ page {
   transform: translateX(-50%);
   width: 90%;
   height: 110rpx;
-  background: rgba(255, 255, 255, 0.65); /* Ultra low opacity white */
+  background: rgba(255,255,255,0.65); /* Ultra low opacity white */
   backdrop-filter: saturate(180%) blur(50px); /* The "Apple Glass" Magic */
   -webkit-backdrop-filter: saturate(180%) blur(50px);
   border-radius: 55rpx;
-  border-top: 0.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.1);
+  border-top: 0.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 10rpx 40rpx rgba(176,138,128,0.18);
   display: flex;
   justify-content: space-between; /* Distribute items */
   align-items: center;
@@ -735,7 +801,7 @@ page {
   top: 10rpx;
   bottom: 10rpx;
   width: 25%; /* 4 tabs -> 25% each */
-  background: #FFFFFF;
+  background: #FFFDFB;
   border-radius: 45rpx;
   box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08), 0 0 1rpx rgba(0,0,0,0.1);
   transition: left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth spring-like */
@@ -756,7 +822,7 @@ page {
   justify-content: center;
   align-items: center;
   font-size: 28rpx;
-  color: #999;
+  color: #B7A9A9;
   font-weight: normal;
   transition: all 0.25s;
 }

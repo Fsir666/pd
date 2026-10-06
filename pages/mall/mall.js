@@ -1,12 +1,15 @@
 const app = getApp();
+const presets = require('../../data/pattern-presets.js');
 
 Page({
   data: {
     communityList: [],
-    leftList: [],
-    rightList: [],
+    feedLeft: [],
+    feedRight: [],
+    feedCount: 0,
     isRefreshing: false,
     feedSort: 'new',
+    feedTag: '',
     searchVisible: false,
     searchFocus: false,
     searchQuery: '',
@@ -15,7 +18,8 @@ Page({
     searchWorks: [],
     currentTab: 1,
     cursorLeft: '25%', // Default for 2nd tab
-    isDragging: false
+    isDragging: false,
+    presetList: []
   },
 
   onLoad() {
@@ -27,7 +31,20 @@ Page({
     this.tabBarWidth = this.windowWidth * 0.9;
     this.tabBarLeft = this.windowWidth * 0.05;
 
-    this.loadCommunityPosts();
+    this.setData({
+      presetList: presets.map(p => ({
+        key: p.key,
+        name: p.name,
+        tags: p.tags || [],
+        w: p.w,
+        h: p.h,
+        beadCount: p.beadCount,
+        thumb: '/images/patterns/' + p.key + '.png'
+      }))
+    }, () => {
+      this.buildFeed();
+      this.loadCommunityPosts();
+    });
     
     // Initialize refresh audio
     this.refreshAudio = wx.createInnerAudioContext();
@@ -61,28 +78,155 @@ Page({
   loadCommunityPosts() {
     wx.showLoading({ title: '加载灵感...' });
     const db = wx.cloud.database();
-    
-    // Using mock data if DB is empty or for robust initial display
-    // But ideally fetch from DB.
-    
+    const tag = (this.data.feedTag || '').trim();
     const orderByField = this.data.feedSort === 'hot' ? 'likes' : 'createTime';
-    db.collection('community_posts').orderBy(orderByField, 'desc').get().then(async res => {
-      // 批量换取临时链接
-      const list = await this.exchangeCloudUrls(res.data);
-      
+
+    // 统一收口：换完临时链接 -> 客户端排序 -> 落库渲染
+    const finish = (rawList) => {
+      const list = this._sortByField(rawList || [], orderByField);
       wx.hideLoading();
-      this.processWaterfallData(list);
-    }).catch(err => {
+      this.setData({ communityList: list }, () => this.buildFeed());
+    };
+
+    const onError = (err) => {
       wx.hideLoading();
       console.error('Failed to load community posts', err);
-      // 不再用 mock 假数据兜底：读不到就保持空态，避免误导用户以为已有内容
+      // 读不到社区数据也不影响图纸展示：清掉作品，重建统一信息流（图纸仍显示）
+      this.setData({ communityList: [] }, () => this.buildFeed());
+    };
+
+    if (tag) {
+      // 分类筛选：云端正则匹配标题/正文/标签，排序放客户端做，避免依赖云端复合索引
+      db.collection('community_posts')
+        .where(db.command.or([
+          { content: db.RegExp({ regexp: tag, options: 'i' }) },
+          { title: db.RegExp({ regexp: tag, options: 'i' }) },
+          { tags: tag }
+        ]))
+        .limit(100)
+        .get()
+        .then(async res => finish(await this.exchangeCloudUrls(res.data)))
+        .catch(onError);
+      return;
+    }
+
+    db.collection('community_posts').orderBy(orderByField, 'desc').limit(100).get().then(async res => {
+      // 批量换取临时链接
+      finish(await this.exchangeCloudUrls(res.data));
+    }).catch(onError);
+  },
+
+  // 客户端排序：兼容数字时间戳/Date/字符串，缺字段的排最后
+  _sortByField(list, field) {
+    return list.slice().sort((a, b) => {
+      const va = a && a[field];
+      const vb = b && b[field];
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      if (typeof va === 'number' && typeof vb === 'number') return vb - va;
+      const ta = va instanceof Date ? va.getTime() : Number(va);
+      const tb = vb instanceof Date ? vb.getTime() : Number(vb);
+      if (!Number.isNaN(ta) && !Number.isNaN(tb)) return tb - ta;
+      return String(va).localeCompare(String(vb));
     });
   },
 
   onFeedSortTap(e) {
     const key = e.currentTarget.dataset.key;
-    if (!key || key === this.data.feedSort) return;
-    this.setData({ feedSort: key }, () => this.loadCommunityPosts());
+    if (!key) return;
+    wx.vibrateShort({ type: 'light' });
+    // 切排序时清掉分类，避免两种筛选状态打架
+    if (key === this.data.feedSort && !this.data.feedTag) return;
+    this.setData({ feedSort: key, feedTag: '' }, () => {
+      this.buildFeed();
+      this.loadCommunityPosts();
+    });
+  },
+
+  onFeedTagTap(e) {
+    const tag = e.currentTarget.dataset.tag;
+    if (!tag) return;
+    wx.vibrateShort({ type: 'light' });
+    // 再点一次同一个分类 = 取消筛选
+    const nextTag = this.data.feedTag === tag ? '' : tag;
+    this.setData({ feedTag: nextTag }, () => {
+      this.buildFeed();
+      this.loadCommunityPosts();
+    });
+  },
+
+  // 统一信息流：把「图纸」和「今日灵感作品」合并成一个瀑布流一起显示
+  buildFeed() {
+    const tag = this.data.feedTag;
+
+    // 1) 图纸卡片
+    let patterns = this.data.presetList;
+    if (tag) patterns = patterns.filter(p => (p.tags || []).indexOf(tag) >= 0);
+    const patternItems = patterns.map(p => ({
+      type: 'pattern',
+      _id: 'preset_' + p.key,
+      key: p.key,
+      name: p.name,
+      thumb: p.thumb,
+      tags: p.tags || [],
+      beadCount: p.beadCount
+    }));
+
+    // 2) 作品卡片（communityList 已由 loadCommunityPosts 按 tag 过滤好）
+    // 去重：内置图纸已被 patternItems 承载（且内置卡跳转的详情页更完整——色号矩阵/用料清单/收藏），
+    // 所以过滤掉 seed_<key> 的种子作品，避免同一图案在信息流出现两次。
+    // 注：这些作品仍完整保留在「我的作品」页。
+    const postItems = (this.data.communityList || [])
+      .filter(p => !String(p._id || '').startsWith('seed_'))
+      .map(p => ({
+        type: 'post',
+        _id: p._id,
+        content: p.content,
+        imageUrl: p.imageUrl,
+        author: p.author,
+        authorAvatar: p.authorAvatar,
+        likes: p.likes,
+        _openid: p._openid
+      }));
+
+    // 3) 合并
+    let merged;
+    if (tag) {
+      // 选了分类：图纸在前、作品在后，全部已是该分类内容
+      merged = patternItems.concat(postItems);
+    } else {
+      // 无筛选：交替穿插，让图纸和作品混在一起出现；末尾补「查看全部图纸」入口
+      merged = [];
+      const maxLen = Math.max(patternItems.length, postItems.length);
+      for (let i = 0; i < maxLen; i++) {
+        if (i < patternItems.length) merged.push(patternItems[i]);
+        if (i < postItems.length) merged.push(postItems[i]);
+      }
+      merged.push({ type: 'more', _id: 'more_all' });
+    }
+
+    // 4) 分两列
+    const feedLeft = [];
+    const feedRight = [];
+    merged.forEach((item, idx) => {
+      if (idx % 2 === 0) feedLeft.push(item);
+      else feedRight.push(item);
+    });
+
+    this.setData({ feedLeft, feedRight, feedCount: merged.length });
+  },
+
+  openPattern(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({ url: '/pages/pattern-detail/pattern-detail?key=' + key });
+  },
+
+  openPatternList() {
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({ url: '/pages/patterns/patterns' });
   },
 
   // 辅助方法：批量换取云文件链接
@@ -207,24 +351,17 @@ Page({
     ];
   },
 
-  processWaterfallData(list) {
-    const leftList = [];
-    const rightList = [];
-    
-    list.forEach((item, index) => {
-      // Simple alternating distribution
-      if (index % 2 === 0) {
-        leftList.push(item);
-      } else {
-        rightList.push(item);
-      }
-    });
-    
-    this.setData({
-      communityList: list,
-      leftList,
-      rightList
-    });
+  onImageError(e) {
+    const { list, index } = e.currentTarget.dataset;
+    const listKey = list === 'left' ? 'feedLeft' : 'feedRight';
+    const currentList = this.data[listKey];
+    const item = currentList[index];
+
+    // 已是占位图则跳过，避免加载失败时反复触发 error
+    if (item && item.type === 'post' && item.imageUrl !== '/images/placeholder.png') {
+      item.imageUrl = '/images/placeholder.png';
+      this.setData({ [listKey]: currentList });
+    }
   },
 
   onRefresh() {
@@ -346,19 +483,6 @@ Page({
   onGenerateTap() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({ url: '/pages/generate/generate' });
-  },
-
-  onImageError(e) {
-    const { list, index } = e.currentTarget.dataset;
-    const listKey = list === 'left' ? 'leftList' : 'rightList';
-    const currentList = this.data[listKey];
-    const item = currentList[index];
-
-    // 已是占位图则跳过，避免加载失败时反复触发 error
-    if (item && item.imageUrl !== '/images/placeholder.png') {
-      item.imageUrl = '/images/placeholder.png';
-      this.setData({ [listKey]: currentList });
-    }
   },
 
   // TabBar Interaction

@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/patterns/patterns",
+    "pages/pattern-detail/pattern-detail",
     "pages/detail/detail",
     "pages/my-collections/my-collections",
     "pages/my-works/my-works",
