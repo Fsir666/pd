@@ -29,7 +29,7 @@
           
           <!-- 公开状态开关 -->
           <view class="card-action" catchtap="preventBubble">
-            <switch checked="{{item.isPublic}}" bindchange="onPublicToggle" data-id="{{item._id}}" data-index="{{index}}" color="#333" style="transform: scale(0.7);"/>
+            <switch checked="{{item.isPublic}}" bindchange="onPublicToggle" data-id="{{item._id}}" data-index="{{index}}" color="#D4607A" style="transform: scale(0.7);"/>
             <text class="action-text">{{item.isPublic ? '已公开' : '私密'}}</text>
           </view>
         </view>

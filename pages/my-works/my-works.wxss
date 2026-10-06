@@ -1,11 +1,10 @@
-/* pages/my-works/my-works.wxss */
+/* pages/my-works/my-works.wxss —— 奶油手作 S1 */
 
-/* Global Page Setup */
 .page-root {
   position: relative;
   width: 100vw;
   min-height: 100vh;
-  background-color: #F2F4F8;
+  background-color: var(--ym-bg, #FBF7F2);
   overflow-x: hidden;
 }
 
@@ -24,33 +23,33 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(90px);
-  opacity: 0.7;
+  opacity: 0.55;
 }
 
 .orb-1 {
-  width: 600rpx;
-  height: 600rpx;
-  background: #E0C3FC; /* Soft Purple */
-  top: -150rpx;
-  left: -100rpx;
+  width: 560rpx;
+  height: 560rpx;
+  background: #F6E9E4; /* 覆盆子粉淡光 */
+  top: -160rpx;
+  left: -120rpx;
   animation: float 10s infinite ease-in-out;
 }
 
 .orb-2 {
-  width: 500rpx;
-  height: 500rpx;
-  background: #FFD1FF; /* Soft Pink */
-  bottom: 10%;
-  right: -100rpx;
+  width: 480rpx;
+  height: 480rpx;
+  background: #F7EEDF; /* 蜂蜜淡光 */
+  bottom: 12%;
+  right: -110rpx;
   animation: float 12s infinite ease-in-out reverse;
 }
 
 .orb-3 {
   width: 400rpx;
   height: 400rpx;
-  background: #D4F1F4; /* Soft Blue */
-  top: 40%;
-  left: 20%;
+  background: #E9F0E8; /* 鼠尾草淡光 */
+  top: 42%;
+  left: 18%;
   animation: float 15s infinite ease-in-out 2s;
 }
 
@@ -69,11 +68,11 @@
 .loading {
   text-align: center;
   margin-top: 200rpx;
-  color: #999;
+  color: var(--ym-text-sub, #9B8A8C);
   font-size: 28rpx;
 }
 
-/* 列表样式 (List Style - Single Column) */
+/* 作品卡片 */
 .work-list {
   display: flex;
   flex-direction: column;
@@ -81,19 +80,15 @@
 }
 
 .card {
-  display: flex; /* Flex Layout for Horizontal Card */
+  display: flex;
   flex-direction: row;
-
-  height: 240rpx; /* Adjusted height for padding */
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 32rpx;
+  align-items: center;
+  background: var(--ym-surface, #FFFDFB);
+  border: 1rpx solid var(--ym-line, #F0E4DC);
+  border-radius: var(--ym-r-lg, 26rpx);
   overflow: hidden;
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6rpx 24rpx rgba(74, 58, 62, 0.06);
   transition: transform 0.2s;
-  box-sizing: border-box; /* Ensure padding includes in height */
 }
 
 .card:active {
@@ -101,27 +96,28 @@
 }
 
 .card-img {
-  width: 192rpx; /* Square size */
-  height: 192rpx;
-  border-radius: 24rpx; /* Rounded corners - Increased for better look */
-  background-color: rgba(255, 255, 255, 0.5);
+  width: 176rpx;
+  height: 176rpx;
   flex-shrink: 0;
+  margin: 18rpx 0 18rpx 18rpx;
+  border-radius: var(--ym-r-md, 20rpx);
+  background: var(--ym-bg-sunk, #F5EDE6);
 }
 
 .card-info {
   flex: 1;
-  padding-left: 24rpx; /* Space between img and text */
-  padding-right: 0;
+  min-width: 0;
+  padding: 22rpx 16rpx 22rpx 22rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .card-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--ym-text, #4A3A3E);
+  margin-bottom: 12rpx;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -130,51 +126,55 @@
 .card-author {
   display: flex;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 10rpx;
 }
 
 .author-avatar {
-  width: 36rpx;
-  height: 36rpx;
+  width: 34rpx;
+  height: 34rpx;
   border-radius: 50%;
-  background-color: #ddd;
-  margin-right: 12rpx;
+  background: var(--ym-bg-sunk, #F5EDE6);
+  margin-right: 10rpx;
+  flex-shrink: 0;
 }
 
 .card-author text {
-  font-size: 26rpx;
-  color: #888;
+  font-size: 24rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card-heat {
   display: flex;
   align-items: center;
-  font-size: 24rpx;
-  color: #ff6b00;
-  font-weight: 500;
-  margin-top: 4rpx;
+  font-size: 23rpx;
+  color: var(--ym-primary, #D4607A);
+  font-weight: 600;
 }
 
 .heat-icon {
-  margin-right: 8rpx;
+  margin-right: 6rpx;
+  font-size: 22rpx;
 }
 
-/* 操作区域 */
+/* 公开状态开关 */
 .card-action {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 24rpx;
-  margin-left: 10rpx;
-  border-left: 1rpx solid rgba(0,0,0,0.03);
-  min-width: 100rpx;
+  align-self: stretch;
+  padding: 0 22rpx;
+  border-left: 1rpx solid var(--ym-line, #F0E4DC);
+  flex-shrink: 0;
 }
 
 .action-text {
   font-size: 20rpx;
-  color: #999;
-  margin-top: 10rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+  margin-top: 6rpx;
 }
 
 /* 空状态 */
@@ -187,33 +187,33 @@
 }
 
 .empty-img {
-  width: 240rpx;
-  height: 240rpx;
+  width: 220rpx;
+  height: 220rpx;
   margin-bottom: 30rpx;
   opacity: 0.8;
 }
 
 .empty-text {
   font-size: 34rpx;
-  color: #333;
-  font-weight: bold;
+  color: var(--ym-text, #4A3A3E);
+  font-weight: 600;
   margin-bottom: 16rpx;
 }
 
 .empty-tips {
-  font-size: 28rpx;
-  color: #999;
-  margin-bottom: 60rpx;
+  font-size: 27rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+  margin-bottom: 56rpx;
 }
 
 .go-create-btn {
-  background: #333;
-  color: #fff;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  color: #FFFDFB;
   font-size: 30rpx;
-  padding: 20rpx 80rpx;
-  border-radius: 100rpx;
+  padding: 22rpx 84rpx;
+  border-radius: 999rpx;
   font-weight: 600;
-  box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10rpx 26rpx rgba(212, 96, 122, 0.28);
   transition: opacity 0.2s;
 }
 
