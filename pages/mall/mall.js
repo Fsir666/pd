@@ -40,9 +40,11 @@ Page({
         h: p.h,
         beadCount: p.beadCount,
         thumb: '/images/patterns/' + p.key + '.png',
-        authorName: '',
+        // 本地兜底：内置图纸都归属「冯」账号（seed 发布到云端），
+        // 云端数据回来前先显示作者名，避免作者行空白。
+        authorName: '冯',
         authorAvatar: '',
-        authorInitial: '',
+        authorInitial: '冯',
         likes: 0
       }))
     }, () => {

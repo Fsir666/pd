@@ -9,8 +9,8 @@ Page({
     canvasW: 0,
     canvasH: 0,
     isFav: false,
-    // 作者信息（来自云端 seed_<key> 记录）
-    author: { name: '', avatar: '', initial: '' },
+    // 作者信息（来自云端 seed_<key> 记录；云端未就绪时兜底显示「冯」）
+    author: { name: '冯', avatar: '', initial: '冯' },
     // 点赞
     likes: 0,
     isLiked: false,

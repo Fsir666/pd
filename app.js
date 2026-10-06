@@ -21,13 +21,20 @@ App({
       wx.setStorageSync('pendingInviteCode', inv.toUpperCase())
     }
 
-    // 一次性：把内置图纸库发布到冯账号（template-api 的 seedPresets 动作内已做全局幂等锁，
-    // 任意用户首次打开都会触发，但只写一次；写的是固定 _id，与触发者无关）
-    if (!wx.getStorageSync('seedPresetsTriggered')) {
-      wx.cloud.callFunction({ name: 'template-api', data: { action: 'seedPresets' } })
-        .then(() => wx.setStorageSync('seedPresetsTriggered', true))
-        .catch(() => {})
-    }
+    // 把内置图纸库发布到冯账号。
+    // template-api 的 seedPresets 已按固定 _id=seed_<key> 做增量幂等：已发布的会跳过，
+    // 只补发缺失的，所以每次冷启动都调用是安全的（不会重复写、不会覆盖已有数据）。
+    // 不再用本地一次性锁 —— 否则新增图纸后旧标记会拦下补发，导致新图纸永远传不上云端。
+    wx.cloud.callFunction({ name: 'template-api', data: { action: 'seedPresets' } })
+      .then((res) => {
+        const r = res && res.result;
+        if (r && r.code === 0) {
+          console.log('[seed] 图纸补发完成: 新增', r.seeded, '已存在', r.skipped, '共', r.total);
+          // 拿到实际总数，供发现页判断云端是否已就绪
+          wx.setStorageSync('seedPresetsTotal', r.total || 0);
+        }
+      })
+      .catch(() => {})
 
     // 尝试从本地存储恢复登录状态
     const userInfo = wx.getStorageSync('userInfo');
