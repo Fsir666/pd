@@ -121,6 +121,12 @@ module.exports = {
                   <text class="feed-tag-label" wx:if="{{item.tags.length}}">{{item.tags[0]}}</text>
                   <text class="bead-count">{{item.beadCount}} 颗</text>
                 </view>
+                <view class="feed-author" wx:if="{{item.authorName}}">
+                  <view class="feed-author-avatar" wx:if="{{item.authorAvatar}}" style="background-image: url('{{item.authorAvatar}}');"></view>
+                  <view class="feed-author-avatar feed-author-avatar-fb" wx:else>{{item.authorInitial}}</view>
+                  <text class="feed-author-name">{{item.authorName}}</text>
+                  <text class="feed-like" wx:if="{{item.likes}}">♡ {{item.likes}}</text>
+                </view>
               </view>
             </view>
             <!-- 作品卡片 -->
@@ -176,6 +182,12 @@ module.exports = {
                 <view class="card-meta">
                   <text class="feed-tag-label" wx:if="{{item.tags.length}}">{{item.tags[0]}}</text>
                   <text class="bead-count">{{item.beadCount}} 颗</text>
+                </view>
+                <view class="feed-author" wx:if="{{item.authorName}}">
+                  <view class="feed-author-avatar" wx:if="{{item.authorAvatar}}" style="background-image: url('{{item.authorAvatar}}');"></view>
+                  <view class="feed-author-avatar feed-author-avatar-fb" wx:else>{{item.authorInitial}}</view>
+                  <text class="feed-author-name">{{item.authorName}}</text>
+                  <text class="feed-like" wx:if="{{item.likes}}">♡ {{item.likes}}</text>
                 </view>
               </view>
             </view>

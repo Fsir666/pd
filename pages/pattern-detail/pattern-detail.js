@@ -8,7 +8,13 @@ Page({
     rows: [],
     canvasW: 0,
     canvasH: 0,
-    isFav: false
+    isFav: false,
+    // 作者信息（来自云端 seed_<key> 记录）
+    author: { name: '', avatar: '', initial: '' },
+    // 点赞
+    likes: 0,
+    isLiked: false,
+    particleList: []
   },
 
   onLoad(query) {
@@ -44,6 +50,36 @@ Page({
       canvasH,
       isFav: (wx.getStorageSync('pattern_favs') || []).indexOf(raw.key) >= 0
     });
+
+    this.loadAuthorAndLikes();
+  },
+
+  // 从云端 seed_<key> 读取作者与点赞数（内置图纸已作为「冯」的社区作品发布）
+  loadAuthorAndLikes() {
+    const raw = this._raw;
+    if (!raw) return;
+    const docId = 'seed_' + raw.key;
+    wx.cloud.database()
+      .collection('templates')
+      .doc(docId)
+      .get()
+      .then(res => {
+        const d = res && res.data;
+        if (!d) return;
+        const ui = d.userInfo || {};
+        const name = d.author || ui.nickName || '悠米拼豆';
+        this.setData({
+          author: {
+            name,
+            avatar: d.authorAvatar || ui.avatarUrl || '',
+            initial: name.charAt(0)
+          },
+          likes: d.likeCount || d.heat || 0
+        });
+      })
+      .catch(() => {
+        // 云端还没发布（冯未打开过 App）时，留空即可，不阻塞浏览
+      });
   },
 
   // 收藏 / 取消收藏（本地存储，内置图纸没有云端数据）
@@ -59,6 +95,74 @@ Page({
     wx.vibrateShort({ type: 'light' });
     wx.showToast({ title: isFav ? '已收藏' : '已取消收藏', icon: 'none' });
     this.setData({ isFav });
+  },
+
+  // 点赞：写入云端 seed_<key>（templates.heat/likeCount + community_posts.likes）
+  onLike(e) {
+    const raw = this._raw;
+    if (!raw) return;
+    const newLikes = this.data.likes + 1;
+    this.setData({ likes: newLikes, isLiked: true });
+    wx.vibrateShort({ type: 'medium' });
+
+    // 粒子特效（简化自社区详情页）
+    const emojis = ['❤️', '✨', '🌸', '🐰', '🐱', '🍭', '🎀', '🦄', '🍓', '🔥'];
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    let touchX, touchY;
+    if (e && e.touches && e.touches.length > 0) {
+      touchX = e.touches[0].clientX;
+      touchY = e.touches[0].clientY;
+    } else if (e && e.detail && e.detail.x) {
+      touchX = e.detail.x;
+      touchY = e.detail.y;
+    } else {
+      const sysInfo = wx.getSystemInfoSync();
+      touchX = sysInfo.windowWidth * 0.5;
+      touchY = sysInfo.windowHeight - 160;
+    }
+    const randomX = (Math.random() - 0.5) * 160;
+    const jumpHeight = -150 - Math.random() * 300;
+    const rotation = (randomX > 0 ? 1 : -1) * (360 + Math.random() * 360);
+    const duration = 1.5 + Math.random();
+
+    const list = this.data.particleList.slice();
+    list.push({
+      id: Date.now() + Math.random(),
+      emoji: randomEmoji,
+      style: `left: ${touchX}px; top: ${touchY}px; --tx: ${randomX}rpx; --ty: ${jumpHeight}rpx; --rot: ${rotation}deg; --duration: ${duration}s;`
+    });
+    this.setData({ particleList: list });
+    setTimeout(() => {
+      const cur = this.data.particleList.slice();
+      const i = cur.findIndex(p => p.id === list[list.length - 1].id);
+      if (i !== -1) {
+        cur.splice(i, 1);
+        this.setData({ particleList: cur });
+      }
+    }, duration * 1000 + 100);
+
+    wx.cloud.callFunction({
+      name: 'template-api',
+      data: { action: 'likeTemplate', templateId: 'seed_' + raw.key }
+    }).then(res => {
+      const r = res && res.result;
+      if (r && r.code === 1001) {
+        // 每日额度用完
+        this.rollbackLike(newLikes);
+        wx.showToast({ title: r.msg || '今天的点赞额度已用完', icon: 'none', duration: 2000 });
+        return;
+      }
+      if (r && r.code !== 0) {
+        throw new Error(r.msg || '云函数错误');
+      }
+    }).catch(err => {
+      console.error('点赞同步失败', err);
+      this.rollbackLike(newLikes);
+    });
+  },
+
+  rollbackLike(newLikes) {
+    this.setData({ likes: newLikes - 1, isLiked: false });
   },
 
   onReady() {

@@ -39,16 +39,61 @@ Page({
         w: p.w,
         h: p.h,
         beadCount: p.beadCount,
-        thumb: '/images/patterns/' + p.key + '.png'
+        thumb: '/images/patterns/' + p.key + '.png',
+        authorName: '',
+        authorAvatar: '',
+        authorInitial: '',
+        likes: 0
       }))
     }, () => {
       this.buildFeed();
       this.loadCommunityPosts();
+      this.enrichPresetsWithMeta();
     });
-    
+
     // Initialize refresh audio
     this.refreshAudio = wx.createInnerAudioContext();
-    this.refreshAudio.src = '/audio/ding.mp3'; 
+    this.refreshAudio.src = '/audio/ding.mp3';
+  },
+
+  // 批量读取内置图纸在云端的「作者 + 点赞数」（seed_<key> 记录）
+  enrichPresetsWithMeta() {
+    const db = wx.cloud.database();
+    const keys = this.data.presetList.map(p => p.key);
+    if (!keys.length) return;
+    // where 支持 _.in，一次最多 20 个，分批查
+    const chunks = [];
+    for (let i = 0; i < keys.length; i += 20) chunks.push(keys.slice(i, i + 20));
+    const tasks = chunks.map(chunk =>
+      db.collection('templates')
+        .where({ _id: db.command.in(chunk.map(k => 'seed_' + k)) })
+        .limit(100)
+        .get()
+        .catch(() => ({ data: [] }))
+    );
+    Promise.all(tasks).then(results => {
+      const map = {};
+      results.forEach(res => {
+        (res.data || []).forEach(d => {
+          const k = String(d._id || '').replace(/^seed_/, '');
+          map[k] = d;
+        });
+      });
+      const presetList = this.data.presetList.map(p => {
+        const d = map[p.key];
+        if (!d) return p;
+        const ui = d.userInfo || {};
+        const name = d.author || ui.nickName || '';
+        return {
+          ...p,
+          authorName: name,
+          authorAvatar: d.authorAvatar || ui.avatarUrl || '',
+          authorInitial: name ? name.charAt(0) : '',
+          likes: d.likeCount || d.heat || 0
+        };
+      });
+      this.setData({ presetList }, () => this.buildFeed());
+    });
   },
 
   onShow() {
@@ -170,7 +215,11 @@ Page({
       name: p.name,
       thumb: p.thumb,
       tags: p.tags || [],
-      beadCount: p.beadCount
+      beadCount: p.beadCount,
+      authorName: p.authorName || '',
+      authorAvatar: p.authorAvatar || '',
+      authorInitial: p.authorInitial || '',
+      likes: p.likes || 0
     }));
 
     // 2) 作品卡片（communityList 已由 loadCommunityPosts 按 tag 过滤好）

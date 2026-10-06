@@ -625,6 +625,12 @@ Page({
         templateId: this.data.id
       }
     }).then(res => {
+      if (res.result && res.result.code === 1001) {
+        // 每日点赞额度用完（每天最多 100 个作品）
+        this.setData({ 'stats.likes': newLikes - 1, isLiked: false });
+        wx.showToast({ title: res.result.msg || '今天的点赞额度已用完', icon: 'none', duration: 2000 });
+        return;
+      }
       if (res.result && res.result.code !== 0) {
         throw new Error(res.result.msg || 'Cloud function error');
       }

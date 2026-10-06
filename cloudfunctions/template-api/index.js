@@ -646,7 +646,20 @@ exports.main = async (event, context) => {
       const now = new Date();
       // 获取东八区日期字符串 YYYY-MM-DD
       const dateStr = new Date(now.getTime() + 8 * 60 * 60 * 1000).toISOString().split('T')[0];
-      
+
+      // 每日上限：同一用户每天最多给 100 个「不同作品」点赞
+      // （同一作品当天重复点赞只 +1 计数，不额外占用额度）
+      const DAILY_LIKE_LIMIT = 100;
+      const todayLikes = await db.collection('template_likes')
+        .where({ _openid: wxContext.OPENID, date: dateStr })
+        .get()
+        .catch(() => ({ data: [] }));
+      const likedTodayIds = new Set((todayLikes.data || []).map(r => r.templateId));
+      const isNewTargetToday = !likedTodayIds.has(templateId);
+      if (isNewTargetToday && likedTodayIds.size >= DAILY_LIKE_LIMIT) {
+        return { code: 1001, msg: `今天的点赞额度已用完（每天最多给 ${DAILY_LIKE_LIMIT} 个作品点赞），明天再来吧` };
+      }
+
       // 查询今日点赞记录
       const likeRecord = await db.collection('template_likes')
         .where({

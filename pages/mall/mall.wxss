@@ -464,6 +464,52 @@
   font-weight: 600;
 }
 
+/* 图纸卡作者行（头像 + 昵称 + 点赞数） */
+.feed-author {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #F0E4DC;
+}
+
+.feed-author-avatar {
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.feed-author-avatar-fb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  color: #FFFDFB;
+  font-size: 18rpx;
+  font-weight: 600;
+}
+
+.feed-author-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 21rpx;
+  color: #9B8A8C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-like {
+  flex-shrink: 0;
+  font-size: 21rpx;
+  color: #D4607A;
+  font-weight: 600;
+}
+
 .feed-more {
   background: rgba(255,255,255,0.62);
   backdrop-filter: blur(20px);

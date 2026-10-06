@@ -10,6 +10,12 @@
         <text>{{isFav ? '已收藏' : '收藏'}}</text>
       </view>
     </view>
+    <view class="author-row" wx:if="{{author.name}}">
+      <view class="author-avatar" wx:if="{{author.avatar}}" style="background-image: url('{{author.avatar}}');"></view>
+      <view class="author-avatar author-avatar-fallback" wx:else>{{author.initial}}</view>
+      <view class="author-name">{{author.name}}</view>
+      <view class="author-badge">图纸作者</view>
+    </view>
     <canvas type="2d" id="patternCanvas" class="canvas"
             style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
     <view class="sheet-tip">格子里的字母就是色号，空白格不用放珠子</view>
@@ -26,8 +32,19 @@
   </view>
 
   <view class="actions">
+    <view class="like-btn {{isLiked ? 'on' : ''}}" bindtap="onLike">
+      <text class="like-icon">{{isLiked ? '❤️' : '🤍'}}</text>
+      <text class="like-count">{{likes}}</text>
+      <text class="like-text">{{isLiked ? '已赞' : '点赞'}}</text>
+    </view>
     <view class="btn btn-ghost" bindtap="copyList">复制采购单</view>
     <view class="btn btn-primary" bindtap="saveImage">保存图纸</view>
+  </view>
+
+  <!-- 点赞粒子层 -->
+  <view class="particle-layer">
+    <view class="particle" wx:for="{{particleList}}" wx:key="id"
+          style="{{item.style}}">{{item.emoji}}</view>
   </view>
 
   <view class="safe-bottom"></view>
