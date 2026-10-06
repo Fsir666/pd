@@ -14,7 +14,13 @@ Page({
     // 点赞
     likes: 0,
     isLiked: false,
-    particleList: []
+    particleList: [],
+    // 视图控制
+    showGrid: true,      // 网格线
+    showCode: true,      // 色号文字
+    scale: 1,            // 缩放倍数
+    viewW: 0,            // 可视区域宽（px）
+    viewH: 0
   },
 
   onLoad(query) {
@@ -24,9 +30,11 @@ Page({
 
     const sysInfo = wx.getSystemInfoSync();
     const winW = sysInfo.windowWidth || 375;
-    const canvasW = Math.floor(winW * 0.92);
-    const cell = canvasW / raw.w;
-    const canvasH = Math.ceil(cell * raw.h);
+    // 可视区宽度：留边距，缩放时 canvas 超出部分靠外层 scroll-view 滚动
+    const viewW = Math.floor(winW * 0.92);
+    // 初始按图纸宽度铺满可视区（长图限制最大高度，超出可上下滚）
+    const cell = viewW / raw.w;
+    const viewH = Math.min(Math.ceil(cell * raw.h), Math.floor(winW * 1.1));
 
     const rows = raw.palette.map((code, i) => ({
       code,
@@ -46,12 +54,93 @@ Page({
         colors: raw.palette.length
       },
       rows,
-      canvasW,
-      canvasH,
+      viewW,
+      viewH,
+      // canvas 实际像素 = 可视区 * 缩放
+      canvasW: Math.round(viewW * this.data.scale),
+      canvasH: Math.round(viewH * this.data.scale),
       isFav: (wx.getStorageSync('pattern_favs') || []).indexOf(raw.key) >= 0
     });
 
     this.loadAuthorAndLikes();
+  },
+
+  // ===== 视图控制 =====
+  toggleGrid() {
+    const next = !this.data.showGrid;
+    this.setData({ showGrid: next });
+    this._needRedraw = true;
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  toggleCode() {
+    const next = !this.data.showCode;
+    this.setData({ showCode: next });
+    this._needRedraw = true;
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  setScale(e) {
+    const val = Number(e.currentTarget.dataset.scale) || 1;
+    if (val === this.data.scale) return;
+    const viewW = this.data.viewW;
+    const viewH = this.data.viewH;
+    this.setData({
+      scale: val,
+      canvasW: Math.round(viewW * val),
+      canvasH: Math.round(viewH * val)
+    }, () => {
+      this._needRedraw = true;
+      // 等 DOM 更新完再重绘
+      setTimeout(() => this.draw(), 60);
+    });
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  // 双指缩放手势
+  onTouchStart(e) {
+    if (e.touches && e.touches.length === 2) {
+      const [a, b] = e.touches;
+      this._pinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      this._pinchStartScale = this.data.scale;
+    }
+  },
+
+  onTouchMove(e) {
+    if (!this._pinchStartDist) return;
+    if (e.touches && e.touches.length === 2) {
+      const [a, b] = e.touches;
+      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      if (!this._pinchStartDist) return;
+      const ratio = dist / this._pinchStartDist;
+      const newScale = Math.min(4, Math.max(1, this._pinchStartScale * ratio));
+      if (Math.abs(newScale - this.data.scale) > 0.01) {
+        this.setData({
+          scale: newScale,
+          canvasW: Math.round(this.data.viewW * newScale),
+          canvasH: Math.round(this.data.viewH * newScale)
+        });
+      }
+    }
+  },
+
+  onTouchEnd() {
+    if (this._pinchStartDist) {
+      this._pinchStartDist = 0;
+      this._needRedraw = true;
+      // 吸附到 0.5 步进，避免 1.37 这种零碎倍数
+      const snapped = Math.round(this.data.scale * 2) / 2;
+      const clamped = Math.min(4, Math.max(1, snapped));
+      if (clamped !== this.data.scale) {
+        this.setData({
+          scale: clamped,
+          canvasW: Math.round(this.data.viewW * clamped),
+          canvasH: Math.round(this.data.viewH * clamped)
+        }, () => setTimeout(() => this.draw(), 40));
+      } else {
+        setTimeout(() => this.draw(), 40);
+      }
+    }
   },
 
   // 从云端 seed_<key> 读取作者与点赞数（内置图纸已作为「冯」的社区作品发布）
@@ -187,7 +276,14 @@ Page({
       canvas.height = info.height * dpr;
       ctx.scale(dpr, dpr);
 
+      const showGrid = this.data.showGrid;
+      const showCode = this.data.showCode;
+      // cell 按 canvas 实际宽度算（缩放后自动变大）
       const cell = info.width / raw.w;
+      // 色号只在格子够大时画，否则糊成一团（48×48 缩放前 cell 太小）
+      const codeReadable = showCode && cell >= 14;
+      const fontSize = Math.min(13, Math.max(8, cell * 0.34));
+
       ctx.fillStyle = '#FFFDFB';
       ctx.fillRect(0, 0, info.width, info.height);
 
@@ -203,18 +299,21 @@ Page({
           } else {
             ctx.fillStyle = raw.hexes[idx];
             ctx.fillRect(x0, y0, cell, cell);
-            if (cell >= 16) {
+            if (codeReadable) {
               const lum = this._lum(raw.hexes[idx]);
               ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
-              ctx.font = '600 ' + Math.min(11, cell * 0.36).toFixed(0) + 'px sans-serif';
+              ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
               ctx.fillText(raw.palette[idx], x0 + cell / 2, y0 + cell / 2);
             }
           }
-          ctx.strokeStyle = (x % 5 === 0 || y % 5 === 0) ? '#C9B8AF' : '#EADFD7';
-          ctx.lineWidth = 0.5;
-          ctx.strokeRect(x0, y0, cell, cell);
+          // 网格线（可关）：5 格加粗
+          if (showGrid) {
+            ctx.strokeStyle = (x % 5 === 0 || y % 5 === 0) ? '#C9B8AF' : '#EADFD7';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(x0, y0, cell, cell);
+          }
         }
       }
       this.canvasNode = canvas;

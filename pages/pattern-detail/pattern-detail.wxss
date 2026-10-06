@@ -69,9 +69,77 @@
 
 .canvas {
   display: block;
-  margin: 0 auto;
   border-radius: 16rpx;
   background: #FFFDFB;
+}
+
+/* 视图工具栏 */
+.view-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  background: #F6E9E4;
+  border: 1rpx solid #EFD9D2;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #9B8A8C;
+  transition: all 0.2s;
+}
+
+.tool-btn.on {
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  border-color: transparent;
+  color: #FFFDFB;
+  box-shadow: 0 4rpx 12rpx rgba(212, 96, 122, 0.26);
+}
+
+.tool-btn:active {
+  transform: scale(0.95);
+}
+
+.tool-ico {
+  font-size: 22rpx;
+  line-height: 1;
+}
+
+.scale-btn {
+  min-width: 68rpx;
+  padding: 0 16rpx;
+  justify-content: center;
+  font-size: 24rpx;
+}
+
+/* 可滚动画布容器 */
+.canvas-scroll {
+  width: 100%;
+  border-radius: var(--ym-r-md, 20rpx);
+  background: #FFFDFB;
+  overflow: hidden;
+}
+
+.canvas-holder {
+  position: relative;
+}
+
+.canvas {
+  display: block;
 }
 
 .sheet-tip {
