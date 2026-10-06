@@ -180,6 +180,80 @@ page {
 }
 
 /* 4. Menu Group (Inset Grouped) */
+/* 每日签到卡片 */
+.checkin-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #FDF0EC 0%, #FBE9E4 100%);
+  border: 1rpx solid #EFD9D2;
+  border-radius: 24rpx;
+  padding: 26rpx 28rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(212, 96, 122, 0.1);
+}
+
+.checkin-card-active {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
+.checkin-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkin-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.checkin-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #A8455C;
+}
+
+.checkin-streak-badge {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #FFFDFB;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.checkin-sub {
+  font-size: 23rpx;
+  color: #9B8A8C;
+  line-height: 1.4;
+}
+
+.checkin-btn {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  min-width: 130rpx;
+  height: 66rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  color: #FFFDFB;
+  font-size: 26rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 18rpx rgba(212, 96, 122, 0.3);
+}
+
+.checkin-btn.done {
+  background: #F6E9E4;
+  color: #C2B4B4;
+  box-shadow: none;
+}
+
 .menu-group {
   background: #FFFDFB;
   border-radius: 24rpx;

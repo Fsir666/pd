@@ -9,6 +9,7 @@ Page({
     showCoinsModal: false,
     walletToday: '',
     walletStreak: 0,
+    checkedInToday: false,
     coinLedger: [],
     coinLedgerSkip: 0,
     coinLedgerHasMore: false,
@@ -170,7 +171,14 @@ Page({
       const streak = typeof d.checkinStreak === 'number' ? d.checkinStreak : 0
       app.updateUserInfo({ coins, energy })
       this.syncData()
-      this.setData({ walletToday: today, walletStreak: streak })
+      // 今天是否已签到：钱包返回的 today === 今天 即已签
+      const now = new Date()
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      this.setData({
+        walletToday: today,
+        walletStreak: streak,
+        checkedInToday: !!today && today === todayStr
+      })
       return true
     }).catch(() => false)
   },
@@ -259,6 +267,8 @@ Page({
       const r = res && res.result
       if (!r) throw new Error('签到失败')
       if (r.code === 10002) {
+        this.setData({ checkedInToday: true })
+        this.fetchWallet()
         wx.showToast({ title: '今天已签到', icon: 'none' })
         return
       }
@@ -275,8 +285,10 @@ Page({
       if (typeof energy === 'number') next.energy = energy
       app.updateUserInfo(next)
       this.syncData()
+      // 签到卡片在弹窗外也要立刻变成「已签到」态
+      this.setData({ checkedInToday: true, walletStreak: streak, walletToday: d.today || this.data.walletToday })
+      this.fetchWallet()
       if (this.data.showCoinsModal) {
-        this.fetchWallet()
         this.fetchCoinLedger(true)
       }
       const extra = rewardEnergy > 0 ? `，体力+${rewardEnergy}` : ''
