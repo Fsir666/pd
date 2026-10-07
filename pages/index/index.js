@@ -1,10 +1,9 @@
 const app = getApp();
 
 // 工具箱的小工具列表（收起时整块隐藏，点「全部工具」果冻动画展开）
+// 注意：id 1/9/13/4 已提升为首页四宫格主入口，此处不再重复，避免同页两个入口
 const ALL_SMALL_TOOLS = [
-  { id: 13, title: '图纸库', desc: '免费图纸', icon: '📐', color: '#D4607A', animClass: 'bounce', size: 'small' },
   { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#7A9E7E', animClass: 'wiggle', size: 'small' },
-  { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#D4607A', animClass: 'spin-slow', size: 'small' },
   { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#94B08F', animClass: 'pulse', size: 'small' },
   { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#D89A5C', animClass: 'breathe', size: 'small' },
   { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#E0A458', animClass: 'pulse' },
@@ -387,7 +386,8 @@ Page({
         wx.navigateTo({ url: '/pages/my-orders/my-orders' });
         break;
       case 12: // AI生成拼豆图
-        wx.navigateTo({ url: '/pages/developer/mock-template/mock-template' });
+        // 该页面未在 app.json 注册，跳转必失败，改为提示
+        wx.showToast({ title: '功能开发中...', icon: 'none' });
         break;
       case 13: // 图纸库
         wx.navigateTo({ url: '/pages/patterns/patterns' });

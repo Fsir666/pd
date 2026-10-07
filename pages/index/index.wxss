@@ -816,3 +816,165 @@ scroll-view {
   font-size: 23rpx;
   color: var(--ym-text-sub, #9B8A8C);
 }
+
+/* ============================================================
+   v1.0.48 排版统一（方案A：四宫格主入口）
+   1) 圆角统一两档：卡片 28rpx / 小元素 20rpx
+   2) 字号三级：区块标题 32rpx / 工具名 27rpx / 描述 22rpx
+   3) 间距节奏：区块间 32rpx / 区块内 20rpx
+   4) 左右边距统一 24rpx
+   5) 装饰收敛：光斑 3→1，图标动画统一 1 种
+   ============================================================ */
+
+/* ---------- 主功能四宫格 ---------- */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  padding: 0 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.quick-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 152rpx;
+  padding: 20rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border: 2rpx solid rgba(255, 255, 255, 0.7);
+  border-radius: 28rpx;
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.10));
+  transition: transform 0.2s ease;
+}
+
+.quick-cell:active {
+  transform: scale(0.97);
+}
+
+/* 主入口大格：横排，视觉唯一焦点 */
+.quick-cell--hero {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  min-height: 128rpx;
+  background: var(--ym-primary, #D4607A);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 12rpx 28rpx rgba(212, 96, 122, 0.26);
+}
+
+.quick-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 20rpx;
+  background: var(--ym-honey-wash, #F7EEDF);
+  margin-bottom: 14rpx;
+}
+
+.quick-icon--hero {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.24);
+  margin-bottom: 0;
+  margin-right: 20rpx;
+  flex: none;
+}
+
+.quick-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  letter-spacing: 0.4rpx;
+}
+
+.quick-desc {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 6rpx;
+}
+
+.quick-title-sm {
+  font-size: 27rpx;
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
+}
+
+.quick-desc-sm {
+  font-size: 22rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+  margin-top: 6rpx;
+}
+
+/* ---------- 统一后的区块标题 ---------- */
+.section-header {
+  margin-bottom: 20rpx;
+  padding: 0;
+}
+
+.section-title-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--ym-text, #4A3A3E);
+  letter-spacing: 0.4rpx;
+}
+
+.section-more {
+  font-size: 23rpx;
+  color: var(--ym-text-sub, #9B8A8C);
+}
+
+/* ---------- 榜单标题行右侧（点赞并入，替代独立 like-strip） ---------- */
+.rank-head-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.rank-head-right .home-like {
+  transform: scale(0.8);
+  transform-origin: right center;
+}
+
+/* ---------- 圆角统一：卡片 28rpx ---------- */
+.toolbox-shell,
+.glass-card {
+  border-radius: 28rpx;
+}
+
+.tool-card {
+  border-radius: 28rpx;
+}
+
+/* ---------- 工具区块间距统一 ---------- */
+.toolbox-section {
+  padding: 0 24rpx 32rpx;
+}
+
+.rank-section {
+  padding: 0 24rpx 40rpx;
+}
+
+/* ---------- 装饰收敛：光斑 3 → 1 ---------- */
+.orb-2,
+.orb-3 {
+  display: none;
+}
+
+.orb-1 {
+  width: 560rpx;
+  height: 560rpx;
+  opacity: 0.5;
+  animation: float 12s infinite ease-in-out;
+}
+
+/* ---------- 图标动画统一为一种（breathe 极轻） ---------- */
+.tool-icon--steady {
+  animation: breathe 3.2s infinite ease-in-out;
+}

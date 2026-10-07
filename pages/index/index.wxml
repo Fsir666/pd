@@ -95,69 +95,44 @@ module.exports = {
         </view>
       </view>
 
-      <!-- 轮播图 -->
-      <swiper class="banner-swiper" indicator-dots autoplay circular indicator-active-color="#fff" indicator-color="rgba(255,255,255,0.5)">
-        <block wx:for="{{banners}}" wx:key="id">
-          <swiper-item>
-            <view class="banner-item" style="background: linear-gradient(135deg, {{item.color}}, {{item.color2}});">
-              <view class="banner-deco banner-deco-1"></view>
-              <view class="banner-deco banner-deco-2"></view>
-              <view class="banner-inner">
-                <text class="banner-icon">{{item.icon}}</text>
-                <view class="banner-text">
-                  <text class="banner-title">{{item.title}}</text>
-                  <text class="banner-sub">{{item.sub}}</text>
-                </view>
-              </view>
-            </view>
-          </swiper-item>
-        </block>
-      </swiper>
-
-      <!-- 开始游戏入口 (升级大按钮) -->
-      <view class="game-start-section" bindtap="onStartGame">
-        <view class="start-btn-card glass-btn">
-          <view class="start-content">
-            <text class="start-title">开始拼豆</text>
-            <text class="start-desc">Create Your Pixel Art</text>
+      <!-- 主功能四宫格（替代原大轮播 + 巨型开始按钮） -->
+      <view class="quick-grid">
+        <view class="quick-cell quick-cell--hero" bindtap="onToolTap" data-id="1">
+          <view class="quick-icon quick-icon--hero"></view>
+          <view class="quick-text">
+            <text class="quick-title">图片转像素</text>
+            <text class="quick-desc">上传照片 3 秒出图纸</text>
           </view>
-          <view class="start-icon">🎨</view>
+        </view>
+        <view class="quick-cell" bindtap="onToolTap" data-id="9">
+          <view class="quick-icon"></view>
+          <text class="quick-title-sm">照片转卡通</text>
+          <text class="quick-desc-sm">一键卡通化</text>
+        </view>
+        <view class="quick-cell" bindtap="onToolTap" data-id="13">
+          <view class="quick-icon"></view>
+          <text class="quick-title-sm">图纸库</text>
+          <text class="quick-desc-sm">29 张免费图纸</text>
+        </view>
+        <view class="quick-cell" bindtap="onToolTap" data-id="4">
+          <view class="quick-icon"></view>
+          <text class="quick-title-sm">色卡对照表</text>
+          <text class="quick-desc-sm">查色号</text>
         </view>
       </view>
 
       <!-- 工具箱 (Toolbox) -->
       <view class="toolbox-section">
         <view class="section-header">
-          <text class="section-title-text">🧰 拼豆工具</text>
+          <text class="section-title-text">🧰 更多工具</text>
         </view>
         <view class="toolbox-shell glass-card">
-          <view class="toolbox-feature-row">
-            <view class="tool-feature tool-feature--primary" bindtap="onToolTap" data-id="1">
-              <view class="tool-feature-top">
-                <view class="tool-feature-icon tool-icon pulse" style="color: #D89A5C">🖼️</view>
-              </view>
-              <view class="tool-feature-text">
-                <text class="tool-feature-title">图片转像素</text>
-                <text class="tool-feature-desc">生成可用拼豆图纸</text>
-              </view>
-            </view>
-            <view class="tool-feature tool-feature--secondary" bindtap="onToolTap" data-id="9">
-              <view class="tool-feature-top">
-                <view class="tool-feature-icon tool-icon wiggle" style="color: #D89A5C">🪄</view>
-              </view>
-              <view class="tool-feature-text">
-                <text class="tool-feature-title">照片转卡通</text>
-                <text class="tool-feature-desc">一键卡通化</text>
-              </view>
-            </view>
-          </view>
-
           <!-- 小工具网格：收起时整块隐藏，展开时果冻动画弹出 -->
           <view class="toolbox-collapse {{toolsExpanded ? 'expanded' : ''}}">
             <view class="toolbox-grid toolbox-grid--compact">
               <block wx:for="{{allSmallTools}}" wx:key="id">
                 <view class="tool-card glass-card size-{{item.size || 'small'}}" bindtap="onToolTap" data-id="{{item.id}}">
-                  <view class="tool-icon {{item.animClass}}" style="color: {{item.color}}">
+                  <view class="tool-icon tool-icon--steady" style="color: {{item.color}}">
                     {{item.icon}}
                   </view>
                   <view class="tool-info">
@@ -168,7 +143,7 @@ module.exports = {
               </block>
             </view>
           </view>
-          
+
           <!-- 展开/收起全部工具（就地切换，不跳页） -->
           <view class="show-all-btn-container" bindtap="onToggleTools">
             <view class="show-all-btn glass-card">
@@ -180,15 +155,14 @@ module.exports = {
       </view>
 
 
-      <view class="like-strip">
-        <like-float class="home-like" show-particles="{{true}}" />
-      </view>
-
       <!-- 热度榜单 (毛玻璃) -->
       <view class="rank-section">
         <view class="section-header">
           <text class="section-title-text">🔥 热门图纸榜</text>
-          <text class="section-more">查看全部 ></text>
+          <view class="rank-head-right">
+            <like-float class="home-like" show-particles="{{false}}" />
+            <text class="section-more">查看全部 ></text>
+          </view>
         </view>
         
         <!-- Template Definition -->
