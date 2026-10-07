@@ -1070,3 +1070,44 @@ scroll-view {
 .tool-icon--steady {
   animation: breathe 3.2s infinite ease-in-out;
 }
+
+/* ============================================================
+   v1.0.50 「更多工具」区瘦身
+   收起：去掉外层卡片壳和标题，只留一个细长贴紧按钮
+   展开：卡片壳 + 果冻网格 + 按钮，三层贴紧
+   ============================================================ */
+
+/* 收起态：壳变成透明容器，无卡片感 */
+.toolbox-shell {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 展开态：恢复卡片壳，把网格和按钮包在一起 */
+.toolbox-shell.shell-open {
+  padding: 16rpx;
+  background: var(--ym-surface, #FFFDFB);
+  border: 2rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--ym-shadow, 0 6rpx 20rpx rgba(176, 138, 128, 0.10));
+}
+
+/* 按钮本身：细长条，不再套 glass-card */
+.show-all-btn {
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: var(--ym-bg-sunk, #F5EDE6);
+  border: none;
+  font-size: 24rpx;
+}
+
+.show-all-btn:active {
+  transform: scale(0.98);
+  background: #EFE3D9;
+}
+
+/* 收起时与上方快捷工具贴紧 */
+.toolbox-section {
+  padding: 0 24rpx 20rpx;
+}

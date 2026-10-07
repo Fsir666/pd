@@ -138,12 +138,9 @@ module.exports = {
         </view>
       </view>
 
-      <!-- 工具箱 (Toolbox) -->
+      <!-- 工具箱 (Toolbox)：收起时只有一个细长按钮，展开才显示卡片壳 -->
       <view class="toolbox-section">
-        <view class="section-header">
-          <text class="section-title-text">🧰 更多工具</text>
-        </view>
-        <view class="toolbox-shell glass-card">
+        <view class="toolbox-shell glass-card {{toolsExpanded ? 'shell-open' : ''}}">
           <!-- 小工具网格：收起时整块隐藏，展开时果冻动画弹出 -->
           <view class="toolbox-collapse {{toolsExpanded ? 'expanded' : ''}}">
             <view class="toolbox-grid toolbox-grid--compact">
@@ -162,8 +159,8 @@ module.exports = {
           </view>
 
           <!-- 展开/收起全部工具（就地切换，不跳页） -->
-          <view class="show-all-btn-container" bindtap="onToggleTools">
-            <view class="show-all-btn glass-card">
+          <view class="show-all-btn-container">
+            <view class="show-all-btn" bindtap="onToggleTools">
               <text>{{toolsExpanded ? '收起工具' : '全部工具'}}</text>
               <text class="arrow-icon {{toolsExpanded ? 'expanded' : ''}}">></text>
             </view>
