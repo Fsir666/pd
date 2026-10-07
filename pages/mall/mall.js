@@ -272,7 +272,9 @@ Page({
     const key = e.currentTarget.dataset.key;
     if (!key) return;
     wx.vibrateShort({ type: 'light' });
-    wx.navigateTo({ url: '/pages/pattern-detail/pattern-detail?key=' + key });
+    // 统一作品页：发现页图纸卡片 → detail（与首页榜单同一页面、同一布局）
+    // 内置图纸在云端以固定 _id = seed_<key> 存在，这里直接按 id 进入 detail
+    wx.navigateTo({ url: '/pages/detail/detail?id=' + encodeURIComponent('seed_' + key) });
   },
 
   openPatternList() {
