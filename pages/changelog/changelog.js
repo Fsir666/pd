@@ -15,7 +15,7 @@ const VERSIONS = [
   {
     version: '1.0.65',
     date: '2026-10-07',
-    time: '17:25',
+    time: '17:23',
     tag: 'opt',
     title: '图纸详情页改成和作品详情页一样的沉浸式布局',
     items: [
