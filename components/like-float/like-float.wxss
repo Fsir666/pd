@@ -17,21 +17,23 @@
   will-change: transform, opacity;
 }
 
+/* 软萌飘心：冒出来 → 缓缓往上飘 → 慢慢淡出（不再像石头一样砸下去） */
 @keyframes gravity {
   0% {
-    transform: translate(0, 0) scale(0.5) rotate(0deg);
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
     opacity: 0;
   }
-  10% {
+  14% {
+    transform: translate(calc(var(--tx, 0) * 0.18), calc(var(--ty, -180rpx) * 0.2)) scale(1.18) rotate(calc(var(--rot) * 0.4));
     opacity: 1;
   }
-  40% {
-    transform: translate(var(--tx, 0), var(--ty, -180rpx)) scale(1.2) rotate(calc(var(--rot) * 0.4));
+  55% {
+    transform: translate(calc(var(--tx, 0) * 0.68), calc(var(--ty, -180rpx) * 0.72)) scale(1.02) rotate(var(--rot));
     opacity: 1;
   }
   100% {
-    transform: translate(calc(var(--tx, 0) * 2), 1500rpx) scale(1) rotate(var(--rot));
-    opacity: 1;
+    transform: translate(var(--tx, 0), var(--ty, -180rpx)) scale(0.82) rotate(calc(var(--rot) * 1.15));
+    opacity: 0;
   }
 }
 

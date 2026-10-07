@@ -414,7 +414,8 @@ Component({
 
     _spawnParticles(x, y) {
       if (this._detached) return;
-      const emojis = ['💖', '✨', '🥳', '😍', '🎉', '😆', '🤩', '🌟', '💫', '😺'];
+      // 软萌系：只用爱心 / 小花 / 蝴蝶结 / 星星，不用人脸表情（之前那套又乱又吵）
+      const emojis = ['💗', '💕', '💖', '🌸', '🎀', '✨', '🌟', '🧸'];
       const now = Date.now();
       if (now - this._budgetTs > 200) {
         this._budgetTs = now;
@@ -428,11 +429,12 @@ Component({
 
       for (let i = 0; i < n; i++) {
         const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-        const randomX = (Math.random() - 0.5) * 160;
-        const jumpHeight = -150 - Math.random() * 300;
+        const randomX = (Math.random() - 0.5) * 110;
+        const jumpHeight = -170 - Math.random() * 220;
         const direction = randomX >= 0 ? 1 : -1;
-        const rotation = direction * (360 + Math.random() * 360);
-        const duration = 1.5 + Math.random() * 1.0;
+        // 轻微摇曳（±28°），不再是整圈疯转
+        const rotation = direction * (12 + Math.random() * 16);
+        const duration = 1.7 + Math.random() * 0.9;
         const id = nowBase + Math.random();
 
         added.push({
