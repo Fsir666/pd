@@ -692,3 +692,44 @@ button.tool-pill.share-pill {
 button.tool-pill.share-pill::after {
   border: none;
 }
+
+/* ============================================================
+   v1.0.54 图片下方区域：作者卡片瘦身 + 字重统一
+   点赞/收藏原本重复塞在作者卡片里（底部工具条已有），已移除
+   ============================================================ */
+
+/* 作者卡片：只留头像+昵称+粉丝+关注，垂直居中不再挤 */
+.author-info {
+  align-items: center;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+  border-radius: 28rpx;
+}
+
+.nickname {
+  font-weight: 500;
+}
+
+.follow-btn {
+  height: 52rpx;
+  padding: 0 24rpx;
+  font-weight: 500;
+}
+
+/* 主按钮：字重降下来，高度圆角统一 */
+.primary-btn {
+  height: 84rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 28rpx;
+}
+
+.primary-actions {
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+/* 标题与标签区收紧 */
+.tags-container {
+  gap: 12rpx;
+}

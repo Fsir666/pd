@@ -42,17 +42,6 @@
           </view>
         </view>
         <!-- 移除统计信息，保持纯净 -->
-        <!-- 作者栏操作按钮组 -->
-        <view class="author-actions">
-          <view class="action-pill like-pill {{isLiked ? 'active' : ''}}" bindtap="onLike">
-            <text class="icon">{{isLiked ? '❤️' : '🤍'}}</text>
-            <text class="count">{{stats.likes}}</text>
-          </view>
-          <view class="action-pill collect-pill {{isCollected ? 'active' : ''}}" bindtap="onCollect">
-            <text class="icon">{{isCollected ? '⭐️' : '☆'}}</text>
-            <text class="label">{{isCollected ? '已收藏' : '收藏'}}</text>
-          </view>
-        </view>
       </view>
     </view>
 
