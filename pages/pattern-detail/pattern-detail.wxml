@@ -85,6 +85,10 @@
       <text class="act-ico">💾</text>
       <text class="act-label">保存</text>
     </view>
+    <button class="act-btn act-ghost" open-type="share">
+      <text class="act-ico">📤</text>
+      <text class="act-label">分享</text>
+    </button>
   </view>
 
   <view class="safe-bottom"></view>

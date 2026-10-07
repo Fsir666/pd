@@ -126,36 +126,5 @@ Page({
 
   goToHome() {
     wx.switchTab({ url: '/pages/index/index' });
-  },
-
-  preventBubble() {
-    // 阻止冒泡，避免点到分享按钮触发卡片跳转
-  },
-
-  // 分享卡片：带成品图 + 小程序入口 + 邀请码
-  onShareAppMessage(e) {
-    const ds = (e && e.target && e.target.dataset) || {};
-    const id = ds.id || '';
-    const key = ds.key || '';
-    const title = ds.title || '拼豆图纸';
-    const img = ds.img || '';
-
-    const app = getApp();
-    const inv = app && app.globalData && app.globalData.userInfo && app.globalData.userInfo.inviteCode ? String(app.globalData.userInfo.inviteCode) : '';
-    const invPart = inv ? `&inv=${encodeURIComponent(inv)}` : '';
-
-    let path;
-    if (key) {
-      path = `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(key)}${invPart}`;
-    } else if (id && String(id).indexOf('seed_') === 0) {
-      path = `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(String(id).slice(5))}${invPart}`;
-    } else if (id) {
-      path = `/pages/detail/detail?id=${encodeURIComponent(id)}${invPart}`;
-    } else {
-      path = '/pages/index/index';
-    }
-    const out = { title, path };
-    if (img) out.imageUrl = img;
-    return out;
   }
 });

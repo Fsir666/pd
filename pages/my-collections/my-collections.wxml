@@ -40,9 +40,6 @@
             <view class="card-meta">
               <text class="meta-text" wx:if="{{item.beadCount}}">{{item.beadCount}} 颗</text>
               <text class="meta-text alt" wx:if="{{item.colorCount}}">{{item.colorCount}} 色</text>
-              <button class="btn-share-sm" open-type="share" catchtap="preventBubble"
-                      data-id="{{item._id}}" data-key="{{item.key}}"
-                      data-title="{{item.title}}" data-img="{{item.thumb || item.imageUrl}}">分享</button>
             </view>
           </view>
         </view>

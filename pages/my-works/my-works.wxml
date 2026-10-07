@@ -59,9 +59,6 @@
                   <text class="heat-icon">🔥</text>
                   <text>{{item.heat || item.likeCount || 0}}</text>
                 </view>
-                <button class="btn-share" open-type="share" catchtap="preventBubble"
-                        data-id="{{item._id}}" data-key="{{item.seedKey}}"
-                        data-title="{{item.title}}" data-img="{{item.thumb || item.imageUrl}}">分享</button>
               </view>
             </view>
           </view>

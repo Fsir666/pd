@@ -185,37 +185,5 @@ Page({
         duration: 3000
       });
     });
-  },
-
-  // 分享卡片：带成品图 + 小程序入口 + 邀请码，发给闺蜜直接拉新
-  onShareAppMessage(e) {
-    const ds = (e && e.target && e.target.dataset) || {};
-    const id = ds.id || '';
-    const key = ds.key || '';
-    const title = ds.title || '拼豆作品';
-    const img = ds.img || '';
-
-    const app = getApp();
-    // 社区作品（非内置图纸）记录分享奖励
-    if (app && app.globalData && app.globalData.isLogged && id && String(id).indexOf('seed_') !== 0) {
-      wx.cloud.callFunction({
-        name: 'template-api',
-        data: { action: 'recordShare', templateId: id }
-      }).then((res) => {
-        const r = res && res.result;
-        if (!r || r.code !== 0) return;
-        const rewardCoins = r.data && typeof r.data.rewardCoins === 'number' ? r.data.rewardCoins : 0;
-        if (rewardCoins > 0) wx.showToast({ title: `分享奖励 +${rewardCoins}`, icon: 'none' });
-      }).catch(() => {});
-    }
-
-    const inv = app && app.globalData && app.globalData.userInfo && app.globalData.userInfo.inviteCode ? String(app.globalData.userInfo.inviteCode) : '';
-    const invPart = inv ? `&inv=${encodeURIComponent(inv)}` : '';
-    const path = key
-      ? `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(key)}${invPart}`
-      : (id ? `/pages/detail/detail?id=${encodeURIComponent(id)}${invPart}` : '/pages/index/index');
-    const out = { title, path };
-    if (img) out.imageUrl = img;
-    return out;
   }
 });

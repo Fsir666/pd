@@ -474,9 +474,16 @@ Page({
 
   onShareAppMessage() {
     const raw = this._raw || {};
-    return {
+    const key = raw.key || '';
+    const app = getApp();
+    const inv = app && app.globalData && app.globalData.userInfo && app.globalData.userInfo.inviteCode ? String(app.globalData.userInfo.inviteCode) : '';
+    const invPart = inv ? `&inv=${encodeURIComponent(inv)}` : '';
+    const path = '/pages/pattern-detail/pattern-detail?key=' + encodeURIComponent(key) + invPart;
+    const out = {
       title: raw.name ? raw.name + ' 拼豆图纸' : '拼豆图纸',
-      path: '/pages/pattern-detail/pattern-detail?key=' + (raw.key || '')
+      path
     };
+    if (key) out.imageUrl = '/images/patterns/' + key + '.png';
+    return out;
   }
 });

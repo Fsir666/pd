@@ -245,6 +245,10 @@
   line-height: 1;
 }
 
+/* 分享按钮是原生 button，去掉默认边框/内边距，外观与其他操作按钮一致 */
+button.act-btn { padding: 0; }
+button.act-btn::after { border: none; }
+
 /* 点赞：最窄，图标 + 数量 */
 .act-like {
   flex: 0 0 128rpx;
