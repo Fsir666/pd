@@ -733,3 +733,108 @@ button.tool-pill.share-pill::after {
 .tags-container {
   gap: 12rpx;
 }
+
+/* ============================================================
+   v1.0.55 底部栏彻底重做
+   1) 分享按钮权重修正（原 button.tool-pill.share-pill{padding:0} 权重更高）
+   2) 输入框白底描边，不再和底栏背景融在一起
+   3) 四个按钮=一条完整分段条，白底+细分隔线，去掉厚重填充
+   ============================================================ */
+
+.input-row {
+  gap: 12rpx;
+  padding: 16rpx 20rpx;
+}
+
+/* 输入区：白底 + 描边，视觉独立 */
+.input-container {
+  flex: 1;
+  min-width: 0;
+  height: 76rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #EFE3D9;
+  border-radius: 999rpx;
+  padding: 0 8rpx 0 22rpx;
+}
+
+.main-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  color: #4A3A3E;
+}
+
+.camera-btn {
+  padding-left: 12rpx;
+}
+
+/* 工具条：完整一条，白底 + 细线分段 */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+  height: 76rpx;
+  gap: 0;
+  background: #FFFFFF;
+  border: 1rpx solid #EFE3D9;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+
+.tool-pill {
+  height: 76rpx;
+  padding: 0 20rpx;
+  gap: 5rpx;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.tool-pill + .tool-pill {
+  border-left: 1rpx solid #F2E7DE;
+}
+
+.tool-pill .icon {
+  font-size: 28rpx;
+}
+
+.tool-pill .tcount {
+  font-size: 21rpx;
+  font-weight: 500;
+  color: #A99A9C;
+}
+
+.tool-pill.liked {
+  background: transparent;
+}
+.tool-pill.liked .icon,
+.tool-pill.liked .tcount {
+  color: #D4607A;
+}
+
+.tool-pill.collected {
+  background: transparent;
+}
+.tool-pill.collected .icon {
+  color: #D89A5C;
+}
+
+/* 分享按钮：权重对齐其它分段，彻底去掉 button 默认外观 */
+button.tool-pill.share-pill {
+  height: 76rpx;
+  margin: 0;
+  padding: 0 20rpx;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.tool-pill.share-pill::after {
+  border: none;
+}
