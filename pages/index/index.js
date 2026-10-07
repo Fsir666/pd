@@ -112,9 +112,11 @@ Page({
       wx.showLoading({ title: '加载榜单...' });
     }
     
-    // 直接查询 templates 集合
+    // 直接查询 templates 集合（排除已设为私密的作品）
     const db = wx.cloud.database();
+    const _ = db.command;
     return db.collection('templates')
+      .where({ isPublic: _.neq(false) })
       .orderBy('heat', 'desc')
       .limit(10)
       .get()

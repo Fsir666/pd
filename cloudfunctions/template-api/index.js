@@ -463,8 +463,9 @@ exports.main = async (event, context) => {
         }
       }
 
-      // 查询前5条热门数据
+      // 查询前5条热门数据（排除已设为私密的作品）
       const result = await db.collection('templates')
+        .where({ isPublic: _.neq(false) })
         .orderBy('heat', 'desc')
         .limit(5)
         .get();
@@ -483,9 +484,14 @@ exports.main = async (event, context) => {
       }
       
       const result = await db.collection('templates').doc(id).get();
+      const doc = result && result.data;
+      // 私密作品只允许作者本人查看
+      if (doc && doc.isPublic === false && doc._openid !== wxContext.OPENID) {
+        return { code: -3, msg: '该作品已设为私密' };
+      }
       return {
         code: 0,
-        data: result.data,
+        data: doc,
         msg: 'success'
       };
     }
@@ -1487,9 +1493,20 @@ exports.main = async (event, context) => {
     if (action === 'togglePublic') {
       const { templateId, isPublic } = event;
       if (!templateId) return { code: -1, msg: 'Missing templateId' };
+      if (!wxContext.OPENID) return { code: 401, msg: '请先登录' };
       
       const safeIsPublic = !!isPublic;
-      
+
+      // 归属校验：只能修改自己的作品，防止越权改/删他人作品或把他人帖子过户到自己名下
+      const templateRes = await db.collection('templates').doc(templateId).get().catch(() => ({ data: null }));
+      const template = templateRes && templateRes.data;
+      if (!template) return { code: -1, msg: '作品不存在' };
+      if (template._openid !== wxContext.OPENID) {
+        return { code: -3, msg: '无权限：只能修改自己的作品' };
+      }
+      // 社区帖归属必须用作品真正作者，不能是调用者
+      const authorOpenid = template._openid || wxContext.OPENID;
+
       // 1. 更新 templates 集合
       await db.collection('templates').doc(templateId).update({
         data: {
@@ -1501,10 +1518,6 @@ exports.main = async (event, context) => {
       // 2. 同步 community_posts 集合
       if (safeIsPublic) {
         // 如果设为公开 -> 添加到社区
-        // 先获取作品详情
-        const templateRes = await db.collection('templates').doc(templateId).get();
-        const template = templateRes.data;
-        
         // 检查是否已存在
         const postRes = await db.collection('community_posts').doc(templateId).get().catch(() => ({ data: null }));
         
@@ -1520,14 +1533,15 @@ exports.main = async (event, context) => {
                templateId: templateId,
                createTime: db.serverDate(),
                updateTime: db.serverDate(),
-               _openid: wxContext.OPENID
+               _openid: authorOpenid
              }
            });
         } else {
             // 已存在 -> 也可以选择更新下信息，防止之前改了标题没同步
             await db.collection('community_posts').doc(templateId).update({
                 data: {
-                    updateTime: db.serverDate()
+                    updateTime: db.serverDate(),
+                    _openid: authorOpenid
                 }
             });
         }
@@ -1988,8 +2002,18 @@ exports.main = async (event, context) => {
       };
     }
 
-    // 3. 重置/初始化数据 (开发调试用)
+    // 3. 重置/初始化数据 (高危！仅限环境变量 ADMIN_OPENIDS 白名单内的管理员)
     if (action === 'reset') {
+      // 安全护栏：未配置 ADMIN_OPENIDS 时一律拒绝，避免任何人清空全站数据
+      const adminOpenids = String(getEnvString('ADMIN_OPENIDS') || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+      const callerOpenid = wxContext.OPENID || '';
+      if (!adminOpenids.length || adminOpenids.indexOf(callerOpenid) === -1) {
+        return { code: -3, msg: 'forbidden: 无权限执行 reset' };
+      }
+
       // 危险操作：清空现有数据
       const countResult = await db.collection('templates').count();
       if (countResult.total > 0) {
