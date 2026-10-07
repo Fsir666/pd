@@ -1,12 +1,30 @@
 <view class="container">
-  <!-- 1. 顶部大图 (视差滚动) -->
-  <image 
-    class="hero-image" 
-    src="{{imageUrl}}" 
-    mode="aspectFill" 
-    bindtap="previewImage" 
-    style="{{heroStyle}}"
-  ></image>
+  <!-- 1. 顶部图纸预览：像素小方块（替代原珠子照片） -->
+  <view class="hero-viewer">
+    <!-- 像素方块模式 -->
+    <block wx:if="{{viewMode === 'pixel' && hasPixel}}">
+      <scroll-view class="canvas-scroll" scroll-x="{{true}}" scroll-y="{{true}}">
+        <canvas type="2d" id="detailCanvas" class="detail-canvas" style="width:{{canvasW}}px;height:{{canvasH}}px;"></canvas>
+      </scroll-view>
+      <view class="viewer-bar viewer-bar-top">
+        <view class="viewer-toggle {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
+        <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
+        <view class="viewer-toggle" bindtap="switchToPhoto">实物图</view>
+      </view>
+      <view class="viewer-bar viewer-bar-bottom">
+        <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" data-scale="1" bindtap="setScale">1×</view>
+        <view class="zoom-btn {{scale === 2 ? 'on' : ''}}" data-scale="2" bindtap="setScale">2×</view>
+        <view class="zoom-btn {{scale === 3 ? 'on' : ''}}" data-scale="3" bindtap="setScale">3×</view>
+      </view>
+    </block>
+    <!-- 实物照片模式 -->
+    <block wx:else>
+      <image class="hero-image" src="{{imageUrl}}" mode="aspectFill" bindtap="previewImage"></image>
+      <view wx:if="{{hasPixel}}" class="viewer-bar viewer-bar-top">
+        <view class="viewer-toggle" bindtap="switchToPixel">看图纸</view>
+      </view>
+    </block>
+  </view>
 
   <!-- 返回按钮 -->
   <view class="back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">

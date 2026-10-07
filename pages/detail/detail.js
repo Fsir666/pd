@@ -45,7 +45,18 @@ Page({
     allComments: [], // 原始评论（按排序方式派生 comments）
     
     // 5. 粒子特效
-    particleList: []
+    particleList: [],
+
+    // 6. 图纸像素预览（替换原来的珠子照片）
+    hasPixel: false,     // 是否有可绘制的图纸数据
+    viewMode: 'photo',   // 'pixel' 像素方块 | 'photo' 实物照片
+    showGrid: true,      // 网格线
+    showCode: true,      // 色号文字
+    scale: 1,            // 缩放倍数（1/2/3）
+    viewW: 0,            // 画布可视宽（px）
+    viewH: 0,            // 画布可视高（px）
+    canvasW: 0,          // canvas 实际宽（px，= viewW * scale）
+    canvasH: 0           // canvas 实际高（px，= viewH * scale）
   },
 
   /**
@@ -62,6 +73,19 @@ Page({
       this.fetchWorkDetails(options.id);
       this.fetchComments(options.id);
       this.fetchUserStatus(options.id);
+    }
+  },
+
+  onReady() {
+    if (this._pixel && this.data.viewMode === 'pixel') {
+      setTimeout(() => this.drawPixel(), 120);
+    }
+  },
+
+  onShow() {
+    // 从拼豆模式等返回时，canvas 内容可能已被回收，重绘一次
+    if (this.data.hasPixel && this.data.viewMode === 'pixel' && this.canvasNode) {
+      setTimeout(() => this.drawPixel(), 60);
     }
   },
 
@@ -136,7 +160,32 @@ Page({
         likes = data.heat || data.likeCount || 0;
       }
 
-      this.setData({
+      // 根据 board（beadColors / codesMard）构建像素图纸数据，替换原来那张「珠子照片」
+      const pixel = this._buildPixelData(board, spec);
+      this._pixel = pixel;
+      const extra = {
+        hasPixel: !!pixel,
+        viewMode: pixel ? 'pixel' : 'photo',
+        showGrid: true,
+        showCode: true,
+        scale: 1
+      };
+      if (pixel) {
+        const sysInfo = wx.getSystemInfoSync();
+        const winW = sysInfo.windowWidth || 375;
+        const winH = sysInfo.windowHeight || 667;
+        const viewW = winW;
+        const cell = viewW / pixel.w;
+        const naturalH = Math.ceil(cell * pixel.h);
+        const maxH = Math.floor(winH * 0.6);
+        const finalH = Math.min(naturalH, maxH);
+        extra.viewW = viewW;
+        extra.viewH = finalH;
+        extra.canvasW = Math.round(viewW);
+        extra.canvasH = Math.round(finalH);
+      }
+
+      this.setData(Object.assign({
         title,
         imageUrl,
         description,
@@ -150,6 +199,8 @@ Page({
           collects: 0,
           views: 0
         }
+      }, extra), () => {
+        if (pixel) setTimeout(() => this.drawPixel(), 120);
       });
       wx.hideLoading();
       this.fetchAuthorProfile();
@@ -315,6 +366,216 @@ Page({
   // 返回上一页
   goBack() {
     wx.navigateBack();
+  },
+
+  // ============ 图纸像素预览（小方块网格，替代原珠子照片）============
+
+  // 构建像素数据：优先 beadColors（新），回退 codesMard（旧）
+  _buildPixelData(board, spec) {
+    if (!board) return null;
+    const brand = (board.brand || 'MARD').toUpperCase();
+    const map = this._getHexCodeMap(brand);
+    let w = Number(board.gridWidth || (spec && spec.cols) || 0);
+    let h = Number(board.gridHeight || (spec && spec.rows) || 0);
+    let hexes = null;
+    const codes = Object.create(null); // "x,y" -> 色号
+
+    if (board.beadColors && Object.keys(board.beadColors).length) {
+      if (!Number.isFinite(w) || w <= 0) w = 32;
+      if (!Number.isFinite(h) || h <= 0) h = 32;
+      hexes = new Array(w * h).fill('');
+      Object.keys(board.beadColors).forEach((key) => {
+        const parts = key.split(',');
+        const x = Number(parts[0]);
+        const y = Number(parts[1]);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        const idx = (y - 1) * w + (x - 1);
+        if (idx < 0 || idx >= w * h) return;
+        const hex = board.beadColors[key] || '';
+        hexes[idx] = hex;
+        if (hex) {
+          const code = map[String(hex).toUpperCase()];
+          if (code) codes[key] = code;
+        }
+      });
+    } else if (Array.isArray(board.codesMard) && Number(board.gridSize) > 0) {
+      const g = Number(board.gridSize);
+      w = g; h = g;
+      const rev = this._getReverseCodeMapMard(); // MARD 色号 -> hex
+      hexes = new Array(g * g).fill('');
+      for (let i = 0; i < board.codesMard.length; i++) {
+        const code = board.codesMard[i] != null ? String(board.codesMard[i]).trim() : '';
+        if (!code) continue;
+        const hex = rev[code] || '';
+        hexes[i] = hex;
+        const y = Math.floor(i / g) + 1;
+        const x = (i % g) + 1;
+        const key = x + ',' + y;
+        // 优先用品牌色号映射，找不到就用 raw 的 MARD 色号兜底
+        const code2 = hex ? (map[String(hex).toUpperCase()] || code) : code;
+        codes[key] = code2;
+      }
+    }
+
+    if (!hexes || !Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
+    return { w, h, hexes, codes };
+  },
+
+  // hex(大写) -> 品牌色号。
+  // 主来源 data/color-data.js（beadColors 的 hex 正是从这里匹配出来的），
+  // 兜底 data/color-mapping.js（另一套 hex 编码）。
+  _getHexCodeMap(brand) {
+    const cacheKey = '_hexCodeMap_' + brand;
+    if (this[cacheKey]) return this[cacheKey];
+    const map = Object.create(null);
+    try {
+      const colorData = require('../../data/color-data.js');
+      const bd = colorData[String(brand).toLowerCase()];
+      if (bd && Array.isArray(bd.subSeries)) {
+        bd.subSeries.forEach((series) => {
+          if (!series.colors) return;
+          series.colors.forEach((c) => {
+            if (c && c.hex && c.code) map[String(c.hex).toUpperCase()] = String(c.code).trim();
+          });
+        });
+      }
+    } catch (e) { /* ignore */ }
+    // 兜底：color-mapping.js（键为大写 hex，值为 {品牌: 色号}）
+    try {
+      const mapping = require('../../data/color-mapping.js') || {};
+      Object.keys(mapping).forEach((hex) => {
+        const m = mapping[hex];
+        const code = m && typeof m[brand] === 'string' ? String(m[brand]).trim() : '';
+        if (code && !map[String(hex).toUpperCase()]) map[String(hex).toUpperCase()] = code;
+      });
+    } catch (e) { /* ignore */ }
+    this[cacheKey] = map;
+    return map;
+  },
+
+  _lum(hex) {
+    const h = String(hex).replace('#', '');
+    const r = parseInt(h.substring(0, 2), 16) || 0;
+    const g = parseInt(h.substring(2, 4), 16) || 0;
+    const b = parseInt(h.substring(4, 6), 16) || 0;
+    return (r + g + b) / 3;
+  },
+
+  // 绘制像素方块到 canvas（缩放时重绘，格子够大才显色号，放大不糊）
+  drawPixel(retry) {
+    const p = this._pixel;
+    if (!p) return;
+    const q = wx.createSelectorQuery();
+    q.select('#detailCanvas').fields({ node: true, size: true }).exec((res) => {
+      const info = res && res[0];
+      if (!info || !info.node || !info.width) {
+        if (!retry) setTimeout(() => this.drawPixel(true), 200);
+        return;
+      }
+      const canvas = info.node;
+      const ctx = canvas.getContext('2d');
+      const dpr = (wx.getSystemInfoSync().pixelRatio || 2);
+      canvas.width = info.width * dpr;
+      canvas.height = info.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const { w, h, hexes, codes } = p;
+      const cell = info.width / w;
+      const codeReadable = this.data.showCode && cell >= 14;
+      const fontSize = Math.min(13, Math.max(8, cell * 0.34));
+
+      ctx.fillStyle = '#FBF7F2';
+      ctx.fillRect(0, 0, info.width, info.height);
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = y * w + x;
+          const hex = hexes[idx];
+          const x0 = x * cell;
+          const y0 = y * cell;
+          if (!hex) {
+            ctx.fillStyle = '#F2E9E2';
+            ctx.fillRect(x0, y0, cell, cell);
+          } else {
+            ctx.fillStyle = hex;
+            ctx.fillRect(x0, y0, cell, cell);
+            if (codeReadable) {
+              const lum = this._lum(hex);
+              ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
+              ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              const code = codes[(x + 1) + ',' + (y + 1)];
+              if (code) ctx.fillText(code, x0 + cell / 2, y0 + cell / 2);
+            }
+          }
+          if (this.data.showGrid) {
+            ctx.strokeStyle = (x % 5 === 0 || y % 5 === 0) ? '#C9B8AF' : '#EADFD7';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(x0, y0, cell, cell);
+          }
+        }
+      }
+      this.canvasNode = canvas;
+    });
+  },
+
+  toggleGrid() {
+    if (this.data.viewMode !== 'pixel') return;
+    this.setData({ showGrid: !this.data.showGrid }, () => setTimeout(() => this.drawPixel(), 40));
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  toggleCode() {
+    if (this.data.viewMode !== 'pixel') return;
+    const next = !this.data.showCode;
+    let scale = this.data.scale;
+    if (next && this._pixel) {
+      const baseCell = this.data.viewW / this._pixel.w;
+      if (baseCell * scale < 14) {
+        scale = Math.min(3, Math.max(1, Math.ceil(14 / baseCell)));
+      }
+    }
+    this.setData({ showCode: next });
+    if (scale !== this.data.scale) {
+      this._applyScale(scale);
+    }
+    setTimeout(() => this.drawPixel(), 60);
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  setScale(e) {
+    if (this.data.viewMode !== 'pixel') return;
+    const val = Number(e.currentTarget.dataset.scale) || 1;
+    if (val === this.data.scale) return;
+    this._applyScale(val);
+    setTimeout(() => this.drawPixel(), 60);
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  _applyScale(newScale) {
+    const viewW = this.data.viewW;
+    const viewH = this.data.viewH;
+    newScale = Math.min(3, Math.max(1, newScale));
+    this.setData({
+      scale: newScale,
+      canvasW: Math.round(viewW * newScale),
+      canvasH: Math.round(viewH * newScale)
+    });
+  },
+
+  switchToPhoto() {
+    this.setData({ viewMode: 'photo' });
+  },
+
+  switchToPixel() {
+    this.setData({ viewMode: 'pixel', scale: 1, canvasW: this.data.viewW, canvasH: this.data.viewH }, () => {
+      setTimeout(() => this.drawPixel(), 80);
+    });
+  },
+
+  onCanvasScroll() {
+    // 仅用按钮缩放，无需记录焦点；保留空处理
   },
 
   // 预览大图
