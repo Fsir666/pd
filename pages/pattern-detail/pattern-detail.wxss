@@ -372,3 +372,64 @@
 .safe-bottom {
   height: 190rpx;
 }
+
+/* 首次进入看图引导 */
+.guide-mask {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 400;
+  background: rgba(58, 42, 38, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-card {
+  width: 560rpx;
+  background: #FFFDFB;
+  border-radius: 32rpx;
+  padding: 44rpx 40rpx 40rpx;
+  box-shadow: 0 20rpx 60rpx rgba(74, 58, 62, 0.25);
+}
+
+.guide-title {
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #4A3A3E;
+  margin-bottom: 36rpx;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 18rpx 0;
+}
+
+.guide-ico {
+  font-size: 44rpx;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.guide-text {
+  font-size: 28rpx;
+  color: #6B5858;
+}
+
+.guide-ok {
+  margin-top: 40rpx;
+  height: 84rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  color: #FFFDFB;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10rpx 26rpx rgba(212, 96, 122, 0.30);
+}
+
+.guide-ok:active { opacity: 0.9; }

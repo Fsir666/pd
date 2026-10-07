@@ -88,4 +88,20 @@
   </view>
 
   <view class="safe-bottom"></view>
+
+  <!-- 首次进入看图引导（看过一次后不再弹） -->
+  <view class="guide-mask" wx:if="{{showGuide}}" bindtap="closeGuide">
+    <view class="guide-card" catchtap="closeGuide">
+      <view class="guide-title">看图小技巧</view>
+      <view class="guide-item">
+        <text class="guide-ico">🤏</text>
+        <text class="guide-text">双指捏合放大缩小</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-ico">👆</text>
+        <text class="guide-text">单指拖动查看细节</text>
+      </view>
+      <view class="guide-ok">知道了</view>
+    </view>
+  </view>
 </view>

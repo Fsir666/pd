@@ -22,7 +22,8 @@ Page({
     viewW: 0,            // 可视区域宽（px）
     viewH: 0,
     scrollLeft: 0,       // 拖动位置（px）
-    scrollTop: 0
+    scrollTop: 0,
+    showGuide: false     // 首次进入的看图引导（看过一次后不再弹）
   },
 
   onLoad(query) {
@@ -311,7 +312,13 @@ Page({
 
   onReady() {
     // 等一帧确保 canvas 拿到 setData 后的尺寸
-    setTimeout(() => this.draw(), 80);
+    setTimeout(() => {
+      this.draw();
+      // 首次进入才弹看图引导，看过就记下来不再弹
+      if (!wx.getStorageSync('pd_pattern_guide_seen')) {
+        this.setData({ showGuide: true });
+      }
+    }, 80);
     // 记录 scroll-view 在页面中的坐标，双指缩放时用来保持焦点
     wx.createSelectorQuery().select('.canvas-scroll').boundingClientRect(rect => {
       if (rect) {
@@ -319,6 +326,12 @@ Page({
         this._scrollRectTop = rect.top;
       }
     }).exec();
+  },
+
+  // 关闭首次引导并记录，下次不再弹
+  closeGuide() {
+    this.setData({ showGuide: false });
+    wx.setStorageSync('pd_pattern_guide_seen', '1');
   },
 
   draw(retry) {
