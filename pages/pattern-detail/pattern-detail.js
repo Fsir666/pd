@@ -359,7 +359,7 @@ Page({
       const codeReadable = showCode && cell >= 14;
       const fontSize = Math.min(13, Math.max(8, cell * 0.34));
 
-      ctx.fillStyle = '#FFFDFB';
+      ctx.fillStyle = '#FBF7F2';
       ctx.fillRect(0, 0, info.width, info.height);
 
       for (let y = 0; y < raw.h; y++) {
@@ -369,7 +369,7 @@ Page({
           const x0 = x * cell;
           const y0 = y * cell;
           if (idx < 0) {
-            ctx.fillStyle = '#FBF7F2';
+            ctx.fillStyle = '#F2E9E2';
             ctx.fillRect(x0, y0, cell, cell);
           } else {
             ctx.fillStyle = raw.hexes[idx];

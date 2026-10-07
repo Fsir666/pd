@@ -130,7 +130,7 @@
 .canvas-scroll {
   width: 100%;
   border-radius: var(--ym-r-md, 20rpx);
-  background: #FFFDFB;
+  background: #FBF7F2;
   overflow: hidden;
 }
 
