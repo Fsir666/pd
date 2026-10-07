@@ -628,3 +628,67 @@ button.tool-pill.share-pill::after {
   height: env(safe-area-inset-bottom);
   background: transparent;
 }
+
+/* ============================================================
+   v1.0.53 底部工具组改版：四个独立药丸 → 一条分段式工具条
+   与左侧输入框同高对齐，分隔线代替各自边框
+   ============================================================ */
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  height: 80rpx;
+  background: #F5EDE6;
+  border: 1rpx solid #F0E4DC;
+  border-radius: 999rpx;
+  overflow: hidden;
+  flex: none;
+}
+
+.tool-pill {
+  height: 80rpx;
+  padding: 0 22rpx;
+  gap: 6rpx;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  transition: background 0.2s ease;
+}
+
+.tool-pill + .tool-pill,
+button.tool-pill + button.tool-pill {
+  border-left: 1rpx solid #EADFD6;
+}
+
+.tool-pill .icon {
+  font-size: 30rpx;
+}
+
+.tool-pill .tcount {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #9B8A8C;
+}
+
+.tool-pill.liked {
+  background: rgba(212, 96, 122, 0.10);
+}
+.tool-pill.liked .icon,
+.tool-pill.liked .tcount {
+  color: #D4607A;
+}
+
+.tool-pill.collected {
+  background: rgba(216, 154, 92, 0.12);
+}
+.tool-pill.collected .icon {
+  color: #D89A5C;
+}
+
+button.tool-pill.share-pill {
+  background: transparent;
+  line-height: 1;
+}
+button.tool-pill.share-pill::after {
+  border: none;
+}
