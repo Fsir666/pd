@@ -2,14 +2,15 @@ const app = getApp();
 
 // 工具箱的小工具列表（收起时整块隐藏，点「全部工具」果冻动画展开）
 // 注意：id 1 / 9 / 13 / 4 已在首页快捷工具栏，此处不再重复
+// iconClass 对应 app.wxss 里的全局线性图标（不再用 emoji，全站风格统一）
 const ALL_SMALL_TOOLS = [
-  { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#7A9E7E', animClass: 'wiggle', size: 'small' },
-  { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#94B08F', animClass: 'pulse', size: 'small' },
-  { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#D89A5C', animClass: 'breathe', size: 'small' },
-  { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#E0A458', animClass: 'pulse' },
-  { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#B49AC4', animClass: 'bounce' },
-  { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#7FA8C4', animClass: 'float' },
-  { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#9AAB8E', animClass: 'wiggle' }
+  { id: 2, title: '抠图', desc: '图片去底', iconClass: 'ico-scissors', size: 'small' },
+  { id: 11, title: '色卡表', desc: 'Excel下载', iconClass: 'ico-sheet', size: 'small' },
+  { id: 3, title: '我的仓库', desc: '管理色卡', iconClass: 'ico-box', size: 'small' },
+  { id: 7, title: '收藏图纸', desc: '我的收藏', iconClass: 'ico-star' },
+  { id: 5, title: '我的作品', desc: '查看创作', iconClass: 'ico-grid' },
+  { id: 6, title: '新手教程', desc: '入门指南', iconClass: 'ico-book' },
+  { id: 8, title: '我的订单', desc: '订单历史', iconClass: 'ico-receipt' }
 ];
 
 Page({

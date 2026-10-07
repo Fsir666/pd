@@ -437,3 +437,32 @@ button.act-btn::after { border: none; }
 }
 
 .guide-ok:active { opacity: 0.9; }
+
+/* v1.0.61 底栏图标：全局线性图标 + 分享段透明 button 覆盖 */
+.act-btn .ico {
+  width: 38rpx;
+  height: 38rpx;
+  margin-bottom: 4rpx;
+}
+
+.share-act {
+  position: relative;
+}
+
+.share-hit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  opacity: 0;
+}
+
+.share-hit::after {
+  border: none;
+}

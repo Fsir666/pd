@@ -70,25 +70,26 @@
   <!-- 底部悬浮操作栏：始终可见，不用滚到底 -->
   <view class="action-bar">
     <view class="act-btn act-like {{isLiked ? 'on' : ''}}" bindtap="onLike">
-      <text class="act-ico">{{isLiked ? '❤️' : '🤍'}}</text>
+      <view class="ico act-ico-svg {{isLiked ? 'ico-heart--on' : 'ico-heart'}}"></view>
       <text class="act-label">{{likes}}</text>
     </view>
     <view class="act-btn act-primary" bindtap="goToBeadMode">
-      <text class="act-ico">🧩</text>
+      <view class="ico ico-grid"></view>
       <text class="act-label">拼豆模式</text>
     </view>
     <view class="act-btn act-ghost" bindtap="copyList">
-      <text class="act-ico">📋</text>
+      <view class="ico ico-copy"></view>
       <text class="act-label">复制</text>
     </view>
     <view class="act-btn act-ghost" bindtap="saveImage">
-      <text class="act-ico">💾</text>
+      <view class="ico ico-download"></view>
       <text class="act-label">保存</text>
     </view>
-    <button class="act-btn act-ghost" open-type="share">
-      <text class="act-ico">📤</text>
+    <view class="act-btn act-ghost share-act">
+      <view class="ico ico-link"></view>
       <text class="act-label">分享</text>
-    </button>
+      <button class="share-hit" open-type="share"></button>
+    </view>
   </view>
 
   <view class="safe-bottom"></view>

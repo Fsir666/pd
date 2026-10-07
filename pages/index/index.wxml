@@ -121,19 +121,19 @@ module.exports = {
       <!-- 快捷工具：一行四个 -->
       <view class="quick-row">
         <view class="quick-item" bindtap="onToolTap" data-id="1">
-          <view class="quick-emoji-wrap qe-sage"><text class="quick-emoji">🖼️</text></view>
+          <view class="quick-emoji-wrap qe-sage"><view class="ico ico-image"></view></view>
           <text class="quick-label">图片转像素</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="9">
-          <view class="quick-emoji-wrap qe-pink"><text class="quick-emoji">🪄</text></view>
+          <view class="quick-emoji-wrap qe-pink"><view class="ico ico-spark"></view></view>
           <text class="quick-label">转卡通</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="13">
-          <view class="quick-emoji-wrap qe-honey"><text class="quick-emoji">📐</text></view>
+          <view class="quick-emoji-wrap qe-honey"><view class="ico ico-grid"></view></view>
           <text class="quick-label">图纸库</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="4">
-          <view class="quick-emoji-wrap qe-mint"><text class="quick-emoji">🎨</text></view>
+          <view class="quick-emoji-wrap qe-mint"><view class="ico ico-palette"></view></view>
           <text class="quick-label">色卡表</text>
         </view>
       </view>
@@ -146,8 +146,8 @@ module.exports = {
             <view class="toolbox-grid toolbox-grid--compact">
               <block wx:for="{{allSmallTools}}" wx:key="id">
                 <view class="tool-card glass-card size-{{item.size || 'small'}}" bindtap="onToolTap" data-id="{{item.id}}">
-                  <view class="tool-icon tool-icon--steady" style="color: {{item.color}}">
-                    {{item.icon}}
+                  <view class="tool-icon tool-icon--steady">
+                    <view class="ico {{item.iconClass}}"></view>
                   </view>
                   <view class="tool-info">
                     <text class="tool-title">{{item.title}}</text>

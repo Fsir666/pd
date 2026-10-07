@@ -78,3 +78,82 @@ page {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* ============================================================
+   全站统一线性图标（v1.0.61）
+   用法：<view class="ico ico-xxx"></view>
+   规则：24x24 viewBox / stroke-width 1.7 / 圆角端点 / 未选中 #6B5B5F
+   ============================================================ */
+
+.ico {
+  width: 36rpx;
+  height: 36rpx;
+  flex: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.ico-image {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.2' y='5' width='17.6' height='14' rx='2.6'/%3E%3Ccircle cx='8.6' cy='10' r='1.5'/%3E%3Cpath d='M4 17.6l4.6-4.6 3.2 3.2 3-3 4.6 4.6'/%3E%3C/svg%3E");
+}
+
+.ico-spark {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 3.2l1.5 4.2 4.2 1.5-4.2 1.5L11 14.6 9.5 10.4 5.3 8.9l4.2-1.5z'/%3E%3Cpath d='M18 14.2l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z'/%3E%3C/svg%3E");
+}
+
+.ico-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.4' y='3.4' width='7.2' height='7.2' rx='1.8'/%3E%3Crect x='13.4' y='3.4' width='7.2' height='7.2' rx='1.8'/%3E%3Crect x='3.4' y='13.4' width='7.2' height='7.2' rx='1.8'/%3E%3Crect x='13.4' y='13.4' width='7.2' height='7.2' rx='1.8'/%3E%3C/svg%3E");
+}
+
+.ico-palette {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.6a8.4 8.4 0 1 0 0 16.8c1.3 0 2.2-.9 2.2-2.1 0-1.1-.9-2-2-2h-1.2c-1.2 0-2.2-1-2.2-2.2s1-2.2 2.2-2.2h1.6c1 0 1.7-.8 1.7-1.8C14.3 6.3 13.4 3.6 12 3.6z'/%3E%3Ccircle cx='8.4' cy='10' r='1' fill='%236B5B5F'/%3E%3Ccircle cx='11.6' cy='7.8' r='1' fill='%236B5B5F'/%3E%3Ccircle cx='15' cy='10.4' r='1' fill='%236B5B5F'/%3E%3C/svg%3E");
+}
+
+.ico-scissors {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='6.4' cy='17.6' r='2.7'/%3E%3Ccircle cx='6.4' cy='6.4' r='2.7'/%3E%3Cpath d='M8.7 8.6L20 19'/%3E%3Cpath d='M8.7 15.4L20 5'/%3E%3C/svg%3E");
+}
+
+.ico-sheet {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.8' y='4.2' width='16.4' height='15.6' rx='2.4'/%3E%3Cpath d='M3.8 9.4h16.4'/%3E%3Cpath d='M9.6 9.4v10.4'/%3E%3C/svg%3E");
+}
+
+.ico-box {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.6 7.6h16.8v10.8a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M2.6 4.4h18.8v3.2H2.6z'/%3E%3Cpath d='M10 12.6h4'/%3E%3C/svg%3E");
+}
+
+.ico-star {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.6l2.6 5.3 5.9.8-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z'/%3E%3C/svg%3E");
+}
+
+.ico-heart {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20.3S3.7 15 3.7 9.4A4.9 4.9 0 0 1 12 6.8a4.9 4.9 0 0 1 8.3 2.6c0 5.6-8.3 10.9-8.3 10.9z'/%3E%3C/svg%3E");
+}
+
+.ico-heart--on {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D4607A' stroke='%23D4607A' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20.3S3.7 15 3.7 9.4A4.9 4.9 0 0 1 12 6.8a4.9 4.9 0 0 1 8.3 2.6c0 5.6-8.3 10.9-8.3 10.9z'/%3E%3C/svg%3E");
+}
+
+.ico-book {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.6C10.4 5.1 8 4.6 4.6 4.6v12.8C8 17.4 10.4 17.9 12 19.4c1.6-1.5 4-2 7.4-2V4.6C16 4.6 13.6 5.1 12 6.6z'/%3E%3Cpath d='M12 6.6v12.8'/%3E%3C/svg%3E");
+}
+
+.ico-receipt {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5.4' y='3.6' width='13.2' height='16.8' rx='2.2'/%3E%3Cpath d='M8.8 8.6h6.4'/%3E%3Cpath d='M8.8 12.4h6.4'/%3E%3Cpath d='M8.8 16.2h4'/%3E%3C/svg%3E");
+}
+
+.ico-copy {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.6' y='8.6' width='11' height='11' rx='2.4'/%3E%3Cpath d='M15.6 8.6V6a2.2 2.2 0 0 0-2.2-2.2H6.4A2.2 2.2 0 0 0 4.2 6v7.2A2.2 2.2 0 0 0 6.4 15.4h2.2'/%3E%3C/svg%3E");
+}
+
+.ico-download {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.2v10'/%3E%3Cpath d='M8.2 10.6l3.8 3.8 3.8-3.8'/%3E%3Cpath d='M4.6 17.4v2a1.8 1.8 0 0 0 1.8 1.8h11.2a1.8 1.8 0 0 0 1.8-1.8v-2'/%3E%3C/svg%3E");
+}
+
+.ico-link {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.7 14.3l4.6-4.6'/%3E%3Cpath d='M11.4 6.9l1.4-1.4a3.6 3.6 0 0 1 5.1 5.1l-1.4 1.4'/%3E%3Cpath d='M12.6 17.1l-1.4 1.4a3.6 3.6 0 0 1-5.1-5.1l1.4-1.4'/%3E%3C/svg%3E");
+}
+
+.ico-camera {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B5B5F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.3 8.8h3.2l1.5-2.4h8l1.5 2.4h3.2v10.4H3.3z'/%3E%3Ccircle cx='12' cy='13.9' r='3.3'/%3E%3C/svg%3E");
+}
