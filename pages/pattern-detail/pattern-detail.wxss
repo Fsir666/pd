@@ -204,34 +204,76 @@
   font-weight: 600;
 }
 
-.actions {
-  margin-top: 32rpx;
+/* 底部悬浮操作栏 */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
   display: flex;
-  align-items: stretch;
-  gap: 16rpx;
+  align-items: center;
+  gap: 14rpx;
+  padding: 18rpx 26rpx calc(18rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 253, 251, 0.94);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border-top: 1rpx solid #F0E4DC;
+  box-shadow: 0 -8rpx 30rpx rgba(160, 130, 115, 0.10);
 }
 
-.btn {
-  flex: 1;
-  height: 92rpx;
-  border-radius: 28rpx;
+.act-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 29rpx;
+  gap: 8rpx;
+  height: 88rpx;
+  border-radius: 26rpx;
+  font-size: 27rpx;
   font-weight: 600;
+  transition: transform 0.15s;
 }
 
-.btn-primary {
-  color: #FFFDFB;
-  background: linear-gradient(135deg, #D4607A, #E0909A);
-  box-shadow: 0 14rpx 34rpx rgba(212, 96, 122, 0.26);
+.act-btn:active { transform: scale(0.95); }
+
+.act-ico {
+  font-size: 30rpx;
+  line-height: 1;
 }
 
-.btn-ghost {
+.act-label {
+  line-height: 1;
+}
+
+/* 点赞：窄一点，图标 + 数量 */
+.act-like {
+  flex: 0 0 150rpx;
   color: #A8455C;
   background: #F6E9E4;
   border: 1rpx solid #EFD9D2;
+}
+
+.act-like.on {
+  color: #FFFDFB;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  border-color: transparent;
+  box-shadow: 0 8rpx 20rpx rgba(212, 96, 122, 0.28);
+}
+
+/* 复制：次要 */
+.act-ghost {
+  flex: 1;
+  color: #A8455C;
+  background: #F6E9E4;
+  border: 1rpx solid #EFD9D2;
+}
+
+/* 保存：主操作 */
+.act-primary {
+  flex: 1.1;
+  color: #FFFDFB;
+  background: linear-gradient(135deg, #D4607A, #E0909A);
+  box-shadow: 0 10rpx 26rpx rgba(212, 96, 122, 0.30);
 }
 
 /* 作者信息行 */
@@ -287,58 +329,6 @@
   border-radius: 999rpx;
 }
 
-/* 点赞按钮 */
-.like-btn {
-  flex-shrink: 0;
-  width: 150rpx;
-  height: 92rpx;
-  border-radius: 28rpx;
-  background: #F6E9E4;
-  border: 1rpx solid #EFD9D2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.like-btn.on {
-  background: linear-gradient(135deg, #D4607A, #E0909A);
-  border-color: transparent;
-  box-shadow: 0 10rpx 24rpx rgba(212, 96, 122, 0.3);
-}
-
-.like-btn:active {
-  transform: scale(0.94);
-}
-
-.like-icon {
-  font-size: 30rpx;
-  line-height: 1;
-}
-
-.like-count {
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #A8455C;
-  margin-top: 4rpx;
-  line-height: 1.1;
-}
-
-.like-btn.on .like-count {
-  color: #FFFDFB;
-}
-
-.like-text {
-  font-size: 18rpx;
-  color: #9B8A8C;
-  line-height: 1.1;
-}
-
-.like-btn.on .like-text {
-  color: rgba(255, 253, 251, 0.85);
-}
-
 /* 点赞粒子层 */
 .particle-layer {
   position: fixed;
@@ -376,6 +366,7 @@
   }
 }
 
+/* 给悬浮底栏留空间，避免内容被遮挡 */
 .safe-bottom {
-  height: 80rpx;
+  height: 190rpx;
 }

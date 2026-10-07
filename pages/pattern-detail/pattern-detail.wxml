@@ -61,20 +61,26 @@
     </view>
   </view>
 
-  <view class="actions">
-    <view class="like-btn {{isLiked ? 'on' : ''}}" bindtap="onLike">
-      <text class="like-icon">{{isLiked ? '❤️' : '🤍'}}</text>
-      <text class="like-count">{{likes}}</text>
-      <text class="like-text">{{isLiked ? '已赞' : '点赞'}}</text>
-    </view>
-    <view class="btn btn-ghost" bindtap="copyList">复制采购单</view>
-    <view class="btn btn-primary" bindtap="saveImage">保存图纸</view>
-  </view>
-
   <!-- 点赞粒子层 -->
   <view class="particle-layer">
     <view class="particle" wx:for="{{particleList}}" wx:key="id"
           style="{{item.style}}">{{item.emoji}}</view>
+  </view>
+
+  <!-- 底部悬浮操作栏：始终可见，不用滚到底 -->
+  <view class="action-bar">
+    <view class="act-btn act-like {{isLiked ? 'on' : ''}}" bindtap="onLike">
+      <text class="act-ico">{{isLiked ? '❤️' : '🤍'}}</text>
+      <text class="act-label">{{likes}}</text>
+    </view>
+    <view class="act-btn act-ghost" bindtap="copyList">
+      <text class="act-ico">📋</text>
+      <text class="act-label">复制采购单</text>
+    </view>
+    <view class="act-btn act-primary" bindtap="saveImage">
+      <text class="act-ico">💾</text>
+      <text class="act-label">保存图纸</text>
+    </view>
   </view>
 
   <view class="safe-bottom"></view>
