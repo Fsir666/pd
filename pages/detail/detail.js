@@ -54,8 +54,7 @@ Page({
     particleList: [],
 
     // 6. 图纸像素预览（替换原来的珠子照片）
-    hasPixel: false,     // 是否有可绘制的图纸数据
-    viewMode: 'photo',   // 'pixel' 像素方块 | 'photo' 实物照片
+    hasPixel: false,     // 是否有可绘制的图纸数据（有则显示像素图纸，无则回退原图）
     showGrid: true,      // 网格线
     showCode: true,      // 色号文字
     scale: 1,            // 缩放倍数（1/2/3/4）
@@ -89,14 +88,14 @@ Page({
   },
 
   onReady() {
-    if (this._pixel && this.data.viewMode === 'pixel') {
+    if (this._pixel && this.data.hasPixel) {
       setTimeout(() => this.drawPixel(), 120);
     }
   },
 
   onShow() {
     // 从拼豆模式等返回时，canvas 内容可能已被回收，重绘一次
-    if (this.data.hasPixel && this.data.viewMode === 'pixel' && this.canvasNode) {
+    if (this.data.hasPixel && this.canvasNode) {
       setTimeout(() => this.drawPixel(), 60);
     }
   },
@@ -180,7 +179,6 @@ Page({
       const materialRows = this._buildMaterialRows(board, spec, pixel);
       const extra = {
         hasPixel: !!pixel,
-        viewMode: pixel ? 'pixel' : 'photo',
         showGrid: true,
         showCode: true,
         scale: 1,
@@ -641,13 +639,13 @@ Page({
   },
 
   toggleGrid() {
-    if (this.data.viewMode !== 'pixel') return;
+    if (!this.data.hasPixel) return;
     this.setData({ showGrid: !this.data.showGrid }, () => setTimeout(() => this.drawPixel(), 40));
     wx.vibrateShort({ type: 'light' });
   },
 
   toggleCode() {
-    if (this.data.viewMode !== 'pixel') return;
+    if (!this.data.hasPixel) return;
     const next = !this.data.showCode;
     let scale = this.data.scale;
     if (next && this._pixel) {
@@ -665,7 +663,7 @@ Page({
   },
 
   setScale(e) {
-    if (this.data.viewMode !== 'pixel') return;
+    if (!this.data.hasPixel) return;
     const val = Number(e.currentTarget.dataset.scale) || 1;
     if (val === this.data.scale) return;
     this._applyScale(val);
@@ -675,7 +673,7 @@ Page({
 
   // ===== 双指捏合缩放（与 pattern-detail 对齐，1–4×）=====
   onCanvasTouchStart(e) {
-    if (this.data.viewMode !== 'pixel') return;
+    if (!this.data.hasPixel) return;
     if (e.touches && e.touches.length === 2) {
       const [a, b] = e.touches;
       this._pinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
@@ -684,7 +682,7 @@ Page({
   },
 
   onCanvasTouchMove(e) {
-    if (this.data.viewMode !== 'pixel') return;
+    if (!this.data.hasPixel) return;
     if (!this._pinchStartDist) return;
     if (e.touches && e.touches.length === 2) {
       const [a, b] = e.touches;
@@ -718,16 +716,6 @@ Page({
       scale: newScale,
       canvasW: Math.round(viewW * newScale),
       canvasH: Math.round(viewH * newScale)
-    });
-  },
-
-  switchToPhoto() {
-    this.setData({ viewMode: 'photo' });
-  },
-
-  switchToPixel() {
-    this.setData({ viewMode: 'pixel', scale: 1, canvasW: this.data.viewW, canvasH: this.data.viewH }, () => {
-      setTimeout(() => this.drawPixel(), 80);
     });
   },
 
@@ -1322,9 +1310,9 @@ Page({
     this.onRemix();
   },
 
-  // 保存图纸图片：仅像素图纸可用（实物图长按即可保存）
+  // 保存图纸图片：仅在有像素图纸数据时可用
   saveImage() {
-    if (this.data.viewMode !== 'pixel' || !this.canvasNode || !this._pixel) {
+    if (!this.data.hasPixel || !this.canvasNode || !this._pixel) {
       wx.showToast({ title: '图纸还没画好', icon: 'none' });
       return;
     }
