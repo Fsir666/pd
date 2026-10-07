@@ -152,18 +152,21 @@ module.exports = {
             </view>
           </view>
 
-          <view class="toolbox-grid toolbox-grid--compact">
-            <block wx:for="{{visibleTools}}" wx:key="id">
-              <view class="tool-card glass-card size-{{item.size || 'small'}}" bindtap="onToolTap" data-id="{{item.id}}">
-                <view class="tool-icon {{item.animClass}}" style="color: {{item.color}}">
-                  {{item.icon}}
+          <!-- 小工具网格：收起时整块隐藏，展开时果冻动画弹出 -->
+          <view class="toolbox-collapse {{toolsExpanded ? 'expanded' : ''}}">
+            <view class="toolbox-grid toolbox-grid--compact">
+              <block wx:for="{{allSmallTools}}" wx:key="id">
+                <view class="tool-card glass-card size-{{item.size || 'small'}}" bindtap="onToolTap" data-id="{{item.id}}">
+                  <view class="tool-icon {{item.animClass}}" style="color: {{item.color}}">
+                    {{item.icon}}
+                  </view>
+                  <view class="tool-info">
+                    <text class="tool-title">{{item.title}}</text>
+                    <text class="tool-desc">{{item.desc}}</text>
+                  </view>
                 </view>
-                <view class="tool-info">
-                  <text class="tool-title">{{item.title}}</text>
-                  <text class="tool-desc">{{item.desc}}</text>
-                </view>
-              </view>
-            </block>
+              </block>
+            </view>
           </view>
           
           <!-- 展开/收起全部工具（就地切换，不跳页） -->
