@@ -1,5 +1,21 @@
 const app = getApp();
 
+// 工具箱的小工具列表
+// 默认收起时只展示前 SMALL_TOOLS_COLLAPSED 个（一行），点「全部工具」展开全部，再点收起
+const ALL_SMALL_TOOLS = [
+  { id: 13, title: '图纸库', desc: '免费图纸', icon: '📐', color: '#D4607A', animClass: 'bounce', size: 'small' },
+  { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#7A9E7E', animClass: 'wiggle', size: 'small' },
+  { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#D4607A', animClass: 'spin-slow', size: 'small' },
+  { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#94B08F', animClass: 'pulse', size: 'small' },
+  { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#D89A5C', animClass: 'breathe', size: 'small' },
+  { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#E0A458', animClass: 'pulse' },
+  { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#B49AC4', animClass: 'bounce' },
+  { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#7FA8C4', animClass: 'float' },
+  { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#9AAB8E', animClass: 'wiggle' }
+];
+// 收起时展示的工具个数（3 列网格 → 正好一行）
+const SMALL_TOOLS_COLLAPSED = 3;
+
 Page({
   data: {
     userInfo: {
@@ -16,19 +32,10 @@ Page({
     hotTemplates: [], // Keep for compatibility if needed
     leftTemplates: [],
     rightTemplates: [],
-    // Unified small tools list for scroll view
-    allSmallTools: [
-      { id: 13, title: '图纸库', desc: '免费图纸', icon: '📐', color: '#D4607A', animClass: 'bounce', size: 'small' },
-      { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#7A9E7E', animClass: 'wiggle', size: 'small' },
-      { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#D4607A', animClass: 'spin-slow', size: 'small' },
-      { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#94B08F', animClass: 'pulse', size: 'small' },
-      { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#D89A5C', animClass: 'breathe', size: 'small' },
-      { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#E0A458', animClass: 'pulse' },
-      { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#B49AC4', animClass: 'bounce' },
-      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#7FA8C4', animClass: 'float' },
-      { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#9AAB8E', animClass: 'wiggle' }
-    ],
-    isToolsExpanded: false,
+    // 工具箱：allSmallTools 是全部，visibleTools 是当前实际展示的
+    allSmallTools: ALL_SMALL_TOOLS,
+    toolsExpanded: false,
+    visibleTools: ALL_SMALL_TOOLS.slice(0, SMALL_TOOLS_COLLAPSED),
     currentTab: 0,
     cursorLeft: '0%', // 初始光标位置
     isDragging: false, // 是否正在拖拽
@@ -320,9 +327,12 @@ Page({
     }
   },
 
-  onShowAllTools() {
-    wx.navigateTo({
-      url: '/pages/all-tools/all-tools'
+  // 「全部工具」：在当前页就地展开/收起，不再跳转到 all-tools 页
+  onToggleTools() {
+    const next = !this.data.toolsExpanded;
+    this.setData({
+      toolsExpanded: next,
+      visibleTools: next ? this.data.allSmallTools : this.data.allSmallTools.slice(0, SMALL_TOOLS_COLLAPSED)
     });
     // 震动反馈
     wx.vibrateShort({ type: 'light' });
