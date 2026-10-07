@@ -38,18 +38,18 @@
   z-index: 20;
 }
 
-/* 预览控制条：放画板右上角，与发现页图纸页对齐
-   注：微信右上角胶囊按钮会遮挡，故整体下移一行（top 88rpx / 142rpx） */
+/* 预览控制条：放画板右下角
+   注：内容卡片上叠 60rpx，故 bottom 相应抬高，避免被卡片压住 */
 .viewer-bar-top {
-  top: 88rpx;
+  top: auto;
+  bottom: 168rpx;
   right: 24rpx;
-  bottom: auto;
 }
 
 .viewer-bar-zoom {
-  top: 142rpx;
+  top: auto;
+  bottom: 100rpx;
   right: 24rpx;
-  bottom: auto;
 }
 
 .viewer-toggle,
