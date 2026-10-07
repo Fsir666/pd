@@ -248,6 +248,30 @@
   gap: 12rpx;
 }
 
+.foot-right {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  flex-shrink: 0;
+}
+
+.btn-share {
+  height: 52rpx;
+  padding: 0 22rpx;
+  display: flex;
+  align-items: center;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #D4607A;
+  background: #F9E8EC;
+  border-radius: 999rpx;
+  line-height: 1;
+}
+
+.btn-share::after { border: none; }
+
+.btn-share:active { opacity: 0.85; }
+
 .card-author {
   display: flex;
   align-items: center;

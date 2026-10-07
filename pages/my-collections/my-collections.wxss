@@ -197,6 +197,25 @@
   background: #EAF0E8;
 }
 
+.btn-share-sm {
+  margin-left: auto;
+  height: 44rpx;
+  padding: 0 16rpx;
+  display: flex;
+  align-items: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #D4607A;
+  background: #F9E8EC;
+  border-radius: 999rpx;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn-share-sm::after { border: none; }
+
+.btn-share-sm:active { opacity: 0.85; }
+
 /* 空状态 */
 .empty-state {
   display: flex;

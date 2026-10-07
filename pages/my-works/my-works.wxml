@@ -54,9 +54,14 @@
                 <view wx:else class="author-avatar author-fallback">{{item.authorInitial}}</view>
                 <text>{{item.author || '我'}}</text>
               </view>
-              <view class="card-heat">
-                <text class="heat-icon">🔥</text>
-                <text>{{item.heat || item.likeCount || 0}}</text>
+              <view class="foot-right">
+                <view class="card-heat">
+                  <text class="heat-icon">🔥</text>
+                  <text>{{item.heat || item.likeCount || 0}}</text>
+                </view>
+                <button class="btn-share" open-type="share" catchtap="preventBubble"
+                        data-id="{{item._id}}" data-key="{{item.seedKey}}"
+                        data-title="{{item.title}}" data-img="{{item.thumb || item.imageUrl}}">分享</button>
               </view>
             </view>
           </view>
