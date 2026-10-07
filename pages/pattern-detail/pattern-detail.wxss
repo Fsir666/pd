@@ -213,8 +213,8 @@
   z-index: 200;
   display: flex;
   align-items: center;
-  gap: 14rpx;
-  padding: 18rpx 26rpx calc(18rpx + env(safe-area-inset-bottom));
+  gap: 12rpx;
+  padding: 18rpx 22rpx calc(18rpx + env(safe-area-inset-bottom));
   background: rgba(255, 253, 251, 0.94);
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
@@ -245,9 +245,9 @@
   line-height: 1;
 }
 
-/* 点赞：窄一点，图标 + 数量 */
+/* 点赞：最窄，图标 + 数量 */
 .act-like {
-  flex: 0 0 150rpx;
+  flex: 0 0 128rpx;
   color: #A8455C;
   background: #F6E9E4;
   border: 1rpx solid #EFD9D2;
@@ -260,17 +260,19 @@
   box-shadow: 0 8rpx 20rpx rgba(212, 96, 122, 0.28);
 }
 
-/* 复制：次要 */
+/* 复制 / 保存：次要 */
 .act-ghost {
   flex: 1;
+  min-width: 0;
   color: #A8455C;
   background: #F6E9E4;
   border: 1rpx solid #EFD9D2;
 }
 
-/* 保存：主操作 */
+/* 拼豆模式：主操作，比次要按钮宽一点 */
 .act-primary {
-  flex: 1.1;
+  flex: 1.35;
+  min-width: 0;
   color: #FFFDFB;
   background: linear-gradient(135deg, #D4607A, #E0909A);
   box-shadow: 0 10rpx 26rpx rgba(212, 96, 122, 0.30);

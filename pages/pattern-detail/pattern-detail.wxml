@@ -73,13 +73,17 @@
       <text class="act-ico">{{isLiked ? '❤️' : '🤍'}}</text>
       <text class="act-label">{{likes}}</text>
     </view>
+    <view class="act-btn act-primary" bindtap="goToBeadMode">
+      <text class="act-ico">🧩</text>
+      <text class="act-label">拼豆模式</text>
+    </view>
     <view class="act-btn act-ghost" bindtap="copyList">
       <text class="act-ico">📋</text>
-      <text class="act-label">复制采购单</text>
+      <text class="act-label">复制</text>
     </view>
-    <view class="act-btn act-primary" bindtap="saveImage">
+    <view class="act-btn act-ghost" bindtap="saveImage">
       <text class="act-ico">💾</text>
-      <text class="act-label">保存图纸</text>
+      <text class="act-label">保存</text>
     </view>
   </view>
 

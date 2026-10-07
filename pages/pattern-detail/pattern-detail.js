@@ -302,6 +302,13 @@ Page({
     this.setData({ likes: newLikes - 1, isLiked: false });
   },
 
+  onShow() {
+    // 从拼豆模式等页面返回时，canvas 内容可能已被回收，重绘一次
+    if (this._raw && this.canvasNode) {
+      setTimeout(() => this.draw(), 60);
+    }
+  },
+
   onReady() {
     // 等一帧确保 canvas 拿到 setData 后的尺寸
     setTimeout(() => this.draw(), 80);
@@ -393,6 +400,43 @@ Page({
     wx.setClipboardData({
       data: lines.join('\n'),
       success: () => wx.showToast({ title: '采购单已复制', icon: 'none' })
+    });
+  },
+
+  // 把图纸导入「拼豆模式」：cells 编码 -> pixelHexes（每格 hex 的一维数组，按行展开）
+  goToBeadMode() {
+    const raw = this._raw;
+    if (!raw) return;
+    wx.vibrateShort({ type: 'light' });
+
+    const total = raw.w * raw.h;
+    const pixelHexes = new Array(total);
+    for (let i = 0; i < total; i++) {
+      const ch = raw.cells.charAt(i);
+      if (ch === '.' || ch === ' ') {
+        pixelHexes[i] = '';
+        continue;
+      }
+      const idx = DIGITS.indexOf(ch);
+      pixelHexes[i] = (idx >= 0 && idx < raw.hexes.length) ? raw.hexes[idx] : '';
+    }
+
+    const app = getApp();
+    if (app && app.globalData) {
+      app.globalData.beadSession = {
+        pixelHexes,
+        gridSize: raw.w,
+        gridHeight: raw.h,
+        selectedBrand: 'MARD',
+        showGrid: true,
+        showRuler: true,
+        showCellCodes: true
+      };
+    }
+
+    wx.navigateTo({
+      url: '/pages/bead-mode/bead-mode',
+      fail: () => wx.showToast({ title: '无法进入拼豆模式', icon: 'none' })
     });
   },
 
