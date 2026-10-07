@@ -146,15 +146,69 @@ scroll-view {
 }
 
 .banner-item {
+  position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: white;
-  font-size: 36rpx;
-  font-weight: 500;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.18);
+}
+
+.banner-deco {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.banner-deco-1 {
+  width: 220rpx;
+  height: 220rpx;
+  top: -70rpx;
+  right: -40rpx;
+}
+
+.banner-deco-2 {
+  width: 140rpx;
+  height: 140rpx;
+  bottom: -50rpx;
+  left: -30rpx;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.banner-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 26rpx;
+  padding: 0 40rpx;
+}
+
+.banner-icon {
+  font-size: 76rpx;
+  line-height: 1;
+  filter: drop-shadow(0 4rpx 6rpx rgba(0, 0, 0, 0.15));
+}
+
+.banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.banner-title {
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.18);
+}
+
+.banner-sub {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 24rpx;
+  font-weight: 400;
+  text-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15);
 }
 
 /* ---------- 开始拼豆 CTA ---------- */
@@ -329,6 +383,7 @@ scroll-view {
   gap: 16rpx;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-flow: row;
+  margin-bottom: 16rpx;
 }
 
 .toolbox-grid {
@@ -353,20 +408,6 @@ scroll-view {
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
-}
-
-.toolbox-scroll-container {
-  position: relative;
-  height: 480rpx;
-  overflow: hidden;
-  margin-bottom: 20rpx;
-}
-
-.toolbox-scroll-view {
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .tool-card.size-small {

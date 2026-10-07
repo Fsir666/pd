@@ -9,9 +9,9 @@ Page({
     isLogged: false,
     isRefreshing: false,
     banners: [
-      { id: 1, color: '#D89A5C', text: '新手拼豆指南' },
-      { id: 2, color: '#7A9E7E', text: '本周热门图纸' },
-      { id: 3, color: '#D4607A', text: '拼豆作品大赛' }
+      { id: 1, color: '#D89A5C', color2: '#E8B27E', icon: '🌟', title: '新手拼豆指南', sub: '3 分钟上手不踩坑' },
+      { id: 2, color: '#7A9E7E', color2: '#9DBB9F', icon: '🔥', title: '本周热门图纸', sub: '大家都在拼的款' },
+      { id: 3, color: '#D4607A', color2: '#E88FA1', icon: '🏆', title: '拼豆作品大赛', sub: '晒作品赢豆币' }
     ],
     hotTemplates: [], // Keep for compatibility if needed
     leftTemplates: [],
