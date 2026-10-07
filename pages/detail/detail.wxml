@@ -164,9 +164,11 @@
         <view class="tool-pill {{isCollected ? 'collected' : ''}}" bindtap="onCollect">
           <view class="ico ico-star {{isCollected ? 'ico-star--on' : ''}}"></view>
         </view>
-        <button class="tool-pill share-pill" open-type="share">
+        <!-- 分享：用普通 view 渲染（与其它三段一致），透明 button 覆盖在上层只负责触发分享 -->
+        <view class="tool-pill share-pill">
           <view class="ico ico-link"></view>
-        </button>
+          <button class="share-hit" open-type="share"></button>
+        </view>
       </view>
     </view>
     
