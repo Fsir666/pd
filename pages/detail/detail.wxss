@@ -43,8 +43,8 @@
   right: 24rpx;
 }
 
-.viewer-bar-bottom {
-  bottom: 24rpx;
+.viewer-bar-zoom {
+  top: 84rpx;
   right: 24rpx;
 }
 

@@ -15,7 +15,7 @@ const VERSIONS = [
   {
     version: '1.0.62',
     date: '2026-10-07',
-    time: '16:04',
+    time: '16:07',
     tag: 'opt',
     title: '作品详情页图纸改成小方块像素预览',
     items: [

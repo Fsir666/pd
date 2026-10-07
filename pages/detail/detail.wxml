@@ -11,7 +11,7 @@
         <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
         <view class="viewer-toggle" bindtap="switchToPhoto">实物图</view>
       </view>
-      <view class="viewer-bar viewer-bar-bottom">
+      <view class="viewer-bar viewer-bar-zoom">
         <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" data-scale="1" bindtap="setScale">1×</view>
         <view class="zoom-btn {{scale === 2 ? 'on' : ''}}" data-scale="2" bindtap="setScale">2×</view>
         <view class="zoom-btn {{scale === 3 ? 'on' : ''}}" data-scale="3" bindtap="setScale">3×</view>
