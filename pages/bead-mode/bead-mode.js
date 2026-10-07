@@ -628,6 +628,19 @@ Page({
     return 20;
   },
 
+  // 重绘全部（网格 + 缩略图）
+  // 历史 bug：loadBeadSession 里调用了 this.redrawAll()，但该方法从未定义，
+  // 导致「从作品进拼豆模式」必抛 TypeError。这里补齐实现。
+  redrawAll() {
+    try {
+      if (typeof this.drawGrid === 'function') this.drawGrid();
+      if (typeof this.drawMiniMap === 'function') this.drawMiniMap();
+      if (typeof this.updateStats === 'function') this.updateStats();
+    } catch (e) {
+      console.error('redrawAll 失败', e);
+    }
+  },
+
   drawGrid() {
     const { ctx, canvas, data } = this;
     if (!ctx || !canvas) return;

@@ -97,17 +97,17 @@ module.exports = {
 
       <!-- 顶部状态栏：豆币 / 体力（见下方 header-status） -->
 
-      <!-- Hero 主创作入口：画板 -->
-      <view class="hero-card" bindtap="onToolTap" data-id="1">
+      <!-- Hero 主创作入口：画板（bead-mode 空白大画板） -->
+      <view class="hero-card" bindtap="onGoBoard">
         <view class="hero-body">
           <view class="hero-badge">
             <text class="hero-badge-dot"></text>
             <text class="hero-badge-text">拼豆创作工具</text>
           </view>
           <text class="hero-title">画板</text>
-          <text class="hero-sub">上传照片 · 自动配色 · 出采购清单</text>
+          <text class="hero-sub">自由绘制 · 选色落珠 · 导出图纸</text>
           <view class="hero-cta">
-            <text class="hero-cta-text">开始创作</text>
+            <text class="hero-cta-text">进入画板</text>
             <text class="hero-cta-arrow">›</text>
           </view>
         </view>
@@ -120,21 +120,21 @@ module.exports = {
 
       <!-- 快捷工具：一行四个 -->
       <view class="quick-row">
+        <view class="quick-item" bindtap="onToolTap" data-id="1">
+          <view class="quick-emoji-wrap qe-sage"><text class="quick-emoji">🖼️</text></view>
+          <text class="quick-label">图片转像素</text>
+        </view>
         <view class="quick-item" bindtap="onToolTap" data-id="9">
-          <view class="quick-emoji-wrap qe-sage"><text class="quick-emoji">🪄</text></view>
+          <view class="quick-emoji-wrap qe-pink"><text class="quick-emoji">🪄</text></view>
           <text class="quick-label">转卡通</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="13">
-          <view class="quick-emoji-wrap qe-pink"><text class="quick-emoji">📐</text></view>
+          <view class="quick-emoji-wrap qe-honey"><text class="quick-emoji">📐</text></view>
           <text class="quick-label">图纸库</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="4">
-          <view class="quick-emoji-wrap qe-honey"><text class="quick-emoji">🎨</text></view>
+          <view class="quick-emoji-wrap qe-mint"><text class="quick-emoji">🎨</text></view>
           <text class="quick-label">色卡表</text>
-        </view>
-        <view class="quick-item" bindtap="onToolTap" data-id="3">
-          <view class="quick-emoji-wrap qe-mint"><text class="quick-emoji">🏰</text></view>
-          <text class="quick-label">我的仓库</text>
         </view>
       </view>
 
