@@ -13,13 +13,13 @@
 
     <block wx:elif="{{collections.length > 0}}">
       <view class="collection-list">
-        <view class="card" wx:for="{{collections}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" data-title="{{item.title}}" data-img="{{item.imageUrl}}">
+        <view class="card" wx:for="{{collections}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" data-key="{{item.key}}" data-title="{{item.title}}" data-img="{{item.imageUrl}}">
           <image class="card-img" src="{{item.imageUrl}}" mode="aspectFill"></image>
           <view class="card-info">
             <view class="card-title">{{item.title}}</view>
             <view class="card-author">
-               <view class="author-avatar"></view>
-               <text>{{item.author}}</text>
+               <view class="author-avatar">{{item.author}}</view>
+               <text>{{item.author || '冯'}}</text>
             </view>
             <view class="card-heat">
               <text class="heat-icon">🔥</text>

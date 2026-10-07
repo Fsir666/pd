@@ -793,6 +793,46 @@ exports.main = async (event, context) => {
       };
     }
 
+    // 幂等收藏：前端本地收藏后同步一份到云端，保证「我的收藏」跨设备可见
+    if (action === 'setCollect') {
+      const { templateId, collected } = event;
+      if (!templateId) return { code: -1, msg: 'Missing templateId' };
+      const want = !!collected;
+      const openid = wxContext.OPENID;
+
+      try {
+        const userRes = await db.collection('users').where({ _openid: openid }).get();
+        if (userRes.data.length === 0) {
+          await db.collection('users').add({
+            data: {
+              _openid: openid,
+              collectedTemplates: want ? [templateId] : [],
+              createTime: db.serverDate(),
+              updateTime: db.serverDate()
+            }
+          });
+          return { code: 0, data: { isCollected: want }, msg: 'ok' };
+        }
+
+        const userDoc = userRes.data[0];
+        const list = userDoc.collectedTemplates || [];
+        const has = list.includes(templateId);
+        if (has === want) {
+          return { code: 0, data: { isCollected: has }, msg: 'noop' };
+        }
+        await db.collection('users').doc(userDoc._id).update({
+          data: {
+            collectedTemplates: want ? _.addToSet(templateId) : _.pull(templateId),
+            updateTime: db.serverDate()
+          }
+        });
+        return { code: 0, data: { isCollected: want }, msg: 'ok' };
+      } catch (err) {
+        console.error('setCollect failed:', err);
+        return { code: -1, msg: 'setCollect failed', error: err };
+      }
+    }
+
     if (action === 'getWallet') {
       const openid = wxContext.OPENID
       const user = await getUserByOpenid(openid)

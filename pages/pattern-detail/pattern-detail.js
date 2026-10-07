@@ -66,17 +66,36 @@ Page({
   },
 
   // ===== 视图控制 =====
+  // 注意：showGrid / showCode 只影响 draw() 内部逻辑，
+  // 改完必须重新调用 draw()，否则画布内容不会变化
   toggleGrid() {
     const next = !this.data.showGrid;
-    this.setData({ showGrid: next });
-    this._needRedraw = true;
+    this.setData({ showGrid: next }, () => {
+      setTimeout(() => this.draw(), 40);
+    });
     wx.vibrateShort({ type: 'light' });
   },
 
   toggleCode() {
     const next = !this.data.showCode;
-    this.setData({ showCode: next });
-    this._needRedraw = true;
+    // 打开色号时，若当前格子太小看不清，自动放大一档让变化可见
+    let scale = this.data.scale;
+    if (next) {
+      const baseCell = this.data.viewW / (this._raw ? this._raw.w : 24);
+      if (baseCell * scale < 13) {
+        scale = Math.min(4, Math.max(1, Math.ceil(13 / baseCell * 2) / 2));
+      }
+    }
+    const viewW = this.data.viewW;
+    const viewH = this.data.viewH;
+    this.setData({
+      showCode: next,
+      scale,
+      canvasW: Math.round(viewW * scale),
+      canvasH: Math.round(viewH * scale)
+    }, () => {
+      setTimeout(() => this.draw(), 60);
+    });
     wx.vibrateShort({ type: 'light' });
   },
 
@@ -171,7 +190,8 @@ Page({
       });
   },
 
-  // 收藏 / 取消收藏（本地存储，内置图纸没有云端数据）
+  // 收藏 / 取消收藏
+  // 双写：本地 Storage 立即生效（离线可用）+ 云端 users.collectedTemplates（跨设备 /「我的收藏」页读取）
   toggleFav() {
     const raw = this._raw;
     if (!raw) return;
@@ -184,6 +204,16 @@ Page({
     wx.vibrateShort({ type: 'light' });
     wx.showToast({ title: isFav ? '已收藏' : '已取消收藏', icon: 'none' });
     this.setData({ isFav });
+
+    // 同步云端（失败不影响本地体验）
+    wx.cloud.callFunction({
+      name: 'template-api',
+      data: {
+        action: 'setCollect',
+        templateId: 'seed_' + raw.key,
+        collected: isFav
+      }
+    }).catch(() => {});
   },
 
   // 点赞：写入云端 seed_<key>（templates.heat/likeCount + community_posts.likes）

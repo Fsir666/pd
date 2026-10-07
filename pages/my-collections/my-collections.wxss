@@ -1,127 +1,103 @@
-/* pages/my-collections/my-collections.wxss */
+/* pages/my-collections/my-collections.wxss — 奶油手作 S1 */
 
-/* Global Page Setup */
 .page-root {
   position: relative;
   width: 100vw;
   min-height: 100vh;
-  background-color: #F2F4F8;
+  background: var(--ym-bg, #FBF7F2);
   overflow-x: hidden;
 }
 
-/* Ambient Diffused Background */
+/* 奶油暖调氛围 */
 .ambient-bg {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.7;
+  filter: blur(80rpx);
+  opacity: 0.5;
 }
 
 .orb-1 {
-  width: 600rpx;
-  height: 600rpx;
-  background: #E0C3FC; /* Soft Purple */
-  top: -150rpx;
-  left: -100rpx;
-  animation: float 10s infinite ease-in-out;
+  width: 460rpx; height: 460rpx;
+  background: #F6D7DE;
+  top: -120rpx; left: -100rpx;
 }
 
 .orb-2 {
-  width: 500rpx;
-  height: 500rpx;
-  background: #FFD1FF; /* Soft Pink */
-  bottom: 10%;
-  right: -100rpx;
-  animation: float 12s infinite ease-in-out reverse;
+  width: 380rpx; height: 380rpx;
+  background: #E4EBDC;
+  bottom: 8%; right: -90rpx;
 }
 
 .orb-3 {
-  width: 400rpx;
-  height: 400rpx;
-  background: #D4F1F4; /* Soft Blue */
-  top: 40%;
-  left: 20%;
-  animation: float 15s infinite ease-in-out 2s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(20rpx, 30rpx); }
+  width: 320rpx; height: 320rpx;
+  background: #F7E6CE;
+  top: 45%; left: 18%;
 }
 
 .container {
   position: relative;
   z-index: 1;
-  padding: 30rpx;
+  padding: 24rpx 28rpx 60rpx;
   box-sizing: border-box;
 }
 
 .loading {
   text-align: center;
   margin-top: 200rpx;
-  color: #999;
+  color: var(--ym-text-3, #B9A79C);
   font-size: 28rpx;
 }
 
-/* 列表样式 (List Style - Single Column) */
 .collection-list {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
 }
 
 .card {
-  display: flex; /* Flex Layout for Horizontal Card */
+  display: flex;
   flex-direction: row;
-  padding: 24rpx; /* Add padding to contain rounded image */
-  height: 240rpx; /* Adjusted height for padding */
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 32rpx;
-  overflow: hidden;
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s;
-  box-sizing: border-box; /* Ensure padding includes in height */
+  padding: 18rpx;
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(160, 130, 115, 0.10);
+  box-sizing: border-box;
+  transition: transform 0.15s;
 }
 
-.card:active {
-  transform: scale(0.98);
-}
+.card:active { transform: scale(0.985); }
 
 .card-img {
-  width: 192rpx; /* Square size */
-  height: 192rpx;
-  border-radius: 24rpx; /* Rounded corners - Increased for better look */
-  background-color: rgba(255, 255, 255, 0.5);
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 20rpx;
+  background: #F5EFE8;
   flex-shrink: 0;
 }
 
 .card-info {
   flex: 1;
-  padding-left: 24rpx; /* Space between img and text */
-  padding-right: 0;
+  padding-left: 20rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .card-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--ym-text-1, #4A3A34);
+  margin-bottom: 10rpx;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -137,69 +113,66 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background-color: #ddd;
-  margin-right: 12rpx;
+  background: var(--ym-primary, #D4607A);
+  color: #FFFFFF;
+  font-size: 20rpx;
+  line-height: 36rpx;
+  text-align: center;
+  margin-right: 10rpx;
+  flex-shrink: 0;
 }
 
 .card-author text {
-  font-size: 26rpx;
-  color: #888;
+  font-size: 24rpx;
+  color: var(--ym-text-3, #B9A79C);
 }
 
 .card-heat {
   display: flex;
   align-items: center;
-  font-size: 24rpx;
-  color: #ff6b00;
+  font-size: 22rpx;
+  color: var(--ym-accent, #D89A5C);
   font-weight: 500;
-  margin-top: 4rpx;
 }
 
-.heat-icon {
-  margin-right: 8rpx;
-  font-size: 24rpx;
-}
+.heat-icon { margin-right: 6rpx; font-size: 22rpx; }
 
 /* 空状态 */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding-top: 200rpx;
 }
 
 .empty-img {
-  width: 240rpx;
-  height: 240rpx;
-  margin-bottom: 30rpx;
-  opacity: 0.8;
+  width: 220rpx;
+  height: 220rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.85;
 }
 
 .empty-text {
-  font-size: 34rpx;
-  color: #333;
-  font-weight: bold;
-  margin-bottom: 16rpx;
+  font-size: 32rpx;
+  color: var(--ym-text-1, #4A3A34);
+  font-weight: 600;
+  margin-bottom: 12rpx;
 }
 
 .empty-tips {
-  font-size: 28rpx;
-  color: #999;
-  margin-bottom: 60rpx;
+  font-size: 26rpx;
+  color: var(--ym-text-3, #B9A79C);
+  margin-bottom: 48rpx;
 }
 
 .go-home-btn {
-  background: #333;
-  color: #fff;
-  font-size: 30rpx;
-  padding: 20rpx 80rpx;
+  background: var(--ym-primary, #D4607A);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  padding: 20rpx 72rpx;
   border-radius: 100rpx;
   font-weight: 600;
-  box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.15);
-  transition: opacity 0.2s;
+  box-shadow: 0 8rpx 20rpx rgba(212, 96, 122, 0.28);
 }
 
-.go-home-btn:active {
-  opacity: 0.9;
-}
+.go-home-btn:active { opacity: 0.9; }
