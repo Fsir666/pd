@@ -143,7 +143,7 @@
           bindconfirm="onSubmitComment"
         />
         <view class="camera-btn" bindtap="onChooseImage">
-          <text class="icon">📷</text>
+          <view class="ico ico-camera"></view>
         </view>
         <!-- 发送按钮：仅在有内容时显示 -->
         <view class="send-btn-inline" wx:if="{{commentContent || commentImage}}" bindtap="onSubmitComment">
@@ -154,18 +154,18 @@
       <!-- 右侧工具栏 -->
       <view class="toolbar-actions">
         <view class="tool-pill comment-pill" bindtap="focusComment">
-          <text class="icon">💬</text>
+          <view class="ico ico-bubble"></view>
           <text class="tcount">{{comments.length}}</text>
         </view>
         <view class="tool-pill {{isLiked ? 'liked' : ''}}" bindtap="onLike">
-          <text class="icon">{{isLiked ? '❤️' : '🤍'}}</text>
+          <view class="ico ico-heart {{isLiked ? 'ico-heart--on' : ''}}"></view>
           <text class="tcount">{{stats.likes}}</text>
         </view>
         <view class="tool-pill {{isCollected ? 'collected' : ''}}" bindtap="onCollect">
-          <text class="icon">{{isCollected ? '⭐' : '☆'}}</text>
+          <view class="ico ico-star {{isCollected ? 'ico-star--on' : ''}}"></view>
         </view>
         <button class="tool-pill share-pill" open-type="share">
-          <text class="icon">🔗</text>
+          <view class="ico ico-link"></view>
         </button>
       </view>
     </view>
