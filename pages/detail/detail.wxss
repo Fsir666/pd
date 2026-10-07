@@ -24,10 +24,12 @@
   height: 100%;
   background: #FBF7F2;
   -webkit-overflow-scrolling: touch;
+  display: flex;
 }
 
 .detail-canvas {
   display: block;
+  margin: auto;
 }
 
 /* 预览控制条：奶油风胶囊按钮 */
