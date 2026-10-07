@@ -1,16 +1,89 @@
 .page {
   min-height: 100vh;
   background: #FBF7F2;
-  padding: 28rpx;
   box-sizing: border-box;
 }
 
-.sheet-card {
+/* 沉浸式顶部大图区 */
+.hero-viewer {
+  position: relative;
+  background: #FBF7F2;
+  overflow: hidden;
+}
+
+/* 悬浮控制条：与作品详情页一致，胶囊风格 */
+.viewer-bar {
+  position: absolute;
+  display: flex;
+  gap: 14rpx;
+  z-index: 30;
+}
+
+.viewer-bar-top {
+  top: 24rpx;
+  right: 24rpx;
+}
+
+.viewer-bar-zoom {
+  top: 78rpx;
+  right: 24rpx;
+}
+
+.viewer-toggle,
+.zoom-btn {
+  padding: 10rpx 22rpx;
+  font-size: 24rpx;
+  line-height: 1;
+  color: #6B5B5F;
+  background: rgba(255, 253, 251, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(201, 184, 175, 0.5);
+  border-radius: 999rpx;
+  box-shadow: 0 6rpx 18rpx rgba(176, 138, 128, 0.16);
+}
+
+.viewer-toggle.on,
+.zoom-btn.on {
+  color: #FBF7F2;
+  background: #D4607A;
+  border-color: #D4607A;
+}
+
+/* 悬浮返回按钮 */
+.back-btn {
+  position: fixed;
+  left: 30rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 253, 251, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1rpx solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 8rpx 24rpx rgba(176, 138, 128, 0.18);
+}
+
+.back-icon {
+  color: #4A3A3E;
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+/* 内容卡片：上叠在大图上 */
+.content-card {
+  position: relative;
+  margin-top: -60rpx;
   background: #FFFDFB;
-  border-radius: 32rpx;
-  padding: 30rpx 26rpx 26rpx;
-  box-shadow: 0 6rpx 20rpx rgba(176, 138, 128, 0.10);
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 40rpx;
+  box-shadow: 0 -10rpx 30rpx rgba(176, 138, 128, 0.10);
   border: 1rpx solid #F0E4DC;
+  border-bottom: none;
 }
 
 .sheet-head {
@@ -126,10 +199,9 @@
   font-size: 24rpx;
 }
 
-/* 可滚动画布容器 */
+/* 可滚动画布容器：沉浸式下无圆角、通栏 */
 .canvas-scroll {
   width: 100%;
-  border-radius: var(--ym-r-md, 20rpx);
   background: #FBF7F2;
   overflow: hidden;
 }
@@ -150,7 +222,7 @@
 }
 
 .list-card {
-  margin-top: 26rpx;
+  margin: 26rpx 28rpx 0;
   background: #FFFDFB;
   border-radius: 32rpx;
   padding: 28rpx 26rpx;

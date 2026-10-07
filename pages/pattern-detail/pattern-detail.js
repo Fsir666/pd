@@ -33,8 +33,9 @@ Page({
 
     const sysInfo = wx.getSystemInfoSync();
     const winW = sysInfo.windowWidth || 375;
-    // 可视区宽度：留边距，缩放时 canvas 超出部分靠外层 scroll-view 滚动
-    const viewW = Math.floor(winW * 0.92);
+    const statusBarHeight = (sysInfo.statusBarHeight || 20) + 4;
+    // 沉浸式：图纸通栏铺满可视宽度
+    const viewW = winW;
     // 初始按图纸宽度铺满可视区（长图限制最大高度，超出可上下滚）
     const cell = viewW / raw.w;
     const viewH = Math.min(Math.ceil(cell * raw.h), Math.floor(winW * 1.1));
@@ -45,9 +46,8 @@ Page({
       count: raw.counts[i]
     }));
 
-    wx.setNavigationBarTitle({ title: raw.name + ' 图纸' });
-
     this.setData({
+      statusBarHeight,
       p: {
         key: raw.key,
         name: raw.name,
@@ -66,6 +66,15 @@ Page({
     });
 
     this.loadAuthorAndLikes();
+  },
+
+  goBack() {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({ url: '/pages/index/index' });
+    }
   },
 
   // ===== 视图控制 =====

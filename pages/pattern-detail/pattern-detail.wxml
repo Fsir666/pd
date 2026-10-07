@@ -1,5 +1,38 @@
 <view class="page">
-  <view class="sheet-card">
+  <!-- 顶部图纸大图（沉浸式，顶到状态栏），控制条悬浮在图上下方 -->
+  <view class="hero-viewer" style="padding-top: {{statusBarHeight}}px;">
+    <scroll-view class="canvas-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}"
+                  scroll-left="{{scrollLeft}}" scroll-top="{{scrollTop}}"
+                  bindscroll="onScroll"
+                  style="height: {{viewH}}px;">
+      <view class="canvas-holder"
+            style="width: {{canvasW}}px; height: {{canvasH}}px;"
+            bindtouchstart="onTouchStart"
+            bindtouchmove="onTouchMove"
+            bindtouchend="onTouchEnd"
+            bindtouchcancel="onTouchEnd">
+        <canvas type="2d" id="patternCanvas" class="canvas"
+                style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+      </view>
+    </scroll-view>
+    <view class="viewer-bar viewer-bar-top">
+      <view class="viewer-toggle {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
+      <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
+    </view>
+    <view class="viewer-bar viewer-bar-zoom">
+      <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" bindtap="setScale" data-scale="1">1×</view>
+      <view class="zoom-btn {{scale === 2 ? 'on' : ''}}" bindtap="setScale" data-scale="2">2×</view>
+      <view class="zoom-btn {{scale === 3 ? 'on' : ''}}" bindtap="setScale" data-scale="3">3×</view>
+    </view>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">
+    <text class="back-icon">←</text>
+  </view>
+
+  <!-- 内容卡片（上叠在大图上） -->
+  <view class="content-card">
     <view class="sheet-head">
       <view class="sheet-head-main">
         <view class="sheet-title">{{p.name}}</view>
@@ -16,38 +49,6 @@
       <view class="author-name">{{author.name}}</view>
       <view class="author-badge">图纸作者</view>
     </view>
-    <!-- 工具栏 -->
-    <view class="view-tools">
-      <view class="tool-group">
-        <view class="tool-btn {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">
-          <text class="tool-ico">▦</text><text>网格</text>
-        </view>
-        <view class="tool-btn {{showCode ? 'on' : ''}}" bindtap="toggleCode">
-          <text class="tool-ico">🔤</text><text>色号</text>
-        </view>
-      </view>
-      <view class="tool-group">
-        <view class="tool-btn scale-btn {{scale === 1 ? 'on' : ''}}" bindtap="setScale" data-scale="1">1×</view>
-        <view class="tool-btn scale-btn {{scale === 2 ? 'on' : ''}}" bindtap="setScale" data-scale="2">2×</view>
-        <view class="tool-btn scale-btn {{scale === 3 ? 'on' : ''}}" bindtap="setScale" data-scale="3">3×</view>
-      </view>
-    </view>
-
-    <!-- 图纸画布：单指拖动由 scroll-view 原生滚动处理，双指做缩放 -->
-    <scroll-view class="canvas-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}"
-                  scroll-left="{{scrollLeft}}" scroll-top="{{scrollTop}}"
-                  bindscroll="onScroll"
-                  style="height: {{viewH}}px;">
-      <view class="canvas-holder"
-            style="width: {{canvasW}}px; height: {{canvasH}}px;"
-            bindtouchstart="onTouchStart"
-            bindtouchmove="onTouchMove"
-            bindtouchend="onTouchEnd"
-            bindtouchcancel="onTouchEnd">
-        <canvas type="2d" id="patternCanvas" class="canvas"
-                style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
-      </view>
-    </scroll-view>
     <view class="sheet-tip">{{scale > 1 ? '单指拖动查看细节 · 双指缩放 · 格子里的字母是色号' : '格子里的字母就是色号，空白格不用放珠子'}}</view>
   </view>
 
