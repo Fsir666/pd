@@ -174,7 +174,7 @@ module.exports = {
         <view class="section-header">
           <text class="section-title-text">🔥 热门图纸榜</text>
           <view class="rank-head-right">
-            <like-float class="home-like" show-particles="{{false}}" />
+            <like-float class="home-like" show-particles="{{true}}" />
             <text class="section-more">查看全部 ></text>
           </view>
         </view>
