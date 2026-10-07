@@ -100,10 +100,111 @@ Page({
       this.getTabBar().setSelected(0);
     }
 
-    // 每次显示页面时同步最新数据
-    this.updateLocalUserData();
-    if (app.globalData.isLogged) {
-      this.fetchWallet();
+  // 每次显示页面时同步最新数据
+  this.updateLocalUserData();
+  if (app.globalData.isLogged) {
+    this.fetchWallet();
+  }
+  // 切回首页时 canvas 内容可能被回收，重绘榜单像素图
+  if (this._rankPixels && Object.keys(this._rankPixels).length) {
+    setTimeout(() => this.drawRankCanvases(), 120);
+  }
+},
+
+  // ===== 榜单像素方块渲染 =====
+  // board（beadColors / codesMard）→ { w, h, hexes[] }，无数据返回 null
+  _buildBoardPixels(board) {
+    if (!board) return null;
+    let w = Number(board.gridWidth);
+    let h = Number(board.gridHeight);
+    let hexes = null;
+    if (board.beadColors && Object.keys(board.beadColors).length) {
+      if (!Number.isFinite(w) || w <= 0) w = 32;
+      if (!Number.isFinite(h) || h <= 0) h = 32;
+      hexes = new Array(w * h).fill('');
+      Object.keys(board.beadColors).forEach((key) => {
+        const parts = key.split(',');
+        const x = Number(parts[0]);
+        const y = Number(parts[1]);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        const idx = (y - 1) * w + (x - 1);
+        if (idx < 0 || idx >= w * h) return;
+        hexes[idx] = board.beadColors[key] || '';
+      });
+    } else if (Array.isArray(board.codesMard) && Number(board.gridSize) > 0) {
+      const g = Number(board.gridSize);
+      w = g; h = g;
+      const rev = this._getMardRevMap();
+      hexes = new Array(g * g).fill('');
+      for (let i = 0; i < board.codesMard.length; i++) {
+        const code = board.codesMard[i] != null ? String(board.codesMard[i]).trim() : '';
+        if (code) hexes[i] = rev[code] || '';
+      }
+    }
+    if (!hexes) return null;
+    return { w, h, hexes };
+  },
+
+  // MARD 色号 → hex（旧版 codesMard 数据用）
+  _getMardRevMap() {
+    if (this._mardRev) return this._mardRev;
+    let mapping = {};
+    try { mapping = require('../../data/color-mapping.js') || {}; } catch (e) { mapping = {}; }
+    const rev = Object.create(null);
+    Object.keys(mapping).forEach((hex) => {
+      const m = mapping[hex];
+      const code = m && typeof m.MARD === 'string' ? String(m.MARD).trim() : '';
+      if (code && !rev[code]) rev[code] = String(hex || '').toUpperCase();
+    });
+    this._mardRev = rev;
+    return rev;
+  },
+
+  // 把有图纸数据的榜单卡片画成小方块
+  drawRankCanvases() {
+    const pixelsMap = this._rankPixels || {};
+    const ranks = Object.keys(pixelsMap);
+    if (!ranks.length) return;
+    const q = wx.createSelectorQuery();
+    ranks.forEach((r) => {
+      q.select('#rankcv-' + r).fields({ node: true, size: true });
+    });
+    q.exec((resList) => {
+      if (!resList) return;
+      resList.forEach((info, i) => {
+        if (!info || !info.node || !info.width) return;
+        this._paintRankCanvas(pixelsMap[ranks[i]], info);
+      });
+    });
+  },
+
+  _paintRankCanvas(p, info) {
+    const canvas = info.node;
+    const ctx = canvas.getContext('2d');
+    const dpr = (wx.getSystemInfoSync().pixelRatio || 2);
+    const W = info.width;
+    const H = info.height;
+    if (!W || !H) return;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+
+    // 底色与卡片图区一致
+    ctx.fillStyle = '#F5EDE6';
+    ctx.fillRect(0, 0, W, H);
+
+    // 图案等比居中
+    const cell = Math.min(W / p.w, H / p.h);
+    const ox = (W - cell * p.w) / 2;
+    const oy = (H - cell * p.h) / 2;
+    for (let y = 0; y < p.h; y++) {
+      for (let x = 0; x < p.w; x++) {
+        const hex = p.hexes[y * p.w + x];
+        if (!hex) continue;
+        ctx.fillStyle = hex;
+        // +0.5 防止浮点误差出现发丝缝
+        ctx.fillRect(ox + x * cell, oy + y * cell, cell + 0.5, cell + 0.5);
+      }
     }
   },
 
@@ -145,21 +246,27 @@ Page({
         }
         
         // 格式化数据以匹配UI
+        const rankPixels = {};
         const templates = res.data.map((item, index) => {
           // 尝试使用 HTTP 链接
           const realUrl = (item.imageUrl && urlMap[item.imageUrl]) ? urlMap[item.imageUrl] : item.imageUrl;
-          
+          const rank = index + 1;
+          const pixels = this._buildBoardPixels(item.board);
+          if (pixels) rankPixels[rank] = pixels;
+
           return {
             ...item,
             id: item._id, // 映射 _id 到 id
-            rank: index + 1,
+            rank,
             // 确保字段存在
             image: item.image || '🎨', // 如果没有 icon，给个默认
             imageUrl: realUrl, // 更新为 HTTP 链接
             time: item.time || '-',
-            size: item.size || '32x32'
+            size: item.size || '32x32',
+            hasBoard: !!pixels // 有图纸数据就用像素方块 canvas 渲染
           };
         });
+        this._rankPixels = rankPixels;
         
         const leftTemplates = [];
         const rightTemplates = [];
@@ -177,6 +284,8 @@ Page({
           leftTemplates,
           rightTemplates
         });
+        // 榜单像素方块渲染（canvas 2d）
+        setTimeout(() => this.drawRankCanvases(), 80);
         return { ok: true };
       }).catch(err => {
         if (!isRefresh) {

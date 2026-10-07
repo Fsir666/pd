@@ -38,13 +38,16 @@
   z-index: 20;
 }
 
+/* 预览控制条：放画板右下角，避开右上角胶囊按钮；bottom 需留出内容卡上叠的 60rpx */
 .viewer-bar-top {
-  top: 24rpx;
+  top: auto;
+  bottom: 158rpx;
   right: 24rpx;
 }
 
 .viewer-bar-zoom {
-  top: 84rpx;
+  top: auto;
+  bottom: 96rpx;
   right: 24rpx;
 }
 

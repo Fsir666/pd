@@ -191,7 +191,8 @@ module.exports = {
             
             <!-- 图片区域 -->
             <view class="rank-img-box">
-              <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" class="rank-img-real" binderror="onImageError" data-index="{{item.rank - 1}}"></image>
+              <canvas wx:if="{{item.hasBoard}}" type="2d" id="rankcv-{{item.rank}}" class="rank-img-real rank-img-canvas"></canvas>
+              <image wx:elif="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" class="rank-img-real" binderror="onImageError" data-index="{{item.rank - 1}}"></image>
               <view wx:else class="rank-img-placeholder">{{item.image}}</view>
               
               <!-- 排名角标 -->
