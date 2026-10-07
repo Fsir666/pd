@@ -95,29 +95,46 @@ module.exports = {
         </view>
       </view>
 
-      <!-- 主功能四宫格（替代原大轮播 + 巨型开始按钮） -->
-      <view class="quick-grid">
-        <view class="quick-cell quick-cell--hero" bindtap="onToolTap" data-id="1">
-          <view class="quick-icon quick-icon--hero"></view>
-          <view class="quick-text">
-            <text class="quick-title">图片转像素</text>
-            <text class="quick-desc">上传照片 3 秒出图纸</text>
+      <!-- 顶部状态栏：豆币 / 体力（见下方 header-status） -->
+
+      <!-- Hero 主创作入口 -->
+      <view class="hero-card" bindtap="onToolTap" data-id="1">
+        <view class="hero-body">
+          <view class="hero-badge">
+            <text class="hero-badge-dot"></text>
+            <text class="hero-badge-text">拼豆图纸生成器</text>
+          </view>
+          <text class="hero-title">照片转拼豆图纸</text>
+          <text class="hero-sub">上传照片 · 自动配色 · 出采购清单</text>
+          <view class="hero-cta">
+            <text class="hero-cta-text">开始创作</text>
+            <text class="hero-cta-arrow">›</text>
           </view>
         </view>
-        <view class="quick-cell" bindtap="onToolTap" data-id="9">
-          <view class="quick-icon"></view>
-          <text class="quick-title-sm">照片转卡通</text>
-          <text class="quick-desc-sm">一键卡通化</text>
+        <view class="hero-beads">
+          <view class="bead b1"></view><view class="bead b2"></view><view class="bead b3"></view>
+          <view class="bead b4"></view><view class="bead b5"></view><view class="bead b6"></view>
+          <view class="bead b7"></view><view class="bead b8"></view><view class="bead b9"></view>
         </view>
-        <view class="quick-cell" bindtap="onToolTap" data-id="13">
-          <view class="quick-icon"></view>
-          <text class="quick-title-sm">图纸库</text>
-          <text class="quick-desc-sm">29 张免费图纸</text>
+      </view>
+
+      <!-- 快捷工具：一行四个 -->
+      <view class="quick-row">
+        <view class="quick-item" bindtap="onToolTap" data-id="9">
+          <view class="quick-emoji-wrap qe-sage"><text class="quick-emoji">🪄</text></view>
+          <text class="quick-label">转卡通</text>
         </view>
-        <view class="quick-cell" bindtap="onToolTap" data-id="4">
-          <view class="quick-icon"></view>
-          <text class="quick-title-sm">色卡对照表</text>
-          <text class="quick-desc-sm">查色号</text>
+        <view class="quick-item" bindtap="onToolTap" data-id="13">
+          <view class="quick-emoji-wrap qe-pink"><text class="quick-emoji">📐</text></view>
+          <text class="quick-label">图纸库</text>
+        </view>
+        <view class="quick-item" bindtap="onToolTap" data-id="4">
+          <view class="quick-emoji-wrap qe-honey"><text class="quick-emoji">🎨</text></view>
+          <text class="quick-label">色卡表</text>
+        </view>
+        <view class="quick-item" bindtap="onToolTap" data-id="3">
+          <view class="quick-emoji-wrap qe-mint"><text class="quick-emoji">🏰</text></view>
+          <text class="quick-label">我的仓库</text>
         </view>
       </view>
 
@@ -177,7 +194,7 @@ module.exports = {
             
             <!-- 图片区域 -->
             <view class="rank-img-box">
-              <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="widthFix" class="rank-img-real" binderror="onImageError" data-index="{{item.rank - 1}}"></image>
+              <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" class="rank-img-real" binderror="onImageError" data-index="{{item.rank - 1}}"></image>
               <view wx:else class="rank-img-placeholder">{{item.image}}</view>
               
               <!-- 排名角标 -->
