@@ -1016,9 +1016,12 @@ scroll-view {
   gap: 12rpx;
 }
 
+/* 注意：这里绝对不能加 transform！
+   like-float 的粒子层是 position:fixed，祖先一旦有 transform，
+   就会变成相对于该祖先定位并被裁切，飘心会被别的元素挡住。
+   需要变小请用组件内部尺寸，不要缩放宿主。 */
 .rank-head-right .home-like {
-  transform: scale(0.8);
-  transform-origin: right center;
+  flex: none;
 }
 
 /* ---------- 圆角统一：卡片 28rpx ---------- */
