@@ -97,14 +97,14 @@ module.exports = {
 
       <!-- 顶部状态栏：豆币 / 体力（见下方 header-status） -->
 
-      <!-- Hero 主创作入口 -->
+      <!-- Hero 主创作入口：画板 -->
       <view class="hero-card" bindtap="onToolTap" data-id="1">
         <view class="hero-body">
           <view class="hero-badge">
             <text class="hero-badge-dot"></text>
-            <text class="hero-badge-text">拼豆图纸生成器</text>
+            <text class="hero-badge-text">拼豆创作工具</text>
           </view>
-          <text class="hero-title">照片转拼豆图纸</text>
+          <text class="hero-title">画板</text>
           <text class="hero-sub">上传照片 · 自动配色 · 出采购清单</text>
           <view class="hero-cta">
             <text class="hero-cta-text">开始创作</text>

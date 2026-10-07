@@ -1111,3 +1111,53 @@ scroll-view {
 .toolbox-section {
   padding: 0 24rpx 20rpx;
 }
+
+/* ============================================================
+   v1.0.51 Hero「画板」视觉贴合
+   名字改短后整体收紧：高度降、间距缩、点阵更精致
+   ============================================================ */
+
+.hero-card {
+  min-height: 196rpx;
+  padding: 26rpx;
+}
+
+.hero-badge {
+  margin-bottom: 12rpx;
+  padding: 5rpx 14rpx;
+}
+
+.hero-title {
+  font-size: 42rpx;
+  letter-spacing: 1rpx;
+  line-height: 1.2;
+}
+
+.hero-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+}
+
+.hero-cta {
+  margin-top: 18rpx;
+  padding: 12rpx 26rpx;
+}
+
+.hero-cta-text {
+  font-size: 25rpx;
+}
+
+/* 点阵装饰：更小更贴，弱化边框感 */
+.hero-beads {
+  width: 116rpx;
+  height: 116rpx;
+  margin-left: 16rpx;
+  gap: 5rpx;
+  padding: 7rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.bead {
+  border-radius: 6rpx;
+}
