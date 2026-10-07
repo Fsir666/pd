@@ -20,7 +20,9 @@ Page({
     showCode: true,      // 色号文字
     scale: 1,            // 缩放倍数
     viewW: 0,            // 可视区域宽（px）
-    viewH: 0
+    viewH: 0,
+    scrollLeft: 0,       // 拖动位置（px）
+    scrollTop: 0
   },
 
   onLoad(query) {
@@ -86,33 +88,19 @@ Page({
         scale = Math.min(4, Math.max(1, Math.ceil(13 / baseCell * 2) / 2));
       }
     }
-    const viewW = this.data.viewW;
-    const viewH = this.data.viewH;
-    this.setData({
-      showCode: next,
-      scale,
-      canvasW: Math.round(viewW * scale),
-      canvasH: Math.round(viewH * scale)
-    }, () => {
-      setTimeout(() => this.draw(), 60);
-    });
+    this.setData({ showCode: next });
+    if (scale !== this.data.scale) {
+      this._applyScale(scale, false);
+    }
+    setTimeout(() => this.draw(), 60);
     wx.vibrateShort({ type: 'light' });
   },
 
   setScale(e) {
     const val = Number(e.currentTarget.dataset.scale) || 1;
     if (val === this.data.scale) return;
-    const viewW = this.data.viewW;
-    const viewH = this.data.viewH;
-    this.setData({
-      scale: val,
-      canvasW: Math.round(viewW * val),
-      canvasH: Math.round(viewH * val)
-    }, () => {
-      this._needRedraw = true;
-      // 等 DOM 更新完再重绘
-      setTimeout(() => this.draw(), 60);
-    });
+    this._applyScale(val, false);
+    setTimeout(() => this.draw(), 60);
     wx.vibrateShort({ type: 'light' });
   },
 
@@ -122,6 +110,14 @@ Page({
       const [a, b] = e.touches;
       this._pinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
       this._pinchStartScale = this.data.scale;
+
+      // 记录双指中心点在「画布内容坐标系」里的位置，缩放后保持这个点不动
+      const cx = (a.clientX + b.clientX) / 2;
+      const cy = (a.clientY + b.clientY) / 2;
+      this._pinchFocusX = cx;
+      this._pinchFocusY = cy;
+      this._pinchContentX = (cx - this._scrollRectLeft + (this._scrollLeft || 0)) / this.data.scale;
+      this._pinchContentY = (cy - this._scrollRectTop + (this._scrollTop || 0)) / this.data.scale;
     }
   },
 
@@ -134,28 +130,50 @@ Page({
       const ratio = dist / this._pinchStartDist;
       const newScale = Math.min(4, Math.max(1, this._pinchStartScale * ratio));
       if (Math.abs(newScale - this.data.scale) > 0.01) {
-        this.setData({
-          scale: newScale,
-          canvasW: Math.round(this.data.viewW * newScale),
-          canvasH: Math.round(this.data.viewH * newScale)
-        });
+        this._applyScale(newScale, false);
       }
     }
+  },
+
+  // 统一设置缩放 + 画布尺寸；keepFocus 为 true 时保持双指中心点不动
+  _applyScale(newScale, keepFocus) {
+    const viewW = this.data.viewW;
+    const viewH = this.data.viewH;
+    newScale = Math.min(4, Math.max(1, newScale));
+
+    const patch = {
+      scale: newScale,
+      canvasW: Math.round(viewW * newScale),
+      canvasH: Math.round(viewH * newScale)
+    };
+
+    if (keepFocus && this._pinchContentX != null) {
+      const left = Math.max(0, this._pinchContentX * newScale - this._pinchFocusX + this._scrollRectLeft);
+      const top = Math.max(0, this._pinchContentY * newScale - this._pinchFocusY + this._scrollRectTop);
+      patch.scrollLeft = Math.round(left);
+      patch.scrollTop = Math.round(top);
+    }
+
+    this.setData(patch);
+  },
+
+  // 记录 scroll-view 的滚动位置（不 setData，避免与 scroll-left 绑定互相触发）
+  onScroll(e) {
+    this._scrollLeft = e.detail.scrollLeft;
+    this._scrollTop = e.detail.scrollTop;
   },
 
   onTouchEnd() {
     if (this._pinchStartDist) {
       this._pinchStartDist = 0;
-      this._needRedraw = true;
       // 吸附到 0.5 步进，避免 1.37 这种零碎倍数
       const snapped = Math.round(this.data.scale * 2) / 2;
       const clamped = Math.min(4, Math.max(1, snapped));
-      if (clamped !== this.data.scale) {
-        this.setData({
-          scale: clamped,
-          canvasW: Math.round(this.data.viewW * clamped),
-          canvasH: Math.round(this.data.viewH * clamped)
-        }, () => setTimeout(() => this.draw(), 40));
+      this._pinchContentX = null;
+      this._pinchContentY = null;
+      if (Math.abs(clamped - this.data.scale) > 0.001) {
+        this._applyScale(clamped, true);
+        setTimeout(() => this.draw(), 50);
       } else {
         setTimeout(() => this.draw(), 40);
       }
@@ -287,6 +305,13 @@ Page({
   onReady() {
     // 等一帧确保 canvas 拿到 setData 后的尺寸
     setTimeout(() => this.draw(), 80);
+    // 记录 scroll-view 在页面中的坐标，双指缩放时用来保持焦点
+    wx.createSelectorQuery().select('.canvas-scroll').boundingClientRect(rect => {
+      if (rect) {
+        this._scrollRectLeft = rect.left;
+        this._scrollRectTop = rect.top;
+      }
+    }).exec();
   },
 
   draw(retry) {

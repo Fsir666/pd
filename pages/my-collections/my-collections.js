@@ -3,7 +3,10 @@ const presets = require('../../data/pattern-presets.js');
 Page({
   data: {
     collections: [],
-    loading: true
+    loading: true,
+    totalCount: 0,
+    // 收藏页按「颗粒总数」给个统计，纯粹让用户有收藏量的感知
+    totalBeads: 0
   },
 
   onLoad() {
@@ -29,6 +32,9 @@ Page({
           imageUrl: '/images/patterns/' + p.key + '.png',
           author: '冯',
           heat: 0,
+          beadCount: p.beadCount,
+          colorCount: p.palette.length,
+          sizeText: p.w + '×' + p.h,
           fromLocal: true
         };
       })
@@ -43,11 +49,30 @@ Page({
     const finish = cloudCards => {
       // 云端 seed_* 与本地合并，按 _id 去重（本地优先，缩略图更清晰）
       const map = {};
-      (cloudCards || []).forEach(c => { map[c._id] = c; });
+      (cloudCards || []).forEach(c => {
+        const id = String(c._id || '');
+        const seedKey = id.indexOf('seed_') === 0 ? id.slice(5) : '';
+        const p = seedKey ? presets.find(x => x.key === seedKey) : null;
+        map[id] = Object.assign({}, c, {
+          key: seedKey,
+          thumb: p ? '/images/patterns/' + p.key + '.png' : c.imageUrl,
+          beadCount: p ? p.beadCount : (c.spec && c.spec.beadCount) || 0,
+          colorCount: p ? p.palette.length : 0,
+          sizeText: p ? (p.w + '×' + p.h) : (c.spec ? (c.spec.cols + '×' + c.spec.rows) : ''),
+          author: c.author || '冯'
+        });
+      });
       localCards.forEach(c => { map[c._id] = c; });
       const list = Object.keys(map).map(k => map[k]);
 
-      this.setData({ collections: list, loading: false });
+      const totalBeads = list.reduce((s, c) => s + (Number(c.beadCount) || 0), 0);
+
+      this.setData({
+        collections: list,
+        totalCount: list.length,
+        totalBeads,
+        loading: false
+      });
     };
 
     if (!wx.cloud) {

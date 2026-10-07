@@ -33,20 +33,22 @@
       </view>
     </view>
 
-    <!-- 图纸画布：可滚动 + 双指缩放 -->
+    <!-- 图纸画布：单指拖动由 scroll-view 原生滚动处理，双指做缩放 -->
     <scroll-view class="canvas-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}"
+                  scroll-left="{{scrollLeft}}" scroll-top="{{scrollTop}}"
+                  bindscroll="onScroll"
                   style="height: {{viewH}}px;">
       <view class="canvas-holder"
             style="width: {{canvasW}}px; height: {{canvasH}}px;"
-            catchtouchstart="onTouchStart"
-            catchtouchmove="onTouchMove"
-            catchtouchend="onTouchEnd"
-            catchtouchcancel="onTouchEnd">
+            bindtouchstart="onTouchStart"
+            bindtouchmove="onTouchMove"
+            bindtouchend="onTouchEnd"
+            bindtouchcancel="onTouchEnd">
         <canvas type="2d" id="patternCanvas" class="canvas"
                 style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
       </view>
     </scroll-view>
-    <view class="sheet-tip">{{scale > 1 ? '可拖动查看细节，双指缩放' : '格子里的字母就是色号，空白格不用放珠子'}}</view>
+    <view class="sheet-tip">{{scale > 1 ? '单指拖动查看细节 · 双指缩放 · 格子里的字母是色号' : '格子里的字母就是色号，空白格不用放珠子'}}</view>
   </view>
 
   <view class="list-card">

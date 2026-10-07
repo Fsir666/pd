@@ -7,6 +7,34 @@
   </view>
 
   <view class="container">
+    <!-- 统计条 -->
+    <view class="stat-bar" wx:if="{{!loading && totalCount > 0}}">
+      <view class="stat-main">
+        <view class="stat-num">{{totalCount}}</view>
+        <view class="stat-label">个作品</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-side">
+        <view class="stat-side-item">
+          <text class="stat-dot pub"></text>
+          <text class="stat-side-num">{{publicCount}}</text>
+          <text class="stat-side-label">公开</text>
+        </view>
+        <view class="stat-side-item">
+          <text class="stat-dot pri"></text>
+          <text class="stat-side-num">{{privateCount}}</text>
+          <text class="stat-side-label">私密</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 筛选 -->
+    <view class="filter-row" wx:if="{{!loading && totalCount > 0}}">
+      <view class="filter-chip {{filter === 'all' ? 'on' : ''}}" bindtap="switchFilter" data-key="all">全部 {{totalCount}}</view>
+      <view class="filter-chip {{filter === 'public' ? 'on' : ''}}" bindtap="switchFilter" data-key="public">公开 {{publicCount}}</view>
+      <view class="filter-chip {{filter === 'private' ? 'on' : ''}}" bindtap="switchFilter" data-key="private">私密 {{privateCount}}</view>
+    </view>
+
     <block wx:if="{{loading}}">
       <view class="loading">加载中...</view>
     </block>
@@ -14,34 +42,40 @@
     <block wx:elif="{{works.length > 0}}">
       <view class="work-list">
         <view class="card" wx:for="{{works}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" data-title="{{item.title}}" data-img="{{item.imageUrl}}">
-          <image class="card-img" src="{{item.imageUrl}}" mode="aspectFill"></image>
+          <image class="card-img" src="{{item.thumb || item.imageUrl}}" mode="aspectFill"></image>
           <view class="card-info">
             <view class="card-title">{{item.title}}</view>
-            <view class="card-author">
-               <image class="author-avatar" src="{{item.userInfo.avatarUrl || userInfo.avatarUrl || '/images/avatars/avatar_1.svg'}}" mode="aspectFill"></image>
-               <text>{{item.author}}</text>
+            <view class="card-meta" wx:if="{{item.sizeText}}">
+              <text class="meta-text">{{item.sizeText}}</text>
             </view>
-            <view class="card-heat">
-              <text class="heat-icon">🔥</text>
-              <text>{{item.heat || 0}}</text>
+            <view class="card-foot">
+              <view class="card-author">
+                <image wx:if="{{item.avatar}}" class="author-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+                <view wx:else class="author-avatar author-fallback">{{item.authorInitial}}</view>
+                <text>{{item.author || '我'}}</text>
+              </view>
+              <view class="card-heat">
+                <text class="heat-icon">🔥</text>
+                <text>{{item.heat || item.likeCount || 0}}</text>
+              </view>
             </view>
           </view>
-          
+
           <!-- 公开状态开关 -->
           <view class="card-action" catchtap="preventBubble">
-            <switch checked="{{item.isPublic}}" bindchange="onPublicToggle" data-id="{{item._id}}" data-index="{{index}}" color="#D4607A" style="transform: scale(0.7);"/>
-            <text class="action-text">{{item.isPublic ? '已公开' : '私密'}}</text>
+            <switch checked="{{item.isPublic}}" bindchange="onPublicToggle" data-id="{{item._id}}" data-index="{{index}}" color="#D4607A" style="transform: scale(0.68);"/>
+            <text class="action-text">{{item.isPublic === false ? '私密' : '公开'}}</text>
           </view>
         </view>
       </view>
     </block>
 
-    <block wx:else>
+    <block wx:elif="{{!loading}}">
       <view class="empty-state">
         <image class="empty-img" src="/images/empty-box.png" mode="aspectFit"></image>
-        <text class="empty-text">还没作品</text>
-        <view class="empty-tips">快去发布你的第一个作品吧</view>
-        <button class="go-create-btn" bindtap="goToCreate">去创作</button>
+        <text class="empty-text">{{totalCount > 0 ? '这个分类还没有作品' : '还没作品'}}</text>
+        <view class="empty-tips">{{totalCount > 0 ? '切回「全部」看看' : '快去发布你的第一个作品吧'}}</view>
+        <button class="go-create-btn" bindtap="goToCreate" wx:if="{{totalCount === 0}}">去创作</button>
       </view>
     </block>
   </view>
