@@ -140,9 +140,10 @@
         </view>
       </view>
       
-      <!-- 底部留白防止遮挡 -->
-      <view class="footer-spacing"></view>
     </view>
+
+    <!-- 底部留白防止底栏遮挡（评论区隐藏时也保留） -->
+    <view class="footer-spacing"></view>
   </view>
 
   <!-- 粒子特效容器 -->
@@ -165,9 +166,9 @@
       </view>
     </view>
 
-    <!-- 输入栏 -->
-    <view class="input-row" wx:if="{{showComment}}">
-      <view class="input-container">
+    <!-- 输入栏（评论区隐藏时：输入框消失，但点赞/收藏/分享按钮组保留并居中） -->
+    <view class="input-row">
+      <view class="input-container" wx:if="{{showComment}}">
         <input 
           class="main-input" 
           placeholder="说点什么..." 
@@ -186,7 +187,7 @@
       </view>
       
       <!-- 右侧工具栏 -->
-      <view class="toolbar-actions" style="{{showComment ? '' : 'margin: 0 auto;'}}">
+      <view class="toolbar-actions" style="{{showComment ? 'margin-left: auto;' : 'margin: 0 auto;'}}">
         <view class="tool-pill comment-pill" wx:if="{{showComment}}" bindtap="focusComment">
           <view class="ico ico-bubble"></view>
           <text class="tcount">{{comments.length}}</text>
