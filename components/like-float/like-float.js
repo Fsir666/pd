@@ -275,6 +275,13 @@ Component({
     },
 
     onTapLike() {
+      // ⚠️ 未登录不要刷全局点赞数。
+      // 这个组件是首页的"点赞"浮标，点赞数会写到 global_like_records / global_stats。
+      // 虽然不会产生残缺账号，但未登录用户点一下就能把全站点赞数顶上去，数据是假的。
+      // 这里只做本地拒绝，不弹登录框 —— 首页点赞更像个好玩的小互动，
+      // 上来就弹"请先登录"体验太重，直接不响应即可。
+      const appInst = getApp();
+      if (!appInst || !appInst.globalData || !appInst.globalData.isLogged) return;
       if (this._countAnimRunning) this._stopCountAnim();
       this._playPop();
       this._pendingDelta += 1;

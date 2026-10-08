@@ -42,6 +42,20 @@ Page({
   },
 
   submitTemplate() {
+    // ⚠️ 这是开发者后台页，往里写的图纸会直接进入公共图纸库（templates 集合）。
+    // 历史 bug：没有任何身份校验，未登录也能提交，会污染正式图纸数据
+    // （后端 action:add 也没有归属校验）。这里至少先要求登录。
+    if (!app.globalData.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再添加图纸',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' });
+        }
+      });
+      return;
+    }
     if (!this.data.form.title) {
       wx.showToast({ title: '请输入标题', icon: 'none' });
       return;
