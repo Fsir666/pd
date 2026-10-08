@@ -108,7 +108,7 @@
     </view>
 
     <!-- 4. 评论区 -->
-    <view class="section-container comment-section">
+    <view class="section-container comment-section" wx:if="{{showComment}}">
       <view class="comment-header">
         <text class="section-title">评论 ({{comments.length}})</text>
         <view class="comment-tabs">
@@ -158,7 +158,7 @@
   <!-- 5. 底部固定评论/操作栏 (Safe Area Adaption) -->
   <view class="bottom-action-bar">
     <!-- 图片预览区 (仅在有图时显示) -->
-    <view class="image-preview-bar" wx:if="{{commentImage}}">
+    <view class="image-preview-bar" wx:if="{{showComment && commentImage}}">
       <view class="preview-wrapper">
         <image class="preview-thumb" src="{{commentImage}}" mode="aspectFill"></image>
         <view class="delete-btn" bindtap="onDeleteImage">×</view>
@@ -166,7 +166,7 @@
     </view>
 
     <!-- 输入栏 -->
-    <view class="input-row">
+    <view class="input-row" wx:if="{{showComment}}">
       <view class="input-container">
         <input 
           class="main-input" 
@@ -186,8 +186,8 @@
       </view>
       
       <!-- 右侧工具栏 -->
-      <view class="toolbar-actions">
-        <view class="tool-pill comment-pill" bindtap="focusComment">
+      <view class="toolbar-actions" style="{{showComment ? '' : 'margin: 0 auto;'}}">
+        <view class="tool-pill comment-pill" wx:if="{{showComment}}" bindtap="focusComment">
           <view class="ico ico-bubble"></view>
           <text class="tcount">{{comments.length}}</text>
         </view>

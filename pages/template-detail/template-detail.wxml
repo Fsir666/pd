@@ -73,7 +73,7 @@
   </view>
 
   <!-- 评论区 -->
-  <view class="info-card comment-section">
+  <view class="info-card comment-section" wx:if="{{showComment}}">
     <view class="comment-header">
       <text class="section-title">评论 ({{comments.length}})</text>
       <view class="comment-tabs">

@@ -38,6 +38,8 @@ Page({
     isFollowingAuthor: false,
     followLoading: false,
     authorFollowerCount: 0,
+    // 评论区总开关：false=隐藏全部评论相关界面（审核需要），改回 true 即可恢复
+    showComment: false,
     statusBarHeight: 20,
     heroStyle: '',
     recommendWorks: [],
