@@ -168,16 +168,21 @@ Page({
       const coins = typeof d.coins === 'number' ? d.coins : 0
       const energy = typeof d.energy === 'number' ? d.energy : 0
       const today = d.today ? String(d.today) : ''
+      const lastCheckinDay = d.lastCheckinDay ? String(d.lastCheckinDay) : ''
       const streak = typeof d.checkinStreak === 'number' ? d.checkinStreak : 0
       app.updateUserInfo({ coins, energy })
       this.syncData()
-      // 今天是否已签到：钱包返回的 today === 今天 即已签
+      // 今天是否已签到 = 云端「上次签到日」=== 云端「今天」。
+      // 注意：d.today 是服务端今天的日期本身，与用户是否签到无关。
+      // 历史 bug：这里曾直接拿 d.today 和客户端今天比对，两者恒等，
+      // 导致没签到也一直显示「已签到」（签到动作本身正常，状态判断错了）。
+      // 统一以云端返回的 today 为基准，避免客户端时区与服务端不一致。
       const now = new Date()
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      const refToday = today || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
       this.setData({
         walletToday: today,
         walletStreak: streak,
-        checkedInToday: !!today && today === todayStr
+        checkedInToday: !!lastCheckinDay && lastCheckinDay === refToday
       })
       return true
     }).catch(() => false)
