@@ -735,6 +735,13 @@ page {
   border: none;
 }
 
+/* 已签到：置灰显示，与签到卡片的状态保持一致 */
+.coin-action-btn.done {
+  color: #A99A9C;
+  background: rgba(169, 154, 156, 0.12);
+  font-weight: 500;
+}
+
 .coin-help {
   margin-top: 28rpx;
   padding-top: 18rpx;

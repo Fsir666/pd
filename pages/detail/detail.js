@@ -777,6 +777,22 @@ Page({
 
   // 提交评论
   onSubmitComment() {
+    // 检查登录状态（与点赞/收藏/关注保持一致）
+    // 评论是 UGC 内容，必须能追溯到真实账号；未登录时 globalData.userInfo 为空，
+    // 会 fallback 成一个假名「我 (当前用户)」写进数据库，评论列表里就成了无名氏。
+    // 且这是客户端直连数据库写入，服务端没有二次校验，所以必须在前端拦住。
+    if (!app.globalData.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再评论',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' });
+        }
+      });
+      return;
+    }
+
     const { commentContent, commentImage, id } = this.data;
 
     // 校验：文本和图片不能同时为空

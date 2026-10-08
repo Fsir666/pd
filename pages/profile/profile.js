@@ -262,6 +262,12 @@ Page({
       this.onLoginTap()
       return
     }
+    // 今天已签到就别再发请求了：后端会返回 10002「今日已签到」，
+    // 白白多一次云函数调用，用户也只是看到一个莫名其妙的提示。
+    if (this.data.checkedInToday) {
+      wx.showToast({ title: '今天已签到啦，明天再来~', icon: 'none' })
+      return
+    }
     wx.vibrateShort({ type: 'light' })
     wx.showLoading({ title: '签到中...' })
     wx.cloud.callFunction({

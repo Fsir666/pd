@@ -230,7 +230,7 @@
       <view class="coin-sub" wx:if="{{walletToday}}">{{walletToday}} · 连签 {{walletStreak}} 天</view>
 
       <view class="coin-actions">
-        <button class="coin-action-btn" bindtap="onCheckinTap">签到</button>
+        <button class="coin-action-btn {{checkedInToday ? 'done' : ''}}" bindtap="onCheckinTap">{{checkedInToday ? '已签到' : '签到'}}</button>
         <button class="coin-action-btn" bindtap="openDailyTasks">任务</button>
         <button class="coin-action-btn" bindtap="openInvite">邀请</button>
       </view>
