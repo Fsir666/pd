@@ -3598,7 +3598,12 @@ Page({
     }
   },
 
-  onUnload() {},
+  onUnload() {
+    // 离开页面时务必清掉连续绘制定时器：
+    // 该定时器仅在 touch 事件中清理，若用户未正常抬手就退出（侧滑返回/切后台/来电），
+    // 500ms 后仍会在已卸载的页面实例上回调 setData，造成资源泄漏与控制台报错。
+    this.clearContinuousDrawTimer();
+  },
 
   loadQuickButtons() {
     const saved = wx.getStorageSync('bead_quick_buttons');
