@@ -208,6 +208,21 @@ Page({
   },
 
   async onSubmitComment() {
+    // 评论属于 UGC，必须登录后再发（与同页 onLikeTemplate 的守卫保持一致）。
+    // 历史 bug：这里没有守卫，未登录也能发出去，
+    // userInfo 会 fallback 成假名「像素用户」，评论区出现无名氏评论。
+    if (!getApp().globalData.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再评论',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' });
+        }
+      });
+      return;
+    }
+
     if (!this.data.commentContent && this.data.commentImages.length === 0) {
       wx.showToast({ title: '请输入内容', icon: 'none' });
       return;

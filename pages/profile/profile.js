@@ -351,6 +351,12 @@ Page({
   },
 
   onClaimDailyTask(e) {
+    // 补齐登录守卫（与同页 onCheckinTap / openDailyTasks 等保持一致）。
+    // 后端 claimDailyTask 有 401 兜底，但前端先拦一下，避免未登录白点一次才被拒。
+    if (!this.data.isLogged) {
+      this.onLoginTap()
+      return
+    }
     const taskId = e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.id : ''
     if (!taskId) return
     wx.vibrateShort({ type: 'light' })
@@ -475,6 +481,11 @@ Page({
   },
 
   bindInvite() {
+    // 补齐登录守卫（后端 bindInvite 有 401 兜底，前端先拦避免白点）
+    if (!this.data.isLogged) {
+      this.onLoginTap()
+      return
+    }
     const code = this.data.inviteInput ? String(this.data.inviteInput).trim().toUpperCase() : ''
     if (!code) {
       wx.showToast({ title: '请填写邀请码', icon: 'none' })

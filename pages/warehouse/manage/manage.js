@@ -1091,9 +1091,25 @@ Page({
     this._animatePie();
   },
 
+  // ⚠️ 历史 bug：wxml 里 data-index="{{index}}" 传过来的是**字符串**（如 "0"），
+  // wxml 侧比较 `pieSelectedIndex === index` 是宽松的（同为字符串）所以样式能高亮，
+  // 但这里 `this._pieSelectedIndex === idx` 是数字 vs 字符串的**严格**比较，永远 false；
+  // 更糟的是 `this._pieSelectedIndex = idx` 会把字符串存进去，紧接着
+  // `_drawPieChart` 里 `this._pieSelectedIndex === i`（i 是数字）同样永远 false
+  // → 点图例文字完全没有反应（扇区不弹开、也不取消）。
+  // 统一转成数字再比较/赋值。
+  _legendIndex(e) {
+    const raw = e && e.currentTarget && e.currentTarget.dataset
+      ? e.currentTarget.dataset.index
+      : undefined;
+    if (raw === undefined || raw === null || raw === '') return -1;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : -1;
+  },
+
   onLegendTap(e) {
-    const idx = e.currentTarget.dataset.index;
-    if (idx === undefined) return;
+    const idx = this._legendIndex(e);
+    if (idx < 0) return;
     
     // If long-pressed focused mode is active, clear it first
     if (this.data.pieFocusedIndex >= 0) {
@@ -1113,8 +1129,8 @@ Page({
   },
 
   onLegendLongPress(e) {
-    const idx = e.currentTarget.dataset.index;
-    if (idx === undefined) return;
+    const idx = this._legendIndex(e);
+    if (idx < 0) return;
     
     // Toggle focus mode
     if (this.data.pieFocusedIndex === idx) {
@@ -1444,11 +1460,15 @@ Page({
     const code = this.data.itemActionCode;
     const count = this.data.itemActionCount;
     this.hideItemActionSheet();
+    // ⚠️ 历史 bug：这里漏了 editorOriginalCount。
+    // 编辑器里「当前库存：X」读的就是这个字段，不赋值就会显示上一次编辑残留的旧值
+    // （或初始的 0），用户点开卡片看到"当前库存：0"但实际有几十颗，会以为数据错了。
     this.setData({
       editorVisible: true,
       editorType: 'count',
       editorCode: code,
-      editorValue: count
+      editorValue: count,
+      editorOriginalCount: count
     });
   },
 

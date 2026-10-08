@@ -1450,16 +1450,15 @@ exports.main = async (event, context) => {
       } catch (e) {}
 
       const now = db.serverDate();
+      // ⚠️ 历史 bug：用户不存在时这里曾自动 add 一条只有 _openid 的「残缺 user」。
+      // 后果与已修的 toggleCollect/setCollect 完全一样：
+      // 之后用户点登录会被 app.login() 判定为「已存在」而跳过注册，昵称存不进去，
+      // 变成无名氏且无法补全资料。
+      // 触发入口还特别多（复刻同款 / 复制用料清单 / 保存图片 / 分享），
+      // 未登录用户随便点一下就中招，比收藏更容易踩到。
+      // 成就只是锦上添花的数据，没有账号就不该记录，直接跳过即可（不建 user）。
       if (!userDoc) {
-        const newUser = {
-          _openid: openid,
-          achievements: { [key]: now },
-          achievementCounters: { [key]: 1 },
-          createTime: now,
-          updateTime: now
-        };
-        await db.collection('users').add({ data: newUser }).catch(() => ({}));
-        return { code: 0, data: { unlocked: true, title }, msg: 'success' };
+        return { code: 0, data: { unlocked: false, title }, msg: 'skipped_no_user' };
       }
 
       const achievements = userDoc.achievements && typeof userDoc.achievements === 'object' ? userDoc.achievements : {};

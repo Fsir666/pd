@@ -1226,6 +1226,11 @@ Page({
 
   _trackAchievement(key) {
     if (!key) return;
+    // ⚠️ 必须在这里挡住未登录用户。
+    // 本方法被「复刻同款 / 复制用料清单 / 保存图片 / 分享」四个常用操作调用，
+    // 而后端 trackAchievement 在用户不存在时曾会自动创建残缺 user（已修），
+    // 旧版本未登录点一下就会永久失去注册资格。成就属于账号体系，没登录就不记。
+    if (!app.globalData.isLogged) return;
     wx.cloud.callFunction({
       name: 'template-api',
       data: { action: 'trackAchievement', key }

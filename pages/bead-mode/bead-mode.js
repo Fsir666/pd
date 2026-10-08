@@ -4231,7 +4231,21 @@ Page({
 
   // 发布功能相关方法
   openPublishModal() {
-    console.log('openPublishModal called');
+    // ⚠️ 发布作品属于 UGC，必须登录后才能发。
+    // 历史 bug：这里没有守卫，未登录也能走完发布流程，
+    // 写出的作品作者会 fallback 成「匿名用户」，社区里会出现无名氏作品。
+    const appInst = getApp();
+    if (!appInst || !appInst.globalData || !appInst.globalData.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再发布作品',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' });
+        }
+      });
+      return;
+    }
     
     if (!this.data.beadColors || Object.keys(this.data.beadColors).length === 0) {
       wx.showToast({ title: '画布是空的，先画点豆子吧～', icon: 'none' });
