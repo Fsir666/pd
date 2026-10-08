@@ -21,8 +21,7 @@ Page({
     const key = e.currentTarget.dataset.key;
     if (!key) return;
     wx.vibrateShort({ type: 'light' });
-    // 统一作品页：内置图纸在云端以 _id = seed_<key> 存在
-    wx.navigateTo({ url: '/pages/detail/detail?id=' + encodeURIComponent('seed_' + key) });
+    wx.navigateTo({ url: '/pages/pattern-detail/pattern-detail?key=' + key });
   },
 
   onShareAppMessage() {

@@ -95,10 +95,20 @@ Page({
     const title = e.currentTarget.dataset.title;
     const img = e.currentTarget.dataset.img;
 
-    // 统一作品页：内置图纸（seed_<key>）与社区作品都走 detail，
-    // 布局完全一致，仅信息不同。
+    // 内置图纸（seed_<key>）跳「图纸详情页」，跟发现页图纸卡保持一致：
+    // 图纸页有网格图 + 色号矩阵 + 复制用料清单，比社区作品页更清晰。
+    const seedKey = String(id || '').indexOf('seed_') === 0
+      ? String(id).slice(5)
+      : '';
+    if (seedKey) {
+      wx.navigateTo({
+        url: `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(seedKey)}`
+      });
+      return;
+    }
+
     wx.navigateTo({
-      url: `/pages/detail/detail?id=${encodeURIComponent(id)}&title=${encodeURIComponent(title || '')}&img=${encodeURIComponent(img || '')}`
+      url: `/pages/detail/detail?id=${id}&title=${encodeURIComponent(title)}&img=${encodeURIComponent(img)}`
     });
   },
 

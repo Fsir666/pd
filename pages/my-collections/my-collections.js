@@ -103,17 +103,18 @@ Page({
     const title = e.currentTarget.dataset.title;
     const img = e.currentTarget.dataset.img;
 
-    // 统一作品页：内置图纸（key / seed_*）→ detail?id=seed_<key>
+    // 内置图纸 -> 干净的图纸详情页（西瓜风格）
     if (key) {
       wx.navigateTo({
-        url: `/pages/detail/detail?id=${encodeURIComponent('seed_' + key)}`
+        url: `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(key)}`
       });
       return;
     }
 
+    // 社区作品 seed_* 也走图纸页
     if (String(id || '').indexOf('seed_') === 0) {
       wx.navigateTo({
-        url: `/pages/detail/detail?id=${encodeURIComponent(id)}`
+        url: `/pages/pattern-detail/pattern-detail?key=${encodeURIComponent(String(id).slice(5))}`
       });
       return;
     }

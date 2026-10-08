@@ -515,10 +515,8 @@
   margin-bottom: 0;
 }
 
-/* 横滑条内层：inline-flex 让宽度随内容撑开，scroll-view 才能算出可滚动宽度 */
-.brand-scroll-inner,
-.series-scroll-inner {
-  display: inline-flex;
+.brand-scroll-inner {
+  display: flex;
   padding-bottom: 6rpx;
 }
 

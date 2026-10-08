@@ -53,8 +53,6 @@ module.exports = {
     bindrefresherpulling="{{refresh.onPulling}}"
     bindrefresherrefresh="onRefresh"
     bindrefresherrestore="onRestore"
-    lower-threshold="300"
-    bindscrolltolower="onScrollToLower"
   >
     <!-- Custom Refresher -->
     <view slot="refresher" class="custom-refresher" prop="{{isRefreshing}}" change:prop="{{refresh.onStatusChange}}">
@@ -158,6 +156,14 @@ module.exports = {
                 </view>
               </view>
             </view>
+            <!-- 查看全部图纸入口 -->
+            <view class="card-item feed-more" wx:else bindtap="openPatternList">
+              <view class="feed-more-inner">
+                <view class="feed-more-icon">🧩</view>
+                <view class="feed-more-text">查看全部图纸</view>
+                <view class="feed-more-arrow">›</view>
+              </view>
+            </view>
           </block>
         </view>
 
@@ -212,14 +218,16 @@ module.exports = {
                 </view>
               </view>
             </view>
+            <!-- 查看全部图纸入口 -->
+            <view class="card-item feed-more" wx:else bindtap="openPatternList">
+              <view class="feed-more-inner">
+                <view class="feed-more-icon">🧩</view>
+                <view class="feed-more-text">查看全部图纸</view>
+                <view class="feed-more-arrow">›</view>
+              </view>
+            </view>
           </block>
         </view>
-      </view>
-
-      <!-- 滑动加载更多 -->
-      <view class="feed-loading" wx:if="{{feedCount > 0}}">
-        <view class="feed-loading-dot" wx:if="{{feedHasMore}}"></view>
-        <text class="feed-loading-text">{{feedHasMore ? '上滑加载更多' : '已经到底啦'}}</text>
       </view>
       
       <!-- Bottom Padding for TabBar -->

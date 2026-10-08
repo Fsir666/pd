@@ -114,12 +114,13 @@ Page({
           isGenerated: false,
           generatedImagePath: ''
         }, () => {
-          // 从「卡通生成」等页面带图跳转过来时自动开始生成；否则仅预览
-          const autoStart = this.data._autoStart || (options && options.from === 'cartoon');
-          if (autoStart) {
+          if (this.data._autoStart) {
             this.setData({ _autoStart: false }, () => {
-              wx.showLoading({ title: '正在生成...' });
-              this.processImage(importPath);
+              if (typeof this.onGenerate === 'function') {
+                this.onGenerate();
+              } else {
+                console.error('onGenerate is not a function');
+              }
             });
           }
         });
@@ -397,8 +398,12 @@ Page({
     }
     this.setData(next, () => {
       if (this.data.isGenerated && this.data.imageUrl) {
-        wx.showLoading({ title: '正在生成...' });
-        this.processImage(this.data.imageUrl);
+        if (this._sampleData && this._sampleSide) {
+          this._rebuildFromSample();
+        } else {
+          wx.showLoading({ title: '正在生成...' });
+          this.processImage(this.data.imageUrl);
+        }
       }
     });
   },
@@ -515,6 +520,28 @@ Page({
       fail: (err) => {
         console.error('chooseMedia failed', err);
       }
+    });
+  },
+
+  onToggleGrid(e) {
+    this.setData({ showGrid: e.detail.value }, () => {
+        this.redrawCanvas({ exportNow: false });
+        this._scheduleExport();
+    });
+  },
+
+  onToggleRuler(e) {
+    this.setData({ showRuler: e.detail.value }, () => {
+        this.redrawCanvas({ exportNow: false });
+        this._scheduleExport();
+    });
+  },
+
+  onSetAuxGrid(e) {
+    const index = parseInt(e.currentTarget.dataset.index);
+    this.setData({ auxGridIndex: index }, () => {
+        this.redrawCanvas({ exportNow: false });
+        this._scheduleExport();
     });
   },
 
@@ -991,9 +1018,9 @@ Page({
             try {
               clearTimeout(timeoutId);
               
-              // ✅ 关键：以「长边」作为基准尺寸（calculateOutputSize 以长边为基准）
-              // 这样竖图也能按所选尺寸生成，不会再出现数值跳变
-              const baseSize = Math.max(this.data.processWidth || 64, this.data.processHeight || 64);
+              // ✅ 关键：使用 processWidth 作为基准尺寸
+              // 这样调整尺寸后，会使用用户设置的宽度
+              const baseSize = this.data.processWidth || 64;
               
               console.log('使用基准尺寸:', baseSize);
               

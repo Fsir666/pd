@@ -121,14 +121,14 @@
       <view class="card-header">
         <text class="card-title">品牌色卡</text>
       </view>
-      <scroll-view scroll-x enable-flex class="brand-scroll" show-scrollbar="{{false}}">
+      <scroll-view scroll-x class="brand-scroll" show-scrollbar="{{false}}">
         <view class="brand-scroll-inner">
           <view class="ios-chip {{selectedBrand === item.key ? 'active' : ''}}" wx:for="{{brandOptions}}" wx:key="key" bindtap="onBrandTap" data-brand="{{item.key}}">
             <text>{{item.key ? item.label : '空'}}</text>
           </view>
         </view>
       </scroll-view>
-      <scroll-view scroll-x enable-flex class="series-scroll" show-scrollbar="{{false}}" wx:if="{{brandSeriesOptions.length}}">
+      <scroll-view scroll-x class="series-scroll" show-scrollbar="{{false}}" wx:if="{{brandSeriesOptions.length}}">
         <view class="series-scroll-inner">
           <view class="ios-chip small {{selectedBrandSeries === item.key ? 'active' : ''}}" wx:for="{{brandSeriesOptions}}" wx:key="key" bindtap="onBrandSeriesTap" data-series="{{item.key}}">
             <text>{{item.label}}</text>
@@ -145,7 +145,7 @@
       </view>
       <block wx:if="{{showAdvanced}}">
         <view class="sub-label">风格预设</view>
-        <scroll-view scroll-x enable-flex class="brand-scroll" show-scrollbar="{{false}}">
+        <scroll-view scroll-x class="brand-scroll" show-scrollbar="{{false}}">
           <view class="brand-scroll-inner">
             <view class="ios-chip {{presetKey === item.key ? 'active' : ''}}" wx:for="{{presetOptions}}" wx:key="key" bindtap="onPresetTap" data-preset="{{item.key}}">
               <text>{{item.label}}</text>

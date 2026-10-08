@@ -19,12 +19,6 @@ Page({
     authorOpenid: '',
     board: null,
     spec: null,
-    // 规格行：宽×高 粒 · 颗数 颗 · 色号 个色号
-    sizeText: '',
-    beadCount: 0,
-    colorCount: 0,
-    // 用料清单（色块 + 色号 + hex + 颗数）
-    materialRows: [],
     stats: {
       likes: 0,
       collects: 0,
@@ -54,10 +48,11 @@ Page({
     particleList: [],
 
     // 6. 图纸像素预览（替换原来的珠子照片）
-    hasPixel: false,     // 是否有可绘制的图纸数据（有则显示像素图纸，无则回退原图）
+    hasPixel: false,     // 是否有可绘制的图纸数据
+    viewMode: 'photo',   // 'pixel' 像素方块 | 'photo' 实物照片
     showGrid: true,      // 网格线
     showCode: true,      // 色号文字
-    scale: 1,            // 缩放倍数（1/2/3/4）
+    scale: 1,            // 缩放倍数（1/2/3）
     viewW: 0,            // 画布可视宽（px）
     viewH: 0,            // 画布可视高（px）
     canvasW: 0,          // canvas 实际宽（px，= viewW * scale）
@@ -73,29 +68,23 @@ Page({
       statusBarHeight: sysInfo.statusBarHeight + 4
     });
 
-    // 统一入口：发现页「图纸」传 key，榜单/作品传 id。
-    // key 映射到云端内置记录 seed_<key>，与发现页数据完全一致（单一数据源）。
-    let id = options.id ? String(options.id) : '';
-    if (!id && options.key) {
-      id = 'seed_' + String(options.key);
-    }
-    if (id) {
-      this.setData({ id });
-      this.fetchWorkDetails(id);
-      this.fetchComments(id);
-      this.fetchUserStatus(id);
+    if (options.id) {
+      this.setData({ id: options.id });
+      this.fetchWorkDetails(options.id);
+      this.fetchComments(options.id);
+      this.fetchUserStatus(options.id);
     }
   },
 
   onReady() {
-    if (this._pixel && this.data.hasPixel) {
+    if (this._pixel && this.data.viewMode === 'pixel') {
       setTimeout(() => this.drawPixel(), 120);
     }
   },
 
   onShow() {
     // 从拼豆模式等返回时，canvas 内容可能已被回收，重绘一次
-    if (this.data.hasPixel && this.canvasNode) {
+    if (this.data.hasPixel && this.data.viewMode === 'pixel' && this.canvasNode) {
       setTimeout(() => this.drawPixel(), 60);
     }
   },
@@ -174,18 +163,12 @@ Page({
       // 根据 board（beadColors / codesMard）构建像素图纸数据，替换原来那张「珠子照片」
       const pixel = this._buildPixelData(board, spec);
       this._pixel = pixel;
-      // 规格行 + 用料清单（供详情页「图纸核心区」直接展示）
-      const sizeInfo = this._buildSizeInfo(board, spec, pixel);
-      const materialRows = this._buildMaterialRows(board, spec, pixel);
       const extra = {
         hasPixel: !!pixel,
+        viewMode: pixel ? 'pixel' : 'photo',
         showGrid: true,
         showCode: true,
-        scale: 1,
-        sizeText: sizeInfo.sizeText,
-        beadCount: sizeInfo.beadCount,
-        colorCount: sizeInfo.colorCount,
-        materialRows
+        scale: 1
       };
       if (pixel) {
         const sysInfo = wx.getSystemInfoSync();
@@ -387,107 +370,6 @@ Page({
 
   // ============ 图纸像素预览（小方块网格，替代原珠子照片）============
 
-  // 规格行：宽×高 粒 · 颗数 颗 · 色号 个色号
-  _buildSizeInfo(board, spec, pixel) {
-    const b = board || {};
-    const s = spec || {};
-    const w = Number(b.gridWidth || (pixel && pixel.w) || s.cols || s.gridSize || 0);
-    const h = Number(b.gridHeight || (pixel && pixel.h) || s.rows || s.gridSize || 0);
-    let beadCount = Number(b.beadCount || s.beadCount || 0);
-    let colorCount = 0;
-
-    // 色号数：优先从像素数据统计实际出现的颜色
-    if (pixel && pixel.hexes) {
-      const set = new Set();
-      let filled = 0;
-      for (let i = 0; i < pixel.hexes.length; i++) {
-        const hex = pixel.hexes[i];
-        if (hex) {
-          filled++;
-          set.add(String(hex).toUpperCase());
-        }
-      }
-      if (!beadCount) beadCount = filled;
-      colorCount = set.size;
-    }
-    // 回退：从 codesMard 统计
-    if (!colorCount && Array.isArray(b.codesMard)) {
-      const set = new Set();
-      let filled = 0;
-      b.codesMard.forEach((c) => {
-        const code = c != null ? String(c).trim() : '';
-        if (code) {
-          filled++;
-          set.add(code);
-        }
-      });
-      if (!beadCount) beadCount = filled;
-      colorCount = set.size;
-    }
-
-    const sizeText = (w && h)
-      ? `${w}×${h} 粒 · ${beadCount} 颗 · ${colorCount} 个色号`
-      : '';
-    return { sizeText, beadCount, colorCount };
-  },
-
-  // 用料清单：色块 + 色号 + hex + 颗数（按颗数倒序）
-  _buildMaterialRows(board, spec, pixel) {
-    const b = board || {};
-    const s = spec || {};
-    const rows = [];
-
-    if (pixel && pixel.hexes && pixel.codes) {
-      // pixel.codes: "x,y" -> 色号；pixel.hexes: 一维 hex 数组
-      const w = pixel.w;
-      const agg = Object.create(null); // 色号 -> { code, hex, count }
-      for (let i = 0; i < pixel.hexes.length; i++) {
-        const hex = pixel.hexes[i];
-        if (!hex) continue;
-        const x = (i % w) + 1;
-        const y = Math.floor(i / w) + 1;
-        const code = pixel.codes[x + ',' + y] || String(hex).toUpperCase();
-        const key = code + '|' + String(hex).toUpperCase();
-        if (!agg[key]) agg[key] = { code, hex: String(hex).toUpperCase(), count: 0 };
-        agg[key].count++;
-      }
-      Object.keys(agg).forEach((k) => rows.push(agg[k]));
-    } else if (Array.isArray(b.codesMard)) {
-      // 兜底：只有 codesMard（色号）——用色号映射反查 hex
-      const rev = this._getReverseCodeMapMard();
-      const agg = Object.create(null);
-      b.codesMard.forEach((c) => {
-        const code = c != null ? String(c).trim() : '';
-        if (!code) return;
-        if (!agg[code]) {
-          const hex = rev[code] || '';
-          agg[code] = { code, hex, count: 0 };
-        }
-        agg[code].count++;
-      });
-      Object.keys(agg).forEach((k) => rows.push(agg[k]));
-    } else if (Array.isArray(b.beadColors)) {
-      // 兜底：beadColors 为数组形态
-      const map = this._getHexCodeMap((b.brand || 'MARD').toUpperCase());
-      const agg = Object.create(null);
-      b.beadColors.forEach((hex) => {
-        if (!hex) return;
-        const H = String(hex).toUpperCase();
-        const code = map[H] || H;
-        const key = code + '|' + H;
-        if (!agg[key]) agg[key] = { code, hex: H, count: 0 };
-        agg[key].count++;
-      });
-      Object.keys(agg).forEach((k) => rows.push(agg[k]));
-    }
-
-    rows.sort((a, b2) => {
-      if (b2.count !== a.count) return b2.count - a.count;
-      return String(a.code).localeCompare(String(b2.code));
-    });
-    return rows;
-  },
-
   // 构建像素数据：优先 beadColors（新），回退 codesMard（旧）
   _buildPixelData(board, spec) {
     if (!board) return null;
@@ -639,19 +521,19 @@ Page({
   },
 
   toggleGrid() {
-    if (!this.data.hasPixel) return;
+    if (this.data.viewMode !== 'pixel') return;
     this.setData({ showGrid: !this.data.showGrid }, () => setTimeout(() => this.drawPixel(), 40));
     wx.vibrateShort({ type: 'light' });
   },
 
   toggleCode() {
-    if (!this.data.hasPixel) return;
+    if (this.data.viewMode !== 'pixel') return;
     const next = !this.data.showCode;
     let scale = this.data.scale;
     if (next && this._pixel) {
       const baseCell = this.data.viewW / this._pixel.w;
       if (baseCell * scale < 14) {
-        scale = Math.min(4, Math.max(1, Math.ceil(14 / baseCell)));
+        scale = Math.min(3, Math.max(1, Math.ceil(14 / baseCell)));
       }
     }
     this.setData({ showCode: next });
@@ -663,7 +545,7 @@ Page({
   },
 
   setScale(e) {
-    if (!this.data.hasPixel) return;
+    if (this.data.viewMode !== 'pixel') return;
     const val = Number(e.currentTarget.dataset.scale) || 1;
     if (val === this.data.scale) return;
     this._applyScale(val);
@@ -671,51 +553,24 @@ Page({
     wx.vibrateShort({ type: 'light' });
   },
 
-  // ===== 双指捏合缩放（与 pattern-detail 对齐，1–4×）=====
-  onCanvasTouchStart(e) {
-    if (!this.data.hasPixel) return;
-    if (e.touches && e.touches.length === 2) {
-      const [a, b] = e.touches;
-      this._pinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-      this._pinchStartScale = this.data.scale;
-    }
-  },
-
-  onCanvasTouchMove(e) {
-    if (!this.data.hasPixel) return;
-    if (!this._pinchStartDist) return;
-    if (e.touches && e.touches.length === 2) {
-      const [a, b] = e.touches;
-      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-      const ratio = dist / this._pinchStartDist;
-      const newScale = Math.min(4, Math.max(1, this._pinchStartScale * ratio));
-      if (Math.abs(newScale - this.data.scale) > 0.05) {
-        this._applyScale(newScale);
-        setTimeout(() => this.drawPixel(), 60);
-      }
-    }
-  },
-
-  onCanvasTouchEnd() {
-    if (!this._pinchStartDist) return;
-    this._pinchStartDist = 0;
-    // 吸附到 0.5 步进，避免出现 1.37 这种零碎倍数
-    const snapped = Math.round(this.data.scale * 2) / 2;
-    const clamped = Math.min(4, Math.max(1, snapped));
-    if (Math.abs(clamped - this.data.scale) > 0.001) {
-      this._applyScale(clamped);
-      setTimeout(() => this.drawPixel(), 50);
-    }
-  },
-
   _applyScale(newScale) {
     const viewW = this.data.viewW;
     const viewH = this.data.viewH;
-    newScale = Math.min(4, Math.max(1, newScale));
+    newScale = Math.min(3, Math.max(1, newScale));
     this.setData({
       scale: newScale,
       canvasW: Math.round(viewW * newScale),
       canvasH: Math.round(viewH * newScale)
+    });
+  },
+
+  switchToPhoto() {
+    this.setData({ viewMode: 'photo' });
+  },
+
+  switchToPixel() {
+    this.setData({ viewMode: 'pixel', scale: 1, canvasW: this.data.viewW, canvasH: this.data.viewH }, () => {
+      setTimeout(() => this.drawPixel(), 80);
     });
   },
 
@@ -1303,33 +1158,6 @@ Page({
     };
     this._trackAchievement('remix');
     wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
-  },
-
-  // 「拼豆模式」入口（与「复刻同款」等价，语义更直白，供统一后的作品页主按钮使用）
-  onGoBeadMode() {
-    this.onRemix();
-  },
-
-  // 保存图纸图片：仅在有像素图纸数据时可用
-  saveImage() {
-    if (!this.data.hasPixel || !this.canvasNode || !this._pixel) {
-      wx.showToast({ title: '图纸还没画好', icon: 'none' });
-      return;
-    }
-    wx.canvasToTempFilePath({
-      canvas: this.canvasNode,
-      success: (res) => {
-        wx.saveImageToPhotosAlbum({
-          filePath: res.tempFilePath,
-          success: () => {
-            wx.showToast({ title: '已存到相册', icon: 'none' });
-            this._trackAchievement('save_image');
-          },
-          fail: () => wx.showToast({ title: '保存失败，请允许相册权限', icon: 'none' })
-        });
-      },
-      fail: () => wx.showToast({ title: '生成图片失败', icon: 'none' })
-    });
   },
 
   onShareAppMessage() {

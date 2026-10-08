@@ -2,29 +2,27 @@
   <!-- 1. 顶部图纸预览：像素小方块（替代原珠子照片） -->
   <view class="hero-viewer">
     <!-- 像素方块模式 -->
-    <block wx:if="{{hasPixel}}">
+    <block wx:if="{{viewMode === 'pixel' && hasPixel}}">
       <scroll-view class="canvas-scroll" scroll-x="{{true}}" scroll-y="{{true}}">
-        <canvas type="2d" id="detailCanvas" class="detail-canvas"
-                style="width:{{canvasW}}px;height:{{canvasH}}px;"
-                bindtouchstart="onCanvasTouchStart"
-                bindtouchmove="onCanvasTouchMove"
-                bindtouchend="onCanvasTouchEnd"
-                bindtouchcancel="onCanvasTouchEnd"></canvas>
+        <canvas type="2d" id="detailCanvas" class="detail-canvas" style="width:{{canvasW}}px;height:{{canvasH}}px;"></canvas>
       </scroll-view>
       <view class="viewer-bar viewer-bar-top">
         <view class="viewer-toggle {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
         <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
+        <view class="viewer-toggle" bindtap="switchToPhoto">实物图</view>
       </view>
       <view class="viewer-bar viewer-bar-zoom">
         <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" data-scale="1" bindtap="setScale">1×</view>
         <view class="zoom-btn {{scale === 2 ? 'on' : ''}}" data-scale="2" bindtap="setScale">2×</view>
         <view class="zoom-btn {{scale === 3 ? 'on' : ''}}" data-scale="3" bindtap="setScale">3×</view>
-        <view class="zoom-btn {{scale === 4 ? 'on' : ''}}" data-scale="4" bindtap="setScale">4×</view>
       </view>
     </block>
-    <!-- 无图纸数据时回退展示原图 -->
+    <!-- 实物照片模式 -->
     <block wx:else>
       <image class="hero-image" src="{{imageUrl}}" mode="aspectFill" bindtap="previewImage"></image>
+      <view wx:if="{{hasPixel}}" class="viewer-bar viewer-bar-top">
+        <view class="viewer-toggle" bindtap="switchToPixel">看图纸</view>
+      </view>
     </block>
   </view>
 
@@ -37,28 +35,14 @@
   <view class="content-card">
     <view class="card-header">
       <text class="title">{{title}}</text>
-      <!-- 规格行：宽×高 粒 · 颗数 颗 · 色号 个色号 -->
-      <text class="spec-line" wx:if="{{sizeText}}">{{sizeText}}</text>
       <view class="tags-container">
         <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
       </view>
     </view>
 
     <view class="primary-actions">
-      <view class="primary-btn primary-remix" bindtap="onGoBeadMode">拼豆模式</view>
+      <view class="primary-btn primary-remix" bindtap="onRemix">复刻同款</view>
       <view class="primary-btn primary-copy" bindtap="onCopyMaterialList">复制清单</view>
-      <view class="primary-btn primary-save" wx:if="{{hasPixel}}" bindtap="saveImage">保存图纸</view>
-    </view>
-
-    <!-- 用料清单：直接展示色块 + 色号 + hex + 颗数 -->
-    <view class="material-card" wx:if="{{materialRows.length > 0}}">
-      <view class="material-title">这版要用的珠子（{{materialRows.length}} 个色号）</view>
-      <view class="material-row" wx:for="{{materialRows}}" wx:key="code">
-        <view class="material-swatch" style="background: {{item.hex}}"></view>
-        <view class="material-code">{{item.code}}</view>
-        <view class="material-hex">{{item.hex}}</view>
-        <view class="material-count">{{item.count}} 颗</view>
-      </view>
     </view>
 
     <!-- 作者信息栏 -->

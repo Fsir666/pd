@@ -1,7 +1,113 @@
-<!--
-  兼容跳转页：作品详情页已统一为 pages/detail/detail。
-  本页只做短暂过渡，onLoad 内立即 redirectTo，正常情况用户看不到内容。
--->
-<view class="redirect-page" style="padding-top: {{statusBarHeight}}px;">
-  <view class="redirect-tip">正在打开图纸…</view>
+<view class="page">
+  <!-- 顶部图纸大图（沉浸式，顶到状态栏），控制条悬浮在图上下方 -->
+  <view class="hero-viewer" style="padding-top: {{statusBarHeight}}px;">
+    <scroll-view class="canvas-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}"
+                  scroll-left="{{scrollLeft}}" scroll-top="{{scrollTop}}"
+                  bindscroll="onScroll"
+                  style="height: {{viewH}}px;">
+      <view class="canvas-holder"
+            style="width: {{canvasW}}px; height: {{canvasH}}px;"
+            bindtouchstart="onTouchStart"
+            bindtouchmove="onTouchMove"
+            bindtouchend="onTouchEnd"
+            bindtouchcancel="onTouchEnd">
+        <canvas type="2d" id="patternCanvas" class="canvas"
+                style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+      </view>
+    </scroll-view>
+    <view class="viewer-bar viewer-bar-top">
+      <view class="viewer-toggle {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
+      <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
+    </view>
+    <view class="viewer-bar viewer-bar-zoom">
+      <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" bindtap="setScale" data-scale="1">1×</view>
+      <view class="zoom-btn {{scale === 2 ? 'on' : ''}}" bindtap="setScale" data-scale="2">2×</view>
+      <view class="zoom-btn {{scale === 3 ? 'on' : ''}}" bindtap="setScale" data-scale="3">3×</view>
+    </view>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">
+    <text class="back-icon">←</text>
+  </view>
+
+  <!-- 内容卡片（上叠在大图上） -->
+  <view class="content-card">
+    <view class="sheet-head">
+      <view class="sheet-head-main">
+        <view class="sheet-title">{{p.name}}</view>
+        <view class="sheet-sub">{{p.w}}×{{p.h}} 粒 · {{p.beadCount}} 颗 · {{p.colors}} 个色号</view>
+      </view>
+      <view class="fav-btn {{isFav ? 'on' : ''}}" bindtap="toggleFav">
+        <text class="fav-icon">{{isFav ? '⭐' : '☆'}}</text>
+        <text>{{isFav ? '已收藏' : '收藏'}}</text>
+      </view>
+    </view>
+    <view class="author-row" wx:if="{{author.name}}">
+      <view class="author-avatar" wx:if="{{author.avatar}}" style="background-image: url('{{author.avatar}}');"></view>
+      <view class="author-avatar author-avatar-fallback" wx:else>{{author.initial}}</view>
+      <view class="author-name">{{author.name}}</view>
+      <view class="author-badge">图纸作者</view>
+    </view>
+    <view class="sheet-tip">{{scale > 1 ? '单指拖动查看细节 · 双指缩放 · 格子里的字母是色号' : '格子里的字母就是色号，空白格不用放珠子'}}</view>
+  </view>
+
+  <view class="list-card">
+    <view class="list-title">这版要用的珠子</view>
+    <view class="row" wx:for="{{rows}}" wx:key="code">
+      <view class="swatch" style="background: {{item.hex}}"></view>
+      <view class="code">{{item.code}}</view>
+      <view class="hex">{{item.hex}}</view>
+      <view class="count">{{item.count}} 颗</view>
+    </view>
+  </view>
+
+  <!-- 点赞粒子层 -->
+  <view class="particle-layer">
+    <view class="particle" wx:for="{{particleList}}" wx:key="id"
+          style="{{item.style}}">{{item.emoji}}</view>
+  </view>
+
+  <!-- 底部悬浮操作栏：始终可见，不用滚到底 -->
+  <view class="action-bar">
+    <view class="act-btn act-like {{isLiked ? 'on' : ''}}" bindtap="onLike">
+      <view class="ico act-ico-svg {{isLiked ? 'ico-heart--on' : 'ico-heart'}}"></view>
+      <text class="act-label">{{likes}}</text>
+    </view>
+    <view class="act-btn act-primary" bindtap="goToBeadMode">
+      <view class="ico ico-grid"></view>
+      <text class="act-label">拼豆模式</text>
+    </view>
+    <view class="act-btn act-ghost" bindtap="copyList">
+      <view class="ico ico-copy"></view>
+      <text class="act-label">复制</text>
+    </view>
+    <view class="act-btn act-ghost" bindtap="saveImage">
+      <view class="ico ico-download"></view>
+      <text class="act-label">保存</text>
+    </view>
+    <view class="act-btn act-ghost share-act">
+      <view class="ico ico-link"></view>
+      <text class="act-label">分享</text>
+      <button class="share-hit" open-type="share"></button>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- 首次进入看图引导（看过一次后不再弹） -->
+  <view class="guide-mask" wx:if="{{showGuide}}" bindtap="closeGuide">
+    <view class="guide-card" catchtap="closeGuide">
+      <view class="guide-title">看图小技巧</view>
+      <view class="guide-item">
+        <text class="guide-ico">🤏</text>
+        <text class="guide-text">双指捏合放大缩小</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-ico">👆</text>
+        <text class="guide-text">单指拖动查看细节</text>
+      </view>
+      <view class="guide-ok">知道了</view>
+    </view>
+  </view>
 </view>

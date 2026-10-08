@@ -1,16 +1,12 @@
 const app = getApp();
 const presets = require('../../data/pattern-presets.js');
 
-// 信息流首屏 / 每次下滑加载的卡片数量（小红书式：先给一屏，往下滑再加载更多）
-const FEED_PAGE_SIZE = 10;
-
 Page({
   data: {
     communityList: [],
     feedLeft: [],
     feedRight: [],
     feedCount: 0,
-    feedHasMore: false,
     isRefreshing: false,
     feedSort: 'new',
     feedTag: '',
@@ -245,59 +241,43 @@ Page({
         _openid: p._openid
       }));
 
-    // 3) 合并成完整内容池（不再拼「查看全部图纸」入口，改为滑动分页加载）
+    // 3) 合并
     let merged;
     if (tag) {
       // 选了分类：图纸在前、作品在后，全部已是该分类内容
       merged = patternItems.concat(postItems);
     } else {
-      // 无筛选：交替穿插，让图纸和作品混在一起出现
+      // 无筛选：交替穿插，让图纸和作品混在一起出现；末尾补「查看全部图纸」入口
       merged = [];
       const maxLen = Math.max(patternItems.length, postItems.length);
       for (let i = 0; i < maxLen; i++) {
         if (i < patternItems.length) merged.push(patternItems[i]);
         if (i < postItems.length) merged.push(postItems[i]);
       }
+      merged.push({ type: 'more', _id: 'more_all' });
     }
 
-    // 4) 缓存完整内容池；首屏只渲染一小批，往下滑再逐批追加
-    this._pool = merged;
-    this._shown = 0;
-    this._renderFeed();
-  },
-
-  // 从内容池取下一批卡片渲染：保持左右两列按奇偶交替，已渲染卡片位置稳定
-  _renderFeed() {
-    const pool = this._pool || [];
-    const shown = Math.min(this._shown + FEED_PAGE_SIZE, pool.length);
+    // 4) 分两列
     const feedLeft = [];
     const feedRight = [];
-    for (let i = 0; i < shown; i++) {
-      if (i % 2 === 0) feedLeft.push(pool[i]);
-      else feedRight.push(pool[i]);
-    }
-    this._shown = shown;
-    this.setData({
-      feedLeft,
-      feedRight,
-      feedCount: pool.length,
-      feedHasMore: shown < pool.length
+    merged.forEach((item, idx) => {
+      if (idx % 2 === 0) feedLeft.push(item);
+      else feedRight.push(item);
     });
-  },
 
-  // 滑动到底部：继续加载下一批（小红书式）
-  onScrollToLower() {
-    if (!this._pool || this._shown >= this._pool.length) return;
-    this._renderFeed();
+    this.setData({ feedLeft, feedRight, feedCount: merged.length });
   },
 
   openPattern(e) {
     const key = e.currentTarget.dataset.key;
     if (!key) return;
     wx.vibrateShort({ type: 'light' });
-    // 统一作品页：发现页图纸卡片 → detail（与首页榜单同一页面、同一布局）
-    // 内置图纸在云端以固定 _id = seed_<key> 存在，这里直接按 id 进入 detail
-    wx.navigateTo({ url: '/pages/detail/detail?id=' + encodeURIComponent('seed_' + key) });
+    wx.navigateTo({ url: '/pages/pattern-detail/pattern-detail?key=' + key });
+  },
+
+  openPatternList() {
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({ url: '/pages/patterns/patterns' });
   },
 
   // 辅助方法：批量换取云文件链接
