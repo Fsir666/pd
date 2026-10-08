@@ -29,6 +29,58 @@
       {
         "type": "glob",
         "value": "**/node_modules/**"
+      },
+      {
+        "type": "file",
+        "value": "广场宣传图.jpg"
+      },
+      {
+        "type": "file",
+        "value": "色卡表_最终版_v4.xlsx"
+      },
+      {
+        "type": "glob",
+        "value": "assets/files/**"
+      },
+      {
+        "type": "file",
+        "value": "package-lock.json"
+      },
+      {
+        "type": "file",
+        "value": "extract_colors.js"
+      },
+      {
+        "type": "file",
+        "value": "generate_xlsx_series_v4.js"
+      },
+      {
+        "type": "file",
+        "value": "inspect_excel_node.js"
+      },
+      {
+        "type": "file",
+        "value": "inspect_excel.py"
+      },
+      {
+        "type": "file",
+        "value": "test_python.py"
+      },
+      {
+        "type": "file",
+        "value": "test-syntax.js"
+      },
+      {
+        "type": "file",
+        "value": "excel_inspection_node.txt"
+      },
+      {
+        "type": "file",
+        "value": "project.private.config.json"
+      },
+      {
+        "type": "glob",
+        "value": "pages/project*.json"
       }
     ],
     "include": []

@@ -1,0 +1,43 @@
+<view class="page-container">
+  <view class="page-header">
+    <text class="header-icon">🚀</text>
+    <text class="header-title">版本概览</text>
+    <text class="header-desc">当前版本 v{{currentVersion}}</text>
+    <text class="header-desc">发布于 {{currentTime}}　·　共 {{totalCount}} 次更新</text>
+  </view>
+
+  <view class="timeline">
+    <view class="version-card" wx:for="{{versions}}" wx:key="version">
+      <view class="card-dot"></view>
+      <view class="card-head">
+        <view class="head-left">
+          <text class="version-no">v{{item.version}}</text>
+          <text class="version-tag {{item.tagCls}}">{{item.tagText}}</text>
+        </view>
+        <view class="head-right">
+          <text class="version-date">{{item.date}}</text>
+          <text class="version-time">{{item.time}}</text>
+        </view>
+      </view>
+      <view class="version-title">{{item.title}}</view>
+      <view class="version-items">
+        <view class="item-row" wx:for="{{item.items}}" wx:for-item="line" wx:key="*this">
+          <text class="item-dot">·</text>
+          <text class="item-text">{{line}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hiddenCount > 0 || showAll}}" bindtap="onToggleAll">
+    <text>{{showAll ? '收起早期版本' : '查看更早 ' + hiddenCount + ' 个版本'}}</text>
+    <text class="load-more-arrow">{{showAll ? '↑' : '↓'}}</text>
+  </view>
+
+  <view class="page-footer">
+    <text class="footer-text">每次更新都会记录在这里～</text>
+  </view>
+</view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />

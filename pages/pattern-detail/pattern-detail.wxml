@@ -5,3 +5,6 @@
 <view class="redirect-page" style="padding-top: {{statusBarHeight}}px;">
   <view class="redirect-tip">正在打开图纸…</view>
 </view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />

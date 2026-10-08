@@ -1,0 +1,622 @@
+<view class="page-root">
+  <view class="paper-bg"></view>
+
+  <view class="header glass-card">
+    <view class="header-left">
+      <text class="header-title">智能豆库</text>
+      <text class="header-sub">库存管理 · 低库存预警 · 变动记录</text>
+    </view>
+    <view class="header-right">
+      <view class="stat-pill">
+        <text class="stat-label">本品牌</text>
+        <text class="stat-value">{{brandTotal}}颗</text>
+      </view>
+      <view class="stat-pill">
+        <text class="stat-label">全部</text>
+        <text class="stat-value">{{allTotal}}颗</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="tabs glass-card">
+    <view class="main-nav">
+      <view class="nav-item {{currentTab==='inventory' ? 'active' : ''}}" data-tab="inventory" bindtap="onTabTap">
+        <text class="nav-icon">📦</text>
+        <text class="nav-text">库存</text>
+      </view>
+      <view class="nav-item {{currentTab==='alerts' ? 'active' : ''}}" data-tab="alerts" bindtap="onTabTap">
+        <text class="nav-icon">⚠️</text>
+        <text class="nav-text">预警</text>
+      </view>
+      <view class="nav-item {{currentTab==='logs' ? 'active' : ''}}" data-tab="logs" bindtap="onTabTap">
+        <text class="nav-icon">📝</text>
+        <text class="nav-text">记录</text>
+      </view>
+      <view class="nav-item {{currentTab==='stats' ? 'active' : ''}}" data-tab="stats" bindtap="onTabTap">
+        <text class="nav-icon">📊</text>
+        <text class="nav-text">统计</text>
+      </view>
+      <view class="nav-item {{currentTab==='add' ? 'active' : ''}}" data-tab="add" bindtap="onTabTap">
+        <text class="nav-icon">➕</text>
+        <text class="nav-text">添加</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{currentTab==='add'}}">
+    <view class="glass-card add-container">
+      <view class="add-header">
+        <text class="add-title">自定义品牌管理</text>
+        <view class="add-btn" bindtap="onShowAddBrandModal">新建品牌</view>
+      </view>
+      
+      <view class="custom-brand-list">
+        <block wx:if="{{customBrands.length > 0}}">
+          <view class="custom-brand-item" wx:for="{{customBrands}}" wx:key="id">
+            <view class="brand-info-row">
+              <text class="brand-name">{{item.name}}</text>
+              <view class="brand-actions">
+                <view class="action-btn edit" data-id="{{item.id}}" bindtap="onEditBrand">编辑</view>
+                <view class="action-btn delete" data-id="{{item.id}}" bindtap="onDeleteBrand">删除</view>
+              </view>
+            </view>
+            
+            <!-- Series List -->
+            <view class="custom-series-list">
+              <view class="series-header">
+                <text class="series-label">色卡列表</text>
+                <view class="add-series-btn" data-brand-id="{{item.id}}" bindtap="onShowAddSeriesModal">+ 添加色卡</view>
+              </view>
+              
+              <block wx:for="{{item.subSeries}}" wx:for-item="series" wx:key="id">
+                <view class="custom-series-item">
+                  <view class="series-info-row">
+                    <text class="series-name">{{series.name}}</text>
+                    <view class="series-actions">
+                      <view class="action-text" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" bindtap="onEditSeries">重命名</view>
+                      <view class="action-text delete" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" bindtap="onDeleteSeries">删除</view>
+                    </view>
+                  </view>
+                  
+                  <!-- Group List -->
+                  <view class="custom-group-list">
+                      <view class="group-header">
+                          <text class="group-label">系列列表</text>
+                          <view class="add-group-btn" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" bindtap="onShowAddGroupModal">+ 添加系列</view>
+                      </view>
+
+                      <block wx:for="{{series.groups}}" wx:for-item="group" wx:key="id">
+                          <view class="custom-group-item">
+                              <view class="group-info-row">
+                                  <text class="group-name">{{group.name}}</text>
+                                  <view class="group-actions">
+                                      <view class="action-text" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" data-group-id="{{group.id}}" bindtap="onEditGroup">重命名</view>
+                                      <view class="action-text delete" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" data-group-id="{{group.id}}" bindtap="onDeleteGroup">删除</view>
+                                  </view>
+                              </view>
+                              
+                              <!-- Color List -->
+                              <view class="custom-color-list">
+                                 <view class="color-header">
+                                    <text class="color-label">包含颜色 ({{group.colors.length}})</text>
+                                    <view class="add-color-btn" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" data-group-id="{{group.id}}" bindtap="onShowAddColorModal">+ 添加颜色</view>
+                                 </view>
+                                 <view class="color-grid-mini">
+                                    <view class="color-item-mini" wx:for="{{group.colors}}" wx:for-item="color" wx:key="code" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" data-group-id="{{group.id}}" data-code="{{color.code}}" bindtap="onEditColor">
+                                       <view class="color-preview-mini" style="background-color: {{color.hex}}"></view>
+                                       <text class="color-code-mini">{{color.code}}</text>
+                                       <view class="color-delete-btn" data-brand-id="{{item.id}}" data-series-id="{{series.id}}" data-group-id="{{group.id}}" data-code="{{color.code}}" catchtap="onDeleteColor">×</view>
+                                    </view>
+                                 </view>
+                              </view>
+                          </view>
+                      </block>
+                  </view>
+                </view>
+              </block>
+            </view>
+          </view>
+        </block>
+        <view class="empty-custom" wx:else>
+          <text>暂无自定义品牌，点击上方“新建品牌”开始添加</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="glass-card">
+    <view class="list-header">
+      <text class="list-title">品牌</text>
+    </view>
+    <view class="brand-grid">
+      <view
+        class="brand-chip {{selectedBrand===item ? 'active' : ''}}"
+        wx:for="{{brands}}"
+        wx:key="item"
+        data-brand="{{item}}"
+        bindtap="onBrandTap"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{currentTab==='inventory'}}">
+  <view class="controls glass-card">
+    <!-- Series Filter for Inventory -->
+    <view class="series-grid">
+      <view
+        class="series-chip {{selectedSeries===item.key ? 'active' : ''}}"
+        wx:for="{{seriesList}}"
+        wx:key="key"
+        data-series="{{item.key}}"
+        bindtap="onSeriesTap"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <!-- Group (Color Series) Filter -->
+    <scroll-view scroll-x class="group-scroll" show-scrollbar="{{false}}" wx:if="{{groupList.length > 0}}">
+      <view class="group-row">
+        <view
+          class="group-chip {{selectedGroup===item.key ? 'active' : ''}}"
+          wx:for="{{groupList}}"
+          wx:key="key"
+          data-group="{{item.key}}"
+          bindtap="onGroupTap"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="controls-row" wx:if="{{!batchMode}}">
+      <view class="batch-btn-large" bindtap="openInventoryBatch">批量设置库存</view>
+    </view>
+
+    <view class="controls-row">
+      <view class="seg">
+        <view class="seg-item {{sortMode==='code' ? 'active' : ''}}" data-sort="code" bindtap="onSortTap">按色号</view>
+        <view class="seg-item {{sortMode==='count' ? 'active' : ''}}" data-sort="count" bindtap="onSortTap">按数量</view>
+      </view>
+
+    </view>
+
+    <view class="controls-row">
+      <view class="search-wrap">
+        <view class="search-icon">🔍</view>
+        <input
+          class="search-input"
+          value="{{searchQuery}}"
+          placeholder="搜索色号"
+          placeholder-class="search-placeholder"
+          bindinput="onSearchInput"
+        />
+        <view class="search-clear" wx:if="{{searchQuery}}" bindtap="onClearSearch">✕</view>
+      </view>
+      <view class="low-pill {{lowCount>0 ? 'warn' : ''}}">
+        {{lowCount>0 ? ('预警 ' + lowCount) : '库存正常'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="list glass-card">
+    <view class="list-header">
+      <text class="list-title">库存明细</text>
+      <text class="list-sub">{{items.length}}项</text>
+    </view>
+
+    <scroll-view scroll-y class="list-scroll" show-scrollbar="{{false}}">
+      <view class="empty-state" wx:if="{{!items.length}}">
+        <view class="empty-icon">📦</view>
+        <text class="empty-text">暂无相关库存</text>
+      </view>
+      <view class="inventory-list" wx:else>
+        <view
+          class="list-item {{item.isLow ? 'low' : ''}} {{item.selected ? 'selected' : ''}}"
+          wx:for="{{items}}"
+          wx:key="key"
+          data-code="{{item.code}}"
+          bindtap="onItemTap"
+        >
+          <view class="item-left">
+            <view class="item-swatch" style="background-color: {{item.hex}}; box-shadow: 0 4rpx 12rpx {{item.hex}}66;"></view>
+            <view class="item-info">
+              <text class="item-code">{{item.code}}</text>
+              <text class="item-hex">{{item.name || item.hex}}</text>
+            </view>
+          </view>
+          
+          <view class="item-right" wx:if="{{!batchMode}}">
+            <view class="item-count-wrap {{item.isLow ? 'warn' : ''}}" data-code="{{item.code}}" catchtap="openCountEditor">
+              <text class="item-count">{{item.count}}</text>
+              <text class="item-unit">颗</text>
+            </view>
+            <view class="item-warn" wx:if="{{item.isLow}}">缺{{item.threshold - item.count}}</view>
+          </view>
+
+          <view class="item-right" wx:else>
+             <view class="check {{item.selected ? 'on' : ''}}"></view>
+          </view>
+        </view>
+      </view>
+      <view class="list-pad"></view>
+    </scroll-view>
+  </view>
+  </view>
+
+  <view wx:if="{{currentTab==='alerts'}}">
+    <view class="controls glass-card">
+      <!-- Series Filter -->
+      <view class="series-filter-grid">
+        <view
+          class="series-chip {{selectedSeries===item.key ? 'active' : ''}}"
+          wx:for="{{seriesList}}"
+          wx:key="key"
+          data-series="{{item.key}}"
+          bindtap="onSeriesTap"
+        >
+          {{item.label}}
+        </view>
+      </view>
+
+      <view class="controls-row" wx:if="{{!batchMode}}">
+        <view class="batch-btn-large" bindtap="openBatch">批量设置阈值</view>
+      </view>
+
+      <view class="controls-row">
+        <view class="low-pill {{lowCount>0 ? 'warn' : ''}}">
+          {{lowCount>0 ? ('预警 ' + lowCount) : '库存正常'}}
+        </view>
+      </view>
+    </view>
+
+    <view class="list glass-card">
+      <view class="list-header">
+        <text class="list-title">预警清单</text>
+        <view class="filter-switch {{showLowStockOnly ? 'active' : ''}}" bindtap="toggleShowLowStockOnly">
+          <view class="switch-dot"></view>
+          <text>仅显示缺货</text>
+        </view>
+      </view>
+      <scroll-view scroll-y class="list-scroll" show-scrollbar="{{false}}">
+        <view class="empty-state-large" wx:if="{{showLowStockOnly && lowCount === 0}}">
+          <view class="empty-illustration">🎉</view>
+          <view class="empty-title">太棒了，库存充足！</view>
+          <view class="empty-desc">当前所有色号库存均高于预警阈值</view>
+          <view class="empty-action" bindtap="openBatch">
+            <text>调整预警阈值</text>
+          </view>
+        </view>
+        <view class="inventory-list" wx:else>
+          <view
+            class="list-item low {{item.selected ? 'selected' : ''}}"
+            wx:for="{{items}}"
+            wx:key="key"
+            wx:if="{{!showLowStockOnly || item.isLow}}"
+            data-code="{{item.code}}"
+            bindtap="onItemTap"
+          >
+            <view class="item-left">
+              <view class="item-swatch" style="background-color: {{item.hex}}; box-shadow: 0 4rpx 12rpx {{item.hex}}66;"></view>
+              <view class="item-info">
+                <text class="item-code">{{item.code}}</text>
+                <text class="item-hex">{{item.name || item.hex}}</text>
+              </view>
+            </view>
+
+            <view class="item-stats">
+              <view class="stat-col">
+                <text class="stat-val">{{item.count}}</text>
+                <text class="stat-lbl">库存</text>
+              </view>
+              <view class="stat-col">
+                <text class="stat-val">{{item.threshold}}</text>
+                <text class="stat-lbl">阈值</text>
+              </view>
+              <view class="stat-col {{item.isLow ? 'warn' : 'safe'}}">
+                <block wx:if="{{item.isLow}}">
+                  <text class="stat-val">{{item.threshold - item.count}}</text>
+                  <text class="stat-lbl">缺货</text>
+                </block>
+                <block wx:else>
+                  <view class="sufficient-tag">充足</view>
+                  <text class="stat-lbl">状态</text>
+                </block>
+              </view>
+            </view>
+            
+            <view class="batch-check" wx:if="{{batchMode}}">
+              <view class="check-circle {{item.selected ? 'checked' : ''}}">
+                 <view class="check-inner" wx:if="{{item.selected}}"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="logs glass-card" wx:if="{{currentTab==='logs'}}">
+    <view class="logs-header">
+      <text class="logs-title">记录</text>
+    </view>
+    <view class="search-wrap" style="margin-bottom: 24rpx;">
+      <view class="search-icon">🔍</view>
+      <input
+        class="search-input"
+        value="{{logSearchQuery}}"
+        placeholder="搜索记录色号"
+        placeholder-class="search-placeholder"
+        bindinput="onLogSearchInput"
+      />
+      <view class="search-clear" wx:if="{{logSearchQuery}}" bindtap="onClearLogSearch">✕</view>
+    </view>
+
+    <!-- Series Filter for Logs -->
+    <view class="series-grid" wx:if="{{logScope === 'brand'}}">
+      <view
+        class="series-chip {{selectedSeries===item.key ? 'active' : ''}}"
+        wx:for="{{seriesList}}"
+        wx:key="key"
+        data-series="{{item.key}}"
+        bindtap="onSeriesTap"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <!-- Group Filter for Logs -->
+    <scroll-view scroll-x class="group-scroll" show-scrollbar="{{false}}" wx:if="{{logScope === 'brand' && groupList.length > 0}}">
+      <view class="group-row">
+        <view
+          class="group-chip {{selectedGroup===item.key ? 'active' : ''}}"
+          wx:for="{{groupList}}"
+          wx:key="key"
+          data-group="{{item.key}}"
+          bindtap="onGroupTap"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Color Selection for Logs -->
+    <scroll-view scroll-x class="log-color-scroll" show-scrollbar="{{false}}" wx:if="{{logScope === 'brand' && items.length > 0}}">
+      <view class="log-color-row">
+        <!-- All Colors Option -->
+        <view 
+          class="log-color-chip {{selectedLogColor === null ? 'active' : ''}}" 
+          bindtap="onLogColorAllTap"
+        >
+          <view class="chip-swatch all-colors-swatch"></view>
+          <text class="chip-code">全部色号</text>
+        </view>
+        <view 
+          class="log-color-chip {{selectedLogColor === item.code ? 'active' : ''}}" 
+          wx:for="{{items}}" 
+          wx:key="code" 
+          data-code="{{item.code}}"
+          bindtap="onLogColorTap"
+        >
+          <view class="chip-swatch" style="background-color: {{item.hex}};"></view>
+          <text class="chip-code">{{item.code}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <scroll-view scroll-y class="logs-scroll" show-scrollbar="{{false}}">
+      <view class="empty-state" wx:if="{{!logs.length}}">
+        <view class="empty-icon">📝</view>
+        <text class="empty-text">暂无变动记录</text>
+      </view>
+      <view class="log-list" wx:else>
+        <view class="log-card" wx:for="{{logs}}" wx:key="id">
+          <view class="log-left">
+            <view class="log-swatch" style="background-color: {{item.hex}};"></view>
+            <view class="log-info">
+              <view class="log-code">
+                {{item.code}}
+                <text class="log-brand" wx:if="{{logScope!=='brand'}}">{{item.brand}}</text>
+              </view>
+              <text class="log-time">{{item.time}}</text>
+            </view>
+          </view>
+          <view class="log-right">
+            <view class="log-delta {{item.isAdd ? 'add' : 'sub'}}">{{item.sign}}{{item.delta}}</view>
+            <view class="log-after">余 {{item.after}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="logs-pad"></view>
+    </scroll-view>
+  </view>
+
+  <view wx:if="{{currentTab==='stats'}}">
+    <view class="stats-card glass-card">
+      <view class="stats-head">
+        <text class="stats-title">各品牌库存总量</text>
+        <text class="stats-sub">颗数合计</text>
+      </view>
+      <canvas type="2d" id="barCanvas" class="chart-canvas"></canvas>
+      <view class="legend-row">
+        <view class="legend" wx:for="{{brands}}" wx:key="item">
+          <view class="legend-swatch" style="background-color: {{item==='MARD'?'#FF6A00': item==='COCO'?'#AF52DE': item==='漫漫'?'#54A0FF': item==='盼盼'?'#34C759':'#FF2D55'}}"></view>
+          <text class="legend-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="stats-card glass-card">
+      <view class="stats-head">
+        <text class="stats-title">{{selectedBrand}} 色号用量占比</text>
+        <text class="stats-sub">Top 8 + 其他</text>
+      </view>
+      <canvas type="2d" id="pieCanvas" class="chart-canvas" bindtouchstart="onPieTouch"></canvas>
+      <view class="legend-row">
+        <view
+          class="legend {{pieFocusedIndex >= 0 && index !== pieFocusedIndex ? 'dimmed' : ''}} {{pieSelectedIndex === index ? 'active' : ''}}"
+          wx:for="{{statsSlices}}"
+          wx:key="label"
+          data-index="{{index}}"
+          bindtap="onLegendTap"
+          bindlongpress="onLegendLongPress"
+        >
+          <view class="legend-swatch" style="background-color: {{item.color || item.hex}}"></view>
+          <text class="legend-text">{{item.label}} {{item.value}} ({{item.percent}}%)</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="stats-card glass-card">
+      <view class="stats-head">
+        <text class="stats-title">库存预警</text>
+        <text class="stats-sub">仅显示前10项</text>
+      </view>
+      <view class="low-list">
+        <view class="low-item" wx:for="{{statsLowList}}" wx:key="code">
+          <view class="low-left">
+            <view class="swatch" style="background-color: {{item.hex}};"></view>
+            <view class="meta">
+              <text class="code">{{item.code}}</text>
+              <text class="sub">阈值 {{item.threshold}}</text>
+            </view>
+          </view>
+          <view class="low-right">
+            <view class="count">{{item.count}}</view>
+            <view class="tag tag-warn">不足</view>
+          </view>
+        </view>
+        <view wx:if="{{!statsLowList || statsLowList.length===0}}" class="log-empty">暂无预警</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="sheet-mask" wx:if="{{editorVisible}}" bindtap="closeEditor">
+    <view class="sheet" catchtap="true">
+      <view class="sheet-title">{{editorType==='count' ? '调整数量' : '设置预警阈值'}}</view>
+      <view class="sheet-sub">{{selectedBrand}} · {{editorCode}}</view>
+      
+      <!-- 当前库存显示 -->
+      <view class="current-stock" wx:if="{{editorType==='count'}}">
+        <text class="current-label">当前库存：</text>
+        <text class="current-value">{{editorOriginalCount}}</text>
+      </view>
+      
+      <!-- 快捷加减按钮 -->
+      <view class="quick-buttons" wx:if="{{editorType==='count'}}">
+        <view class="quick-row">
+          <view class="quick-btn minus" bindtap="onQuickAdjust" data-delta="-100">-100</view>
+          <view class="quick-btn minus" bindtap="onQuickAdjust" data-delta="-50">-50</view>
+          <view class="quick-btn minus" bindtap="onQuickAdjust" data-delta="-10">-10</view>
+          <view class="quick-btn minus" bindtap="onQuickAdjust" data-delta="-1">-1</view>
+        </view>
+        <view class="quick-row">
+          <view class="quick-btn plus" bindtap="onQuickAdjust" data-delta="1">+1</view>
+          <view class="quick-btn plus" bindtap="onQuickAdjust" data-delta="10">+10</view>
+          <view class="quick-btn plus" bindtap="onQuickAdjust" data-delta="50">+50</view>
+          <view class="quick-btn plus" bindtap="onQuickAdjust" data-delta="100">+100</view>
+        </view>
+      </view>
+      
+      <input class="sheet-input" type="number" value="{{editorValue}}" bindinput="onEditorInput" />
+      <view class="sheet-hint">{{editorType==='count' ? '最少为 0，支持直接输入或快捷调整' : '库存低于阈值时会提示'}}</view>
+      <view class="sheet-actions">
+        <view class="sheet-btn ghost" bindtap="closeEditor">取消</view>
+        <view class="sheet-btn primary" bindtap="confirmEditor">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="sheet-mask" wx:if="{{itemActionVisible}}" bindtap="hideItemActionSheet">
+    <view class="sheet action-sheet" catchtap="true">
+      <view class="sheet-header">
+        <view class="sheet-title">{{selectedBrand}} · {{itemActionCode}}</view>
+        <view class="sheet-close" bindtap="hideItemActionSheet">✕</view>
+      </view>
+      
+      <view class="action-list">
+        <view class="action-item" bindtap="onActionEditCount">
+          <view class="action-icon">📦</view>
+          <view class="action-content">
+            <view class="action-label">修改库存数量</view>
+            <view class="action-desc">当前: {{itemActionCount}}</view>
+          </view>
+          <view class="action-arrow">›</view>
+        </view>
+        
+        <view class="action-item" bindtap="onActionEditThreshold">
+          <view class="action-icon">⚠️</view>
+          <view class="action-content">
+            <view class="action-label">设置预警阈值</view>
+            <view class="action-desc">当前: {{itemActionThreshold}}</view>
+          </view>
+          <view class="action-arrow">›</view>
+        </view>
+
+        <view class="action-item" bindtap="onActionViewLogs">
+          <view class="action-icon">📝</view>
+          <view class="action-content">
+            <view class="action-label">查看变动记录</view>
+            <view class="action-desc">历史出入库明细</view>
+          </view>
+          <view class="action-arrow">›</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+
+  <view class="sheet-mask" wx:if="{{logDialogVisible}}" bindtap="closeLogDialog">
+    <view class="sheet log-sheet" catchtap="true">
+      <view class="sheet-header">
+        <view class="sheet-title">{{selectedBrand}} {{logDialogCode}} 变动记录</view>
+        <view class="sheet-close" bindtap="closeLogDialog">✕</view>
+      </view>
+      
+      <scroll-view scroll-y class="log-sheet-scroll" show-scrollbar="{{false}}">
+        <view class="empty-state" wx:if="{{!itemLogs.length}}" style="padding: 40rpx 0;">
+          <view class="empty-icon" style="font-size: 60rpx;">📝</view>
+          <text class="empty-text">暂无记录</text>
+        </view>
+        <view class="timeline" wx:else>
+          <view class="timeline-item" wx:for="{{itemLogs}}" wx:key="id">
+            <view class="timeline-left">
+              <view class="timeline-line"></view>
+              <view class="timeline-dot {{item.isAdd ? 'add' : 'sub'}}"></view>
+            </view>
+            <view class="timeline-content">
+              <view class="timeline-header">
+                <text class="timeline-time">{{item.time}}</text>
+                <text class="timeline-after">库存: {{item.after}}</text>
+              </view>
+              <view class="timeline-body">
+                <text class="timeline-delta {{item.isAdd ? 'add' : 'sub'}}">{{item.sign}}{{item.delta}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="batch-bar glass-card" wx:if="{{batchMode}}">
+    <view class="batch-bar-left">
+       <view class="batch-btn-cancel" bindtap="closeBatch">取消</view>
+    </view>
+    <view class="batch-bar-center">
+       <input class="batch-bar-input" type="number" placeholder="{{batchType==='count' ? '输入库存数量' : '输入阈值'}}" value="{{batchValue}}" bindinput="onBatchInput" />
+    </view>
+    <view class="batch-bar-right">
+       <view class="batch-btn-toggle" bindtap="toggleSelectAll">{{selectAllText}}</view>
+       <view class="batch-btn-apply" bindtap="applyBatch">应用</view>
+    </view>
+  </view>
+
+  <include src="./manage_modals.wxml"/>
+</view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />

@@ -467,7 +467,7 @@ Page({
     const openid = e.currentTarget.dataset.openid;
     if (!openid) return;
     wx.navigateTo({
-      url: `/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
+      url: `/packageMisc/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
     });
   },
 
@@ -475,7 +475,7 @@ Page({
     const openid = e.currentTarget.dataset.openid;
     if (!openid) return;
     wx.navigateTo({
-      url: `/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
+      url: `/packageMisc/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
     });
   },
 
@@ -484,7 +484,7 @@ Page({
     if (!openid) return;
     this.closeSearch();
     wx.navigateTo({
-      url: `/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
+      url: `/packageMisc/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
     });
   },
 
@@ -548,12 +548,12 @@ Page({
       });
       return;
     }
-    wx.navigateTo({ url: '/pages/game/game' });
+    wx.navigateTo({ url: '/packageGame/pages/game/game' });
   },
 
   onGenerateTap() {
     wx.vibrateShort({ type: 'light' });
-    wx.navigateTo({ url: '/pages/generate/generate' });
+    wx.navigateTo({ url: '/packageTool/pages/generate/generate' });
   },
 
   // TabBar Interaction

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "色卡详情",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
+}

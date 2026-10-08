@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "搜索",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

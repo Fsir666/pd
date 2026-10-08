@@ -17,7 +17,7 @@ Page({
     // 「🎨 拼豆模式 / 自由创作拼豆作品」和「开始创作」，点完却回到首页，答非所问。
     // bead-mode 不传 beadSession 时即为空白画板，本地创作无需登录，可直接进。
     wx.navigateTo({
-      url: '/pages/bead-mode/bead-mode',
+      url: '/packageGame/pages/bead-mode/bead-mode',
       fail: () => {
         wx.showToast({ title: '打开失败，请重试', icon: 'none' });
       }
@@ -36,17 +36,17 @@ Page({
 
   // 跳转到抠图功能
   goToCutout() {
-    wx.navigateTo({ url: '/pages/matting/matting' });
+    wx.navigateTo({ url: '/packageTool/pages/matting/matting' });
   },
 
   // 跳转到色卡对照表
   goToColorChart() {
-    wx.navigateTo({ url: '/pages/color-chart/color-chart' });
+    wx.navigateTo({ url: '/packageTool/pages/color-chart/color-chart' });
   },
 
   // 跳转到新手教程
   goToTutorial() {
-    wx.navigateTo({ url: '/pages/beginner-guide/beginner-guide' });
+    wx.navigateTo({ url: '/packageMisc/pages/beginner-guide/beginner-guide' });
   },
 
   // 显示即将上线弹窗

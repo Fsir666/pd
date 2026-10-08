@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "新手教程",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
+}

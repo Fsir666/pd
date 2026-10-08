@@ -404,7 +404,7 @@ Page({
       return;
     }
     // 直接跳转到拼豆模式页面
-    wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
+    wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
   },
 
   // 首页主入口「画板」：进入空白大画板自由绘制
@@ -415,7 +415,7 @@ Page({
     if (appInst && appInst.globalData) {
       appInst.globalData.beadSession = null;
     }
-    wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
+    wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
   },
 
   goToDetail(e) {
@@ -500,39 +500,39 @@ Page({
     
     switch (id) {
       case 1: // 生成像素图
-        wx.navigateTo({ url: '/pages/generate/generate' });
+        wx.navigateTo({ url: '/packageTool/pages/generate/generate' });
         break;
       case 2: // 抠图 (原图纸编辑)
-        wx.navigateTo({ url: '/pages/matting/matting' });
+        wx.navigateTo({ url: '/packageTool/pages/matting/matting' });
         break;
       case 9: // 转卡通（入口已隐藏：依赖豆包 API，未配置前不对外）
-        wx.navigateTo({ url: '/pages/cartoon/cartoon' });
+        wx.navigateTo({ url: '/packageTool/pages/cartoon/cartoon' });
         break;
       case 14: // 拼豆模式（空白画板，本地可用，替代原"转卡通"的快捷位）
-        wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
+        wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
         break;
       case 11: // Excel 色卡表
-        wx.navigateTo({ url: '/pages/color-list/color-list' });
+        wx.navigateTo({ url: '/packageTool/pages/color-list/color-list' });
         break;
       case 3: // 我的仓库
         // 直达「豆库管理」（智能豆库）：功能最全（库存/预警/记录/统计/添加）。
         // 原先的 warehouse 页只记录「有没有这个色」，与豆库管理数据不互通，已不再作为入口。
-        wx.navigateTo({ url: '/pages/warehouse/manage/manage' });
+        wx.navigateTo({ url: '/packageWarehouse/pages/warehouse/manage/manage' });
         break;
       case 4: // 色卡表
-        wx.navigateTo({ url: '/pages/color-chart/color-chart' });
+        wx.navigateTo({ url: '/packageTool/pages/color-chart/color-chart' });
         break;
       case 5: // 我的作品
         wx.navigateTo({ url: '/pages/my-works/my-works' });
         break;
       case 6: // 新手教程
-        wx.navigateTo({ url: '/pages/beginner-guide/beginner-guide' });
+        wx.navigateTo({ url: '/packageMisc/pages/beginner-guide/beginner-guide' });
         break;
       case 7: // 收藏图纸
         wx.navigateTo({ url: '/pages/my-collections/my-collections' });
         break;
       case 8: // 我的订单
-        wx.navigateTo({ url: '/pages/my-orders/my-orders' });
+        wx.navigateTo({ url: '/packageMisc/pages/my-orders/my-orders' });
         break;
       case 12: // AI生成拼豆图
         // 该页面未在 app.json 注册，跳转必失败，改为提示

@@ -186,7 +186,7 @@ Page({
     const openid = e.currentTarget.dataset.openid;
     if (!openid) return;
     wx.navigateTo({
-      url: `/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
+      url: `/packageMisc/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
     });
   },
 

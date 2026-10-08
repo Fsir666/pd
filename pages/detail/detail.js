@@ -261,7 +261,7 @@ Page({
     const openid = this.data.authorOpenid;
     if (!openid) return;
     wx.navigateTo({
-      url: `/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
+      url: `/packageMisc/pages/user-profile/user-profile?openid=${encodeURIComponent(openid)}`
     });
   },
 
@@ -1307,7 +1307,7 @@ Page({
         showCellCodes: true
       };
       this._trackAchievement('remix');
-      wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
+      wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
       return;
     }
     
@@ -1316,7 +1316,7 @@ Page({
     const codes = board.codesMard;
     if (!grid || !Array.isArray(codes) || codes.length !== grid * grid) {
       wx.navigateTo({
-        url: `/pages/game/game?imageUrl=${encodeURIComponent(this.data.imageUrl)}&size=32`
+        url: `/packageGame/pages/game/game?imageUrl=${encodeURIComponent(this.data.imageUrl)}&size=32`
       });
       return;
     }
@@ -1324,7 +1324,7 @@ Page({
     const pixelHexes = this._buildPixelHexesFromCodesMard(codes, grid);
     if (!pixelHexes) {
       wx.navigateTo({
-        url: `/pages/game/game?imageUrl=${encodeURIComponent(this.data.imageUrl)}&size=32`
+        url: `/packageGame/pages/game/game?imageUrl=${encodeURIComponent(this.data.imageUrl)}&size=32`
       });
       return;
     }
@@ -1341,7 +1341,7 @@ Page({
       showCellCodes: true
     };
     this._trackAchievement('remix');
-    wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
+    wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
   },
 
   // 「拼豆模式」入口（与「复刻同款」等价，语义更直白，供统一后的作品页主按钮使用）

@@ -1,0 +1,70 @@
+<view class="page-root">
+  <view class="ambient-bg">
+    <view class="orb orb-1"></view>
+    <view class="orb orb-2"></view>
+  </view>
+
+  <view class="container">
+    <view class="glass-card">
+      <text class="title">生成 Q 版拼豆卡通图</text>
+      <text class="subtitle">选择比例与清晰度，提交后自动生成</text>
+      <text class="cost-note">本次将消耗 10 豆币</text>
+
+      <view class="form-section">
+        <text class="section-title">图片比例</text>
+        <radio-group class="radio-grid" bindchange="onRatioChange">
+          <label class="radio-item" wx:for="{{ratioOptions}}" wx:key="*this">
+            <radio value="{{item}}" checked="{{item === ratioValue}}" />
+            <text class="radio-text">{{item}}</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="form-section">
+        <text class="section-title">分辨率</text>
+        <radio-group class="radio-row" bindchange="onResolutionChange">
+          <label class="radio-item-row" wx:for="{{resolutionOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{item.value === resolutionValue}}" />
+            <text class="radio-text">{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="preview-box" wx:if="{{src}}">
+        <image class="preview-img" src="{{src}}" mode="aspectFit"></image>
+      </view>
+
+      <button class="btn-primary" bindtap="onSubmit" disabled="{{isGenerating || !src}}">
+        {{isGenerating ? '生成中...' : '提交生成（10豆币）'}}
+      </button>
+    </view>
+
+    <view class="glass-card result-card" wx:if="{{resultUrl}}">
+      <view class="result-header">
+        <text class="result-title">生成结果</text>
+        <view class="btn-link" bindtap="onSubmit">重新生成</view>
+      </view>
+
+      <view class="result-box">
+        <image class="result-img" src="{{resultTempPath || resultUrl}}" mode="aspectFit" bindtap="onPreviewResult"></image>
+      </view>
+
+      <view class="actions">
+        <button class="btn-secondary" bindtap="onSaveResult">保存到手机</button>
+        <button class="btn-primary" bindtap="onImportToGenerate">一键生成拼豆图</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="generating-mask" wx:if="{{isGenerating}}">
+    <view class="generating-card">
+      <view class="generating-spinner"></view>
+      <text class="generating-title">正在生成卡通图</text>
+      <text class="generating-sub">本次将消耗 10 豆币 · 一般 20～90 秒完成</text>
+      <text class="generating-sub">请耐心等待，生成完成会自动展示结果</text>
+    </view>
+  </view>
+</view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />

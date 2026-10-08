@@ -633,7 +633,7 @@ Page({
     if (this.data.template && this.data.template.imageUrl) {
       const selectedSize = this.data.sizeOptions[this.data.sizeIndex].size;
       wx.navigateTo({
-        url: `/pages/game/game?imageUrl=${encodeURIComponent(this.data.template.imageUrl)}&size=${selectedSize}`
+        url: `/packageGame/pages/game/game?imageUrl=${encodeURIComponent(this.data.template.imageUrl)}&size=${selectedSize}`
       });
     } else {
       wx.showToast({
@@ -642,7 +642,7 @@ Page({
       });
       setTimeout(() => {
         wx.navigateTo({
-          url: '/pages/game/game'
+          url: '/packageGame/pages/game/game'
         });
       }, 1000);
     }

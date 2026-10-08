@@ -105,7 +105,7 @@ Page({
   goToCreate() {
     // Navigate to Game (Creation) Page
     wx.navigateTo({
-      url: '/pages/game/game'
+      url: '/packageGame/pages/game/game'
     });
   },
 

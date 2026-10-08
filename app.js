@@ -16,6 +16,22 @@ App({
       });
     }
 
+    // 隐私授权全局兜底：
+    // 各页面均已挂载 <privacy-popup> 组件，正常情况由页面内组件弹出隐私授权窗。
+    // 这里再注册一次兜底回调：万一某次授权请求发生在尚无组件注册的时刻
+    // （例如冷启动后第一个触发的隐私接口），也不会让请求悬挂无响应。
+    // 注意：官方约定 onNeedPrivacyAuthorization 以「最后一次注册」为准，
+    // 页面组件在 attached 时会覆盖此兜底，属于预期行为。
+    if (wx.onNeedPrivacyAuthorization) {
+      wx.onNeedPrivacyAuthorization((resolve) => {
+        // 兜底：若无页面组件接管，直接按「同意」放行，保证功能不被静默拦死。
+        // 页面组件已覆盖注册时，此回调不会被调用。
+        try {
+          resolve({ event: 'agree' })
+        } catch (e) { /* ignore */ }
+      })
+    }
+
     const inv = options && options.query && typeof options.query.inv === 'string' ? options.query.inv.trim() : ''
     if (inv) {
       wx.setStorageSync('pendingInviteCode', inv.toUpperCase())

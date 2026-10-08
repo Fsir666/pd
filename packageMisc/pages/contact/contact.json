@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "联系客服",
+  "backgroundColor": "#F2F2F7",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
+}

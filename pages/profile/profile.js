@@ -97,21 +97,21 @@ Page({
     wx.vibrateShort({ type: 'light' });
     // 直达「豆库管理」，与首页/全部工具的「我的仓库」入口保持一致
     wx.navigateTo({
-      url: '/pages/warehouse/manage/manage'
+      url: '/packageWarehouse/pages/warehouse/manage/manage'
     });
   },
 
   goToMyOrders() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
-      url: '/pages/my-orders/my-orders'
+      url: '/packageMisc/pages/my-orders/my-orders'
     });
   },
 
   goToContact() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
-      url: '/pages/contact/contact'
+      url: '/packageMisc/pages/contact/contact'
     });
   },
 
@@ -119,7 +119,7 @@ Page({
   goToChangelog() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
-      url: '/pages/changelog/changelog'
+      url: '/packageMisc/pages/changelog/changelog'
     });
   },
 
@@ -539,7 +539,7 @@ Page({
     const type = e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.type ? e.currentTarget.dataset.type : 'following';
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
-      url: `/pages/follow-list/follow-list?type=${encodeURIComponent(type)}`
+      url: `/packageMisc/pages/follow-list/follow-list?type=${encodeURIComponent(type)}`
     });
   },
 

@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "灵感发现",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

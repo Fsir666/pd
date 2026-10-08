@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "图纸库",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/privacy-popup"
+  }
 }

@@ -82,3 +82,6 @@
     </block>
   </view>
 </view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />

@@ -1,37 +1,81 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/patterns/patterns",
-    "pages/pattern-detail/pattern-detail",
-    "pages/detail/detail",
-    "pages/my-collections/my-collections",
-    "pages/my-works/my-works",
     "pages/mall/mall",
     "pages/square/square",
-    "pages/search/search",
-    "pages/game/game",
-    "pages/warehouse/warehouse",
-    "pages/warehouse/manage/manage",
-    "pages/bead-mode/bead-mode",
     "pages/profile/profile",
-    "pages/changelog/changelog",
-    "pages/follow-list/follow-list",
-    "pages/user-profile/user-profile",
+    "pages/detail/detail",
+    "pages/patterns/patterns",
+    "pages/pattern-detail/pattern-detail",
+    "pages/search/search",
     "pages/template-detail/template-detail",
-    "pages/developer/developer",
-    "pages/developer/add-template/add-template",
-    "pages/my-orders/my-orders",
-    "pages/contact/contact",
-    "pages/beginner-guide/beginner-guide",
-    "pages/color-chart/color-chart",
-    "pages/generate/generate",
-    "pages/matting/matting",
-    "pages/cartoon/cartoon",
-    "pages/cartoon-generate/cartoon-generate",
-    "pages/all-tools/all-tools",
-    "pages/color-list/color-list",
-    "pages/brand-detail/brand-detail"
+    "pages/my-collections/my-collections",
+    "pages/my-works/my-works"
   ],
+  "subPackages": [
+    {
+      "root": "packageTool",
+      "name": "tool",
+      "pages": [
+        "pages/generate/generate",
+        "pages/matting/matting",
+        "pages/cartoon/cartoon",
+        "pages/cartoon-generate/cartoon-generate",
+        "pages/all-tools/all-tools",
+        "pages/color-chart/color-chart",
+        "pages/color-list/color-list",
+        "pages/brand-detail/brand-detail"
+      ]
+    },
+    {
+      "root": "packageGame",
+      "name": "game",
+      "pages": [
+        "pages/game/game",
+        "pages/bead-mode/bead-mode"
+      ]
+    },
+    {
+      "root": "packageWarehouse",
+      "name": "warehouse",
+      "pages": [
+        "pages/warehouse/warehouse",
+        "pages/warehouse/manage/manage"
+      ]
+    },
+    {
+      "root": "packageMisc",
+      "name": "misc",
+      "pages": [
+        "pages/changelog/changelog",
+        "pages/follow-list/follow-list",
+        "pages/user-profile/user-profile",
+        "pages/developer/developer",
+        "pages/developer/add-template/add-template",
+        "pages/my-orders/my-orders",
+        "pages/contact/contact",
+        "pages/beginner-guide/beginner-guide"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["tool", "game"]
+    },
+    "pages/mall/mall": {
+      "network": "all",
+      "packages": ["tool"]
+    },
+    "pages/square/square": {
+      "network": "all",
+      "packages": ["game"]
+    },
+    "pages/profile/profile": {
+      "network": "all",
+      "packages": ["misc", "warehouse"]
+    }
+  },
   "usingComponents": {
     "like-float": "/components/like-float/like-float"
   },
@@ -76,6 +120,7 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
   "permission": {
     "scope.writePhotosAlbum": {
       "desc": "用于保存导出的图纸图片到相册"

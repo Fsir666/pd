@@ -1,0 +1,51 @@
+<view class="intro-container">
+  <!-- 顶部装饰 -->
+  <view class="intro-header">
+    <view class="icon-bg">
+      <text class="header-icon">🏰</text>
+    </view>
+    <text class="app-title">智能豆库</text>
+    <text class="app-subtitle">Smart Bead Warehouse</text>
+  </view>
+
+  <!-- 功能特性列表 -->
+  <view class="feature-list">
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #E0C3FC25;">
+        <text class="feature-icon">📦</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">全品牌管理</text>
+        <text class="feature-desc">支持 Artkal、Mard、Coco 等主流品牌色卡，一站式管理所有豆子。</text>
+      </view>
+    </view>
+
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #FFD1FF25;">
+        <text class="feature-icon">📊</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">库存可视化</text>
+        <text class="feature-desc">一目了然的库存状态，精准记录每一次消耗与补充，告别盲目补货。</text>
+      </view>
+    </view>
+
+    <view class="feature-card glass-card">
+      <view class="feature-icon-box" style="background: #D4F1F425;">
+        <text class="feature-icon">⚠️</text>
+      </view>
+      <view class="feature-content">
+        <text class="feature-title">智能预警</text>
+        <text class="feature-desc">自定义低库存阈值，豆子不足时自动提醒，让创作无后顾之忧。</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-action">
+    <button class="enter-btn" bindtap="onEnterWarehouse">进入仓库</button>
+  </view>
+</view>
+
+<!-- 全局隐私授权弹窗 -->
+<privacy-popup />
