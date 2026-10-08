@@ -432,6 +432,28 @@ Page({
     wx.navigateTo({ url });
   },
 
+  // 首页榜单封面加载失败兜底（index.wxml:195 绑定）
+  // 注意：榜单拆成 leftTemplates / rightTemplates 两列渲染，只改 hotTemplates 不会刷新，
+  // 必须同步更新该项所在那一列，否则图片会一直裂着。
+  onImageError(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (!Number.isFinite(idx) || idx < 0) return;
+
+    const item = (this.data.hotTemplates || [])[idx];
+    const placeholder = '/images/placeholder.png';
+    // 已是占位图则跳过，避免加载失败时反复触发 error
+    if (!item || !item.imageUrl || item.imageUrl === placeholder) return;
+
+    const patch = { [`hotTemplates[${idx}].imageUrl`]: placeholder };
+    // 原数组偶数下标进左列、奇数下标进右列（见 fetchHotTemplates 的拆分规则）
+    if (idx % 2 === 0) {
+      patch[`leftTemplates[${idx / 2}].imageUrl`] = placeholder;
+    } else {
+      patch[`rightTemplates[${(idx - 1) / 2}].imageUrl`] = placeholder;
+    }
+    this.setData(patch);
+  },
+
   onTemplateTap(e) {
     const id = e.currentTarget.dataset.id;
     const template = this.data.hotTemplates.find(t => t.id === id);
