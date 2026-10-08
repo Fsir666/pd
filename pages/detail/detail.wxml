@@ -187,7 +187,7 @@
       </view>
       
       <!-- 右侧工具栏 -->
-      <view class="toolbar-actions" style="{{showComment ? 'margin-left: auto;' : 'margin: 0 auto;'}}">
+      <view class="toolbar-actions" style="margin-left: auto;">
         <view class="tool-pill comment-pill" wx:if="{{showComment}}" bindtap="focusComment">
           <view class="ico ico-bubble"></view>
           <text class="tcount">{{comments.length}}</text>
