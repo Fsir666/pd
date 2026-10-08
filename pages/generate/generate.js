@@ -691,9 +691,18 @@ Page({
     
     const app = getApp();
     if (app && app.globalData) {
+      // 必须以「实际像素矩阵的宽高」为准，不能用 data.gridSize。
+      // _pixelHexes 是按 _pixelCols 逐行展开的一维数组（长度 = cols * rows），
+      // 而图片按原图宽高比处理后 cols ≠ rows（竖图 rows 更大）。
+      // 历史 bug：这里只传 gridSize（宽度）不传 gridHeight，
+      // bead-mode 会 fallback 成 gridHeight = gridSize，画布行数被设成宽度，
+      // 竖图 / 横图进拼豆模式时下半部分（或右侧）的格子会被裁掉，看起来像图案撕裂。
+      const gridW = this._pixelCols || this.data.processWidth || this.data.gridSize;
+      const gridH = this._pixelRows || this.data.processHeight || gridW;
       app.globalData.beadSession = {
         pixelHexes: this._pixelHexes,
-        gridSize: this.data.gridSize,
+        gridSize: gridW,
+        gridHeight: gridH,
         showGrid: this.data.showGrid,
         showRuler: this.data.showRuler,
         showCellCodes: this.data.showCellCodes,

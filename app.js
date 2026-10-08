@@ -89,9 +89,22 @@ App({
             }).get();
 
             if (dbRes.data.length > 0) {
+              const existing = dbRes.data[0];
+              // 2.1.1 残缺账号（没有昵称）：放行会变成无名氏
+              // 成因：历史上未登录点收藏时，template-api 会自动建一条只有 _openid 的记录。
+              // 若这里照常判定「已登录」，注册弹窗就永远不会出现，用户也没法补昵称。
+              // 现在改判为「需补全资料」：返回 null 让页面弹注册框，
+              // 提交后由 createUser 走「已存在则补全」分支把昵称/头像/ID/邀请码补齐，实现自愈。
+              if (!existing.nickName) {
+                console.log('检测到残缺账号（无昵称），引导补全资料');
+                wx.hideLoading();
+                resolve(null);
+                return;
+              }
+
               // 2.1 用户已存在
-              console.log('用户已存在:', dbRes.data[0]);
-              const user = dbRes.data[0];
+              console.log('用户已存在:', existing);
+              const user = existing;
               this.globalData.userInfo = user;
               this.globalData.isLogged = true;
               wx.setStorageSync('userInfo', user);

@@ -41,9 +41,61 @@ exports.main = async (event, context) => {
     }).get()
 
     if (userCheck.data.length > 0) {
+      // ⚠️ 历史 bug：这里曾经「发现已存在就直接返回」，什么都不补。
+      // 后果很严重：未登录点收藏时，template-api 的 toggleCollect / setCollect
+      // 会自动建一条只有 _openid + collectedTemplates 的「残缺 user」。
+      // 之后用户点登录 -> app.login() 查到这条记录 -> 判定「已存在」直接放行，
+      // 注册弹窗永远不出现；即使手动填了昵称提交，走到这里又被原样返回，
+      // 昵称根本存不进去 —— 用户变成无名氏且永久无法注册。
+      // 现在改为：已存在时把缺失的关键字段补全，让残缺账号能自愈。
+      const exist = userCheck.data[0] || {}
+      const patch = {}
+
+      // 1) 昵称 / 头像 / 手机：只有「本地没值 + 本次传了值」才写入，不覆盖已有资料
+      if (!exist.nickName && userData.nickName) patch.nickName = userData.nickName
+      if (!exist.avatarUrl && userData.avatarUrl) patch.avatarUrl = userData.avatarUrl
+      if (!exist.phone && userData.phone) patch.phone = userData.phone
+
+      // 2) 8 位用户 ID：残缺 user 没有，补一个（用于分享主页 / 邀请匹配）
+      if (!exist.userId) {
+        let uniqueId = null
+        let retryCount = 0
+        while (!uniqueId && retryCount < 10) {
+          const tempId = generateRandomId()
+          const idCheck = await db.collection('users').where({ userId: tempId }).count()
+          if (idCheck.total === 0) uniqueId = tempId
+          else retryCount++
+        }
+        if (uniqueId) patch.userId = uniqueId
+      }
+
+      // 3) 邀请码：残缺 user 没有，补一个
+      if (!exist.inviteCode) {
+        let inviteCode = null
+        let retryCount2 = 0
+        while (!inviteCode && retryCount2 < 10) {
+          const temp = generateInviteCode(6)
+          const codeCheck = await db.collection('users').where({ inviteCode: temp }).count()
+          if (codeCheck.total === 0) inviteCode = temp
+          else retryCount2++
+        }
+        if (inviteCode) patch.inviteCode = inviteCode
+      }
+
+      // 4) 数值型默认字段：只在完全缺失时补，绝不覆盖已有余额（否则会清掉用户的豆币）
+      if (typeof exist.coins !== 'number') patch.coins = 100
+      if (typeof exist.energy !== 'number') patch.energy = 5
+      if (typeof exist.invitedCount !== 'number') patch.invitedCount = 0
+      if (!exist.invitedBy) patch.invitedBy = ''
+
+      if (Object.keys(patch).length > 0) {
+        patch.updateTime = db.serverDate()
+        await db.collection('users').doc(exist._id).update({ data: patch }).catch(() => null)
+      }
+
       return {
         success: true,
-        data: userCheck.data[0],
+        data: { ...exist, ...patch },
         message: '用户已存在'
       }
     }

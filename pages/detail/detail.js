@@ -1050,6 +1050,22 @@ Page({
   },
 
   onCollect() {
+    // 检查登录状态（与点赞/关注保持一致）
+    // 重要：未登录时必须拦截。否则请求打到后端，template-api 会为这个 openid
+    // 建一条只有 _openid 的「残缺 user」，用户之后点登录会被判定为已存在，
+    // 注册弹窗永不出现、昵称也存不进去 —— 等于永久失去注册资格。
+    if (!app.globalData.isLogged) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再收藏',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) wx.switchTab({ url: '/pages/profile/profile' });
+        }
+      });
+      return;
+    }
+
     // 防止快速点击
     if (this.data.isCollecting) return;
     

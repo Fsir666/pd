@@ -13,7 +13,15 @@ Page({
 
   // 跳转到拼豆模式
   goToBeadMode() {
-    wx.switchTab({ url: '/pages/index/index' });
+    // 历史 bug：这里跳的是首页（switchTab index），但入口文案明明是
+    // 「🎨 拼豆模式 / 自由创作拼豆作品」和「开始创作」，点完却回到首页，答非所问。
+    // bead-mode 不传 beadSession 时即为空白画板，本地创作无需登录，可直接进。
+    wx.navigateTo({
+      url: '/pages/bead-mode/bead-mode',
+      fail: () => {
+        wx.showToast({ title: '打开失败，请重试', icon: 'none' });
+      }
+    });
   },
 
   // 跳转到图纸库

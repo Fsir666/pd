@@ -737,22 +737,10 @@ exports.main = async (event, context) => {
       let isCollected = false;
 
       if (userRes.data.length === 0) {
-        // 用户不存在，创建用户并添加收藏
-        // 注意：实际项目中创建用户可能需要更多信息，这里仅作为 fallback 或初次初始化
-        try {
-          await db.collection('users').add({
-            data: {
-              _openid: openid,
-              collectedTemplates: [templateId],
-              createTime: db.serverDate(),
-              updateTime: db.serverDate()
-            }
-          });
-          isCollected = true;
-        } catch (e) {
-          console.error('Create user failed:', e);
-          return { code: -1, msg: 'Create user failed', error: e };
-        }
+        // ⚠️ 同 setCollect：不要自动建「残缺 user」（只有 _openid + collectedTemplates）。
+        // 一旦建了，用户再点登录会被 app.login() 判定为「已存在」而跳过注册，
+        // 变成无名氏且永久无法补全资料。要求先登录，由 createUser 建完整账号。
+        return { code: 401, msg: '请先登录', data: { isCollected: false } };
       } else {
         const userDoc = userRes.data[0];
         const userDocId = userDoc._id;
@@ -809,15 +797,12 @@ exports.main = async (event, context) => {
       try {
         const userRes = await db.collection('users').where({ _openid: openid }).get();
         if (userRes.data.length === 0) {
-          await db.collection('users').add({
-            data: {
-              _openid: openid,
-              collectedTemplates: want ? [templateId] : [],
-              createTime: db.serverDate(),
-              updateTime: db.serverDate()
-            }
-          });
-          return { code: 0, data: { isCollected: want }, msg: 'ok' };
+          // ⚠️ 不要在这里自动建「残缺 user」。
+          // 历史 bug：这里曾直接 add 一条只有 _openid + collectedTemplates 的记录，
+          // 导致用户之后再点登录时 app.login() 认为「已存在」直接放行，
+          // 注册弹窗永不出现，且 createUser 也会原样返回 —— 用户永久无法注册。
+          // 正确做法：要求先登录，由 createUser 建立完整账号。
+          return { code: 401, msg: '请先登录', data: { isCollected: false } };
         }
 
         const userDoc = userRes.data[0];
