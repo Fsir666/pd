@@ -13,6 +13,17 @@
 
 const VERSIONS = [
   {
+    version: '1.0.85',
+    date: '2026-10-08',
+    time: '15:49',
+    tag: 'opt',
+    title: '版本概览不再堆成一大页',
+    items: [
+      '更新日志默认只显示最近 12 条，打开不再是一长串',
+      '想翻旧版本的点底部「查看更早 xx 个版本」，再点一下收起'
+    ]
+  },
+  {
     version: '1.0.84',
     date: '2026-10-08',
     time: '15:30',
@@ -1096,24 +1107,44 @@ const TAG_MAP = {
   opt: { text: '优化', cls: 'tag-opt' }
 }
 
+// 默认只展示最近 N 条，避免页面过长；点「查看更早版本」再展开
+const RECENT_COUNT = 12
+
 Page({
   data: {
     versions: [],
     currentVersion: '',
-    currentTime: ''
+    currentTime: '',
+    totalCount: 0,
+    hiddenCount: 0,
+    showAll: false
   },
 
   onLoad() {
-    const versions = VERSIONS.map((v) => {
+    const all = VERSIONS.map((v) => {
       const t = TAG_MAP[v.tag] || TAG_MAP.opt
       return Object.assign({}, v, { tagText: t.text, tagCls: t.cls })
     })
-    const first = versions.length ? versions[0] : null
+    const first = all.length ? all[0] : null
+    this._allVersions = all
     this.setData({
-      versions,
       currentVersion: first ? first.version : '',
-      currentTime: first ? first.date + ' ' + first.time : ''
+      currentTime: first ? first.date + ' ' + first.time : '',
+      totalCount: all.length
+    }, () => this._applyVisible())
+  },
+
+  _applyVisible() {
+    const all = this._allVersions || []
+    const list = this.data.showAll ? all : all.slice(0, RECENT_COUNT)
+    this.setData({
+      versions: list,
+      hiddenCount: all.length - list.length
     })
+  },
+
+  onToggleAll() {
+    this.setData({ showAll: !this.data.showAll }, () => this._applyVisible())
   },
 
   onShareAppMessage() {

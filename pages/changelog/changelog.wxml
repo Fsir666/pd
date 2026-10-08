@@ -3,7 +3,7 @@
     <text class="header-icon">🚀</text>
     <text class="header-title">版本概览</text>
     <text class="header-desc">当前版本 v{{currentVersion}}</text>
-    <text class="header-desc">发布于 {{currentTime}}　·　共 {{versions.length}} 次更新</text>
+    <text class="header-desc">发布于 {{currentTime}}　·　共 {{totalCount}} 次更新</text>
   </view>
 
   <view class="timeline">
@@ -27,6 +27,11 @@
         </view>
       </view>
     </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hiddenCount > 0 || showAll}}" bindtap="onToggleAll">
+    <text>{{showAll ? '收起早期版本' : '查看更早 ' + hiddenCount + ' 个版本'}}</text>
+    <text class="load-more-arrow">{{showAll ? '↑' : '↓'}}</text>
   </view>
 
   <view class="page-footer">

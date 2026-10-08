@@ -157,3 +157,21 @@
   font-size: 24rpx;
   color: var(--ym-text-faint, #C2B4B4);
 }
+
+/* ---------- 展开 / 收起更早版本 ---------- */
+.load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 24rpx 0;
+  background: var(--ym-surface, #FFFDFB);
+  border-radius: var(--ym-r-md, 20rpx);
+  box-shadow: 0 2rpx 12rpx rgba(74, 58, 62, 0.05);
+  font-size: 26rpx;
+  color: var(--ym-primary, #D4607A);
+}
+
+.load-more-arrow {
+  font-size: 22rpx;
+}
