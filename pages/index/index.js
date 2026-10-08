@@ -512,7 +512,9 @@ Page({
         wx.navigateTo({ url: '/pages/color-list/color-list' });
         break;
       case 3: // 我的仓库
-        wx.navigateTo({ url: '/pages/warehouse/warehouse' });
+        // 直达「豆库管理」（智能豆库）：功能最全（库存/预警/记录/统计/添加）。
+        // 原先的 warehouse 页只记录「有没有这个色」，与豆库管理数据不互通，已不再作为入口。
+        wx.navigateTo({ url: '/pages/warehouse/manage/manage' });
         break;
       case 4: // 色卡表
         wx.navigateTo({ url: '/pages/color-chart/color-chart' });

@@ -290,10 +290,14 @@ Page({
         const doc = res.data[0];
         console.log('[Warehouse] Loaded from cloud:', doc._id);
         this._docId = doc._id;
-        // Merge cloud data (cloud source of truth)
-        this._inventory = doc.inventory || {};
-        this._thresholds = doc.thresholds || {};
-        this._logs = doc.logs || [];
+        // 以云端为准，但云端为空时保留本地数据。
+        // ⚠️ 历史 bug：这里无条件用云端覆盖本地。若上次退出时本地有没来得及同步的改动
+        // （见 _saveToCloud 的防抖），这次进来就会被云端旧数据冲掉，用户等于白数一遍珠子。
+        // 现在：云端该字段为空（没有这个 key / 空对象 / 空数组）时，保留本地已有的。
+        const hasKeys = (o) => o && typeof o === 'object' && Object.keys(o).length > 0;
+        this._inventory = hasKeys(doc.inventory) ? doc.inventory : (this._inventory || {});
+        this._thresholds = hasKeys(doc.thresholds) ? doc.thresholds : (this._thresholds || {});
+        this._logs = Array.isArray(doc.logs) && doc.logs.length > 0 ? doc.logs : (this._logs || []);
         
         if (doc.customBrands) {
           this.setData({ customBrands: doc.customBrands });
@@ -339,28 +343,62 @@ Page({
   _saveToCloud() {
     if (!this._docId) return;
     // Debounce save
+    // 防抖从 2000ms 降到 800ms：库存是一颗颗数出来的，窗口越短越不容易丢改动。
+    // 配合下方 onUnload/onHide 的强制 flush，基本可以杜绝「改完就退出导致没同步」。
     if (this._saveTimer) clearTimeout(this._saveTimer);
     this._saveTimer = setTimeout(() => {
-      wx.showNavigationBarLoading();
-      db.collection(COLL_WAREHOUSE).doc(this._docId).update({
-        data: {
-          inventory: this._inventory,
-          thresholds: this._thresholds,
-          logs: this._logs,
-          updateTime: db.serverDate()
-        }
-      }).then(() => {
-        console.log('[Warehouse] Auto-saved to cloud');
-        wx.hideNavigationBarLoading();
-      }).catch(err => {
-        console.error('[Warehouse] Auto-save failed', err);
-        wx.hideNavigationBarLoading();
-      });
-    }, 2000); // 2s debounce
+      this._flushToCloud();
+    }, 800);
+  },
+
+  // 立即把当前数据推到云端（跳过防抖）。退出页面/切后台时调用。
+  _flushToCloud() {
+    if (!this._docId) return;
+    if (this._saveTimer) {
+      clearTimeout(this._saveTimer);
+      this._saveTimer = null;
+    }
+    wx.showNavigationBarLoading();
+    db.collection(COLL_WAREHOUSE).doc(this._docId).update({
+      data: {
+        inventory: this._inventory,
+        thresholds: this._thresholds,
+        logs: this._logs,
+        updateTime: db.serverDate()
+      }
+    }).then(() => {
+      console.log('[Warehouse] Auto-saved to cloud');
+      wx.hideNavigationBarLoading();
+    }).catch(err => {
+      console.error('[Warehouse] Auto-save failed', err);
+      wx.hideNavigationBarLoading();
+      // 数据已写本地不会丢，但要让用户知道云端没同步成功（换设备会看不到）。
+      // 只在本次会话第一次失败时提示，避免反复弹窗打扰。
+      if (!this._saveFailedNotified) {
+        this._saveFailedNotified = true;
+        wx.showToast({
+          title: '云端同步失败，数据已存本地',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
   },
 
   onShow() {
     this._refreshAll();
+  },
+
+  // ⚠️ 历史 bug：没有 onUnload / onHide。
+  // 云保存有防抖，用户改完数量立刻退出页面时定时器直接没了，
+  // 改动只落在本机；下次进页面云端旧数据又把本地覆盖回去 —— 等于白改。
+  // 这里在离开页面时强制 flush 一次。
+  onHide() {
+    this._flushToCloud();
+  },
+
+  onUnload() {
+    this._flushToCloud();
   },
 
   _buildCatalogByBrand() {
@@ -434,6 +472,34 @@ Page({
     if (!this._inventory[brand] || typeof this._inventory[brand] !== 'object') this._inventory[brand] = {};
     this._inventory[brand][code] = count;
     wx.setStorageSync(KEY_INVENTORY, this._inventory);
+    this._saveToCloud();
+  },
+
+  // 批量写入库存：只在最后落一次本地存储 + 触发一次云同步。
+  // ⚠️ 历史 bug：批量设置时循环调用 _setInventory，选 200 个色号就是
+  // 200 次 setStorageSync（同步阻塞、每次都全量序列化整个库存对象）+ 200 次云同步重置，
+  // 批量改一次 221 色会明显卡住。这里合并成一次写入。
+  _setInventoryBatch(brand, codeValueMap) {
+    if (!this._inventory || typeof this._inventory !== 'object') this._inventory = {};
+    if (!this._inventory[brand] || typeof this._inventory[brand] !== 'object') this._inventory[brand] = {};
+    Object.keys(codeValueMap || {}).forEach(code => {
+      this._inventory[brand][code] = codeValueMap[code];
+    });
+    wx.setStorageSync(KEY_INVENTORY, this._inventory);
+    this._saveToCloud();
+  },
+
+  // 批量写日志：entries 按时间从新到旧传入，一次性 unshift 进去
+  _pushLogs(entries) {
+    if (!Array.isArray(entries) || entries.length === 0) return;
+    const logs = Array.isArray(this._logs) ? this._logs : [];
+    // 倒序遍历 unshift，保证传入顺序（新→旧）在列表里保持正确
+    for (let i = entries.length - 1; i >= 0; i--) {
+      logs.unshift(entries[i]);
+    }
+    if (logs.length > 300) logs.length = 300;
+    this._logs = logs;
+    wx.setStorageSync(KEY_LOGS, logs);
     this._saveToCloud();
   },
 
@@ -604,15 +670,11 @@ Page({
     return String(codeA).localeCompare(String(codeB));
   },
 
-  onSeriesTap(e) {
-    const series = e.currentTarget.dataset.series;
-    if (!series || series === this.data.selectedSeries) return;
-    
-    this.setData({ selectedSeries: series }, () => {
-      this._updateGroupList();
-      this._refreshAll();
-    });
-  },
+  // ⚠️ 历史 bug：本类里曾有两个同名的 onSeriesTap（后面 1199 行附近还有一个），
+  // JS 对象字面量同名 key 后者覆盖前者，导致这个「会调用 _updateGroupList」的版本
+  // 成了永不执行的死代码，而生效的版本漏了 _updateGroupList —— 切换色卡系列时
+  // 下方的「分组」列表不跟着变，仍停留在上一个系列的分组。
+  // 现已合并为一个实现（见下方 onSeriesTap），此处删除。
 
   onGroupTap(e) {
     const group = e.currentTarget.dataset.group;
@@ -623,16 +685,10 @@ Page({
     });
   },
 
-  onLogColorTap(e) {
-    const code = e.currentTarget.dataset.code;
-    if (this.data.selectedLogColor === code) {
-      // Toggle off
-      this.setData({ selectedLogColor: null });
-    } else {
-      this.setData({ selectedLogColor: code });
-    }
-    this._refreshAll();
-  },
+  // ⚠️ 历史 bug：本类里曾有两个同名 onLogColorTap（下方「记录」区还有一个），
+  // 同名 key 后者覆盖前者，这个版本是永不执行的死代码。
+  // 顺带一提它本身也有问题：_refreshAll() 写在 setData 外面，会读到更新前的旧 data。
+  // 保留下方那个（在 setData 回调里刷新）的正确实现，此处删除死代码。
 
   onLogColorAllTap() {
     this.setData({ selectedLogColor: null });
@@ -1196,11 +1252,15 @@ Page({
     this.setData({ sortMode }, () => this._refreshAll());
   },
 
+  // 切换色卡系列：必须同时刷新「分组」列表（_updateGroupList），
+  // 否则选中 Mard-48 时下方分组还停留在 Mard-24 的，会筛出空列表。
+  // 这里同时重置批量选择态，避免跨系列残留选中项。
   onSeriesTap(e) {
     const s = e.currentTarget.dataset.series;
     if (s === this.data.selectedSeries) return;
     this.setData({ selectedSeries: s, batchMode: false, selectedCount: 0, selectAllText: '全选' }, () => {
       this._selectedSet = new Set();
+      this._updateGroupList();
       this._refreshAll();
     });
   },
@@ -1584,20 +1644,29 @@ Page({
           const target = Array.from(this._selectedSet);
           if (type === 'count') {
             const inv = this._getBrandInventory(brand);
+            // 先收集所有改动，最后一次性落盘：
+            // 逐条 _setInventory 会导致 N 次同步写存储 + N 次云同步，批量改 221 色会卡顿。
+            const changed = {};
+            const logEntries = [];
+            const nowTs = Date.now();
             for (let i = 0; i < target.length; i++) {
               const code = target[i];
               const oldCount = clampInt(inv[code], 0);
               if (v !== oldCount) {
-                this._setInventory(brand, code, v);
-                this._pushLog({
-                  id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
-                  ts: Date.now(),
+                changed[code] = v;
+                logEntries.push({
+                  id: `${nowTs}_${i}_${Math.random().toString(16).slice(2)}`,
+                  ts: nowTs,
                   brand,
                   code,
                   delta: v - oldCount,
                   after: v
                 });
               }
+            }
+            if (Object.keys(changed).length > 0) {
+              this._setInventoryBatch(brand, changed);
+              this._pushLogs(logEntries);
             }
           } else {
             const t = this._getBrandThresholds(brand);
@@ -1696,10 +1765,13 @@ Page({
       customBrands.push(newBrand);
     }
 
+    // ⚠️ 历史 bug：提示语在 setData 之后才读 editingBrandId，而上面已经把它置 null 了，
+    // 所以「编辑已有品牌」也会显示"添加成功"。先存一份再清空。
+    const isEditing = !!this.data.editingBrandId;
     this.setData({ customBrands, addBrandVisible: false, editingBrandId: null });
     this._saveCustomBrands();
     
-    wx.showToast({ title: this.data.editingBrandId ? '修改成功' : '添加成功', icon: 'success' });
+    wx.showToast({ title: isEditing ? '修改成功' : '添加成功', icon: 'success' });
   },
 
   onDeleteBrand(e) {
@@ -1780,9 +1852,11 @@ Page({
       brand.subSeries.push(newSeries);
     }
 
+    // 同上：先存编辑态再 setData 清空，否则提示永远是"添加成功"
+    const isEditingSeries = !!this.data.editingSeriesId;
     this.setData({ customBrands, addSeriesVisible: false, editingSeriesId: null });
     this._saveCustomBrands();
-    wx.showToast({ title: this.data.editingSeriesId ? '修改成功' : '添加成功', icon: 'success' });
+    wx.showToast({ title: isEditingSeries ? '修改成功' : '添加成功', icon: 'success' });
   },
 
   onDeleteSeries(e) {
@@ -1873,9 +1947,11 @@ Page({
       series.groups.push(newGroup);
     }
 
+    // 同上：先存编辑态再 setData 清空，否则提示永远是"添加成功"
+    const isEditingGroup = !!this.data.editingGroupId;
     this.setData({ customBrands, addGroupVisible: false, editingGroupId: null });
     this._saveCustomBrands();
-    wx.showToast({ title: this.data.editingGroupId ? '修改成功' : '添加成功', icon: 'success' });
+    wx.showToast({ title: isEditingGroup ? '修改成功' : '添加成功', icon: 'success' });
   },
 
   onDeleteGroup(e) {

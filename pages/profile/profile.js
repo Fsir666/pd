@@ -95,8 +95,9 @@ Page({
 
   goToMyWarehouse() {
     wx.vibrateShort({ type: 'light' });
+    // 直达「豆库管理」，与首页/全部工具的「我的仓库」入口保持一致
     wx.navigateTo({
-      url: '/pages/warehouse/warehouse'
+      url: '/pages/warehouse/manage/manage'
     });
   },
 

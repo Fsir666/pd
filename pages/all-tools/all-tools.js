@@ -66,7 +66,9 @@ Page({
         wx.navigateTo({ url: '/pages/color-list/color-list' });
         break;
       case 3: // 我的仓库
-        wx.navigateTo({ url: '/pages/warehouse/warehouse' });
+        // 直达「豆库管理」：原先的 warehouse 页只是简易色号勾选，
+        // 与豆库管理各存一套本地数据、互不互通，容易让人以为库存录了没生效。
+        wx.navigateTo({ url: '/pages/warehouse/manage/manage' });
         break;
       case 4: // 色卡表
         wx.navigateTo({ url: '/pages/color-chart/color-chart' });

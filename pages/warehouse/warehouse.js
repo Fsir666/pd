@@ -10,7 +10,17 @@ Page({
   },
 
   onLoad() {
-    this.loadColors();
+    // 本页已并入「豆库管理」（pages/warehouse/manage/manage）。
+    // 原先这里只是简易色号勾选，与豆库管理各存一套本地数据、互不互通，
+    // 用户会以为库存录了没生效。所有入口已改指向豆库管理，
+    // 这里再做一次兜底重定向，避免任何遗漏入口把用户带进这套废弃数据。
+    wx.redirectTo({
+      url: '/pages/warehouse/manage/manage',
+      fail: () => {
+        // 重定向失败（极低概率）时退回原逻辑，保证页面还能用
+        this.loadColors();
+      }
+    });
   },
 
   loadColors() {
