@@ -124,9 +124,9 @@ module.exports = {
           <view class="quick-emoji-wrap qe-sage"><view class="ico ico-image"></view></view>
           <text class="quick-label">图片转像素</text>
         </view>
-        <view class="quick-item" bindtap="onToolTap" data-id="9">
-          <view class="quick-emoji-wrap qe-pink"><view class="ico ico-spark"></view></view>
-          <text class="quick-label">转卡通</text>
+        <view class="quick-item" bindtap="onToolTap" data-id="14">
+          <view class="quick-emoji-wrap qe-pink"><view class="ico ico-box"></view></view>
+          <text class="quick-label">拼豆模式</text>
         </view>
         <view class="quick-item" bindtap="onToolTap" data-id="13">
           <view class="quick-emoji-wrap qe-honey"><view class="ico ico-grid"></view></view>

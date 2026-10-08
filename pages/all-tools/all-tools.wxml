@@ -26,13 +26,13 @@
         <view class="card-action">Go</view>
       </view>
 
-      <view class="featured-card secondary" bindtap="onToolTap" data-id="9">
-        <view class="card-bg-icon">🪄</view>
+      <view class="featured-card secondary" bindtap="onToolTap" data-id="14">
+        <view class="card-bg-icon">🧩</view>
         <view class="card-content">
-          <view class="card-icon wiggle">🪄</view>
+          <view class="card-icon wiggle">🧩</view>
           <view class="card-text">
-            <text class="card-title">照片转卡通</text>
-            <text class="card-desc">一键卡通化</text>
+            <text class="card-title">拼豆模式</text>
+            <text class="card-desc">大画板自由拼豆</text>
           </view>
         </view>
         <view class="card-action">Go</view>

@@ -56,8 +56,11 @@ Page({
       case 2: // 抠图
         wx.navigateTo({ url: '/pages/matting/matting' });
         break;
-      case 9: // 转卡通
+      case 9: // 转卡通（入口已隐藏：依赖豆包 API，未配置前不对外）
         wx.navigateTo({ url: '/pages/cartoon/cartoon' });
+        break;
+      case 14: // 拼豆模式（替代原"转卡通"的卡片位）
+        wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
         break;
       case 10: // 拼豆计算器
         wx.showToast({ title: '计算器即将上线', icon: 'none' });

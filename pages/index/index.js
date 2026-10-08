@@ -505,8 +505,11 @@ Page({
       case 2: // 抠图 (原图纸编辑)
         wx.navigateTo({ url: '/pages/matting/matting' });
         break;
-      case 9: // 转卡通
+      case 9: // 转卡通（入口已隐藏：依赖豆包 API，未配置前不对外）
         wx.navigateTo({ url: '/pages/cartoon/cartoon' });
+        break;
+      case 14: // 拼豆模式（空白画板，本地可用，替代原"转卡通"的快捷位）
+        wx.navigateTo({ url: '/pages/bead-mode/bead-mode' });
         break;
       case 11: // Excel 色卡表
         wx.navigateTo({ url: '/pages/color-list/color-list' });
