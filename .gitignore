@@ -1,0 +1,2 @@
+# 云函数依赖，体积大且可由 npm install 还原
+cloudfunctions/**/node_modules/
