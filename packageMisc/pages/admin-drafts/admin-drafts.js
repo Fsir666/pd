@@ -193,13 +193,21 @@ Page({
     wx.navigateTo({ url: '/pages/my-works/my-works' });
   },
 
-  // 单张删除（已发布则撤回，未发布则从库移除）
+  // 单张删除
+  // 已添加到名下的图纸直接拦截：后端 deleteDraft 对已发布的会执行「撤回发布」，
+  // 会把名下作品一起下架。在拿到支持「仅移出图纸库」的云函数前，前端先挡住。
   deleteItem(e) {
     const key = e.currentTarget.dataset.key;
     if (!key) return;
+    const item = this.data.drafts.find(d => d.key === key);
+    if (item && item.claimed) {
+      wx.showToast({ title: '该图纸已添加到名下，暂不能删除', icon: 'none', duration: 2200 });
+      wx.vibrateShort({ type: 'medium' });
+      return;
+    }
     wx.showModal({
       title: '删除图纸',
-      content: '确定删除这张图纸吗？\n（已发布将撤回，未发布从库移除）',
+      content: '确定从图纸库删除这张图纸吗？',
       confirmText: '删除',
       confirmColor: '#E2677A',
       success: (res) => { if (res.confirm) this.doDelete([key]); }
@@ -207,15 +215,28 @@ Page({
   },
 
   // 批量删除选中
+  // 勾选中只要混入已添加到名下的图纸，一律拦下，避免连带撤回
   deleteSelected() {
     const keys = Object.keys(this.data.selected);
     if (!keys.length) {
       wx.showToast({ title: '请先勾选图纸', icon: 'none' });
       return;
     }
+    const claimedCount = this.data.drafts.filter(
+      d => this.data.selected[d.key] && d.claimed
+    ).length;
+    if (claimedCount > 0) {
+      wx.showToast({
+        title: `勾选中有 ${claimedCount} 张已添加到名下，不能删除`,
+        icon: 'none',
+        duration: 2200
+      });
+      wx.vibrateShort({ type: 'medium' });
+      return;
+    }
     wx.showModal({
       title: '删除图纸',
-      content: `确定删除 ${keys.length} 张图纸吗？\n（已发布的将撤回，未发布的从库移除）`,
+      content: `确定从图纸库删除 ${keys.length} 张图纸吗？`,
       confirmText: '删除',
       confirmColor: '#E2677A',
       success: (res) => { if (res.confirm) this.doDelete(keys); }
