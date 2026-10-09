@@ -24,12 +24,7 @@
   </view>
 
   <block wx:else>
-    <!-- 操作说明 -->
-    <view class="hint-bar">
-      <text class="hint-text">勾选你想要的图纸，点底部按钮即可加到你的名下</text>
-    </view>
-
-    <!-- 工具行：全选 + 公开/私密 -->
+    <!-- 工具行：全选 + 公开/私密（固定在顶栏下方） -->
     <view class="tool-row">
       <view class="tool-left" bindtap="toggleSelectAll">
         <view class="checkbox {{selectedCount > 0 && selectedCount === drafts.length ? 'checked' : ''}}">
@@ -48,6 +43,10 @@
 
     <!-- 图纸网格 -->
     <scroll-view class="grid-scroll" scroll-y>
+      <!-- 操作说明：随内容滚动，下滑后自动让位给图纸以扩大可视面积 -->
+      <view class="hint-bar">
+        <text class="hint-text">勾选图纸，点底部按钮即可加到你的名下</text>
+      </view>
       <view class="grid">
         <view class="card {{item.checked ? 'checked' : ''}}" wx:for="{{drafts}}" wx:key="key"
               data-key="{{item.key}}" bindtap="toggleSelect">
