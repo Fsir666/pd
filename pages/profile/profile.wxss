@@ -318,6 +318,9 @@ page {
 .color-purple { background: #B49AC4; }
 .color-purple .menu-icon { filter: brightness(100); }
 
+.color-gray { background: #9A8E92; }
+.color-gray .menu-icon { filter: brightness(100); }
+
 /* Override for emoji icons if they are text, use white text color */
 .icon-box text {
   color: #FFFDFB;

@@ -154,6 +154,47 @@ Page({
     });
   },
 
+  // 管理员通道：手机自助开通（输开通码，把本账号设为管理员，永久生效）
+  openAdminChannel() {
+    if (!this.data.isLogged) {
+      this.onLoginTap();
+      return;
+    }
+    wx.showModal({
+      title: '管理员通道',
+      content: '输入开通码以启用「图纸库管理」（仅开发者本人使用）',
+      editable: true,
+      placeholderText: '请输入开通码',
+      success: (res) => {
+        if (!res.confirm) return;
+        const code = String(res.content || '').trim();
+        if (!code) {
+          wx.showToast({ title: '请输入开通码', icon: 'none' });
+          return;
+        }
+        wx.showLoading({ title: '验证中...' });
+        wx.cloud.callFunction({
+          name: 'template-api',
+          data: { action: 'setAdmin', code }
+        }).then(r => {
+          wx.hideLoading();
+          const result = (r && r.result) || {};
+          if (result.code === 0) {
+            this.setData({ isAdmin: true });
+            wx.showToast({ title: '已开通管理员', icon: 'success' });
+          } else if (result.code === -4) {
+            wx.showToast({ title: '开通码错误', icon: 'none' });
+          } else {
+            wx.showToast({ title: (result.msg ? String(result.msg) : '开通失败'), icon: 'none' });
+          }
+        }).catch(err => {
+          wx.hideLoading();
+          wx.showToast({ title: '网络错误，请重试', icon: 'none' });
+        });
+      }
+    });
+  },
+
   // switchTab removed, custom-tab-bar handles it internally
 
   // 同步全局数据

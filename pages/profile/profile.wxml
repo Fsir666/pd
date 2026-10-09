@@ -150,6 +150,20 @@
       </view>
     </view>
 
+    <view class="menu-group" wx:if="{{isLogged && !isAdmin}}">
+      <view class="menu-item" bindtap="openAdminChannel" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-gray">
+            <text class="menu-icon">🔐</text>
+          </view>
+          <text class="item-title">管理员通道</text>
+        </view>
+        <view class="item-right">
+          <text class="icon-chevron"></text>
+        </view>
+      </view>
+    </view>
+
     <view class="menu-group">
       <view class="menu-item" bindtap="goToContact" hover-class="hover-scale">
         <view class="item-left">
