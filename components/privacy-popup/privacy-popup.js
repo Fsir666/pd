@@ -17,7 +17,9 @@ Component({
       }
     },
 
-    // 页面卸载时若仍有未处理的授权请求，主动放行，避免请求悬挂
+    // 页面卸载时若仍有未处理的授权请求，主动放行，避免请求悬挂；
+    // 关键：把全局监听「交还」给兜底回调，否则监听会悬空在这个已销毁的页面实例上，
+    // 导致后续在 tab 页（如「我的」点登录）触发隐私接口时弹不出窗、登录无响应。
     detached() {
       if (this._privacyResolve) {
         try {
@@ -26,6 +28,15 @@ Component({
         this._privacyResolve = null
       }
       this.setData({ showPopup: false })
+
+      // 交还全局监听给兜底：直接放行隐私接口，保证不再悬空
+      if (wx.onNeedPrivacyAuthorization) {
+        try {
+          wx.onNeedPrivacyAuthorization((resolve) => {
+            try { resolve({ event: 'agree' }) } catch (e) { /* ignore */ }
+          })
+        } catch (e) { /* ignore */ }
+      }
     }
   },
 

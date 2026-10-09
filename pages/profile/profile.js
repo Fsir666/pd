@@ -43,7 +43,8 @@ Page({
     editSaving: false,
     currentTab: 3,
     cursorLeft: '75%',
-    isDragging: false
+    isDragging: false,
+    isAdmin: false
   },
 
   onLoad() {
@@ -61,8 +62,9 @@ Page({
       this.fetchFollowStats();
       this.fetchWallet();
       this.fetchInviteInfo();
+      this.checkAdmin();
     } else {
-      this.setData({ followingCount: 0, followerCount: 0 });
+      this.setData({ followingCount: 0, followerCount: 0, isAdmin: false });
     }
 
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -127,6 +129,28 @@ Page({
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
       url: '/pages/my-works/my-works'
+    });
+  },
+
+  // 管理员：图纸库管理入口
+  goToAdminDrafts() {
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({
+      url: '/packageMisc/pages/admin-drafts/admin-drafts'
+    });
+  },
+
+  // 判断当前用户是否管理员（决定「图纸库管理」按钮是否显示）
+  checkAdmin() {
+    wx.cloud.callFunction({
+      name: 'template-api',
+      data: { action: 'checkAdmin' }
+    }).then(res => {
+      const r = (res && res.result) || {};
+      const isAdmin = !!(r.data && r.data.isAdmin);
+      if (this.data.isAdmin !== isAdmin) this.setData({ isAdmin });
+    }).catch(() => {
+      if (this.data.isAdmin) this.setData({ isAdmin: false });
     });
   },
 

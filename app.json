@@ -54,7 +54,8 @@
         "pages/developer/add-template/add-template",
         "pages/my-orders/my-orders",
         "pages/contact/contact",
-        "pages/beginner-guide/beginner-guide"
+        "pages/beginner-guide/beginner-guide",
+        "pages/admin-drafts/admin-drafts"
       ]
     }
   ],

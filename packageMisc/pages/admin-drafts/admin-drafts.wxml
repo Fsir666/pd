@@ -1,0 +1,87 @@
+<view class="page">
+  <!-- 顶部栏 -->
+  <view class="topbar">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="topbar-title">图纸库</view>
+    <view class="myworks-btn" bindtap="goMyWorks">
+      <text>我的作品</text>
+    </view>
+  </view>
+
+  <!-- 非管理员 / 错误提示 -->
+  <view class="state-box" wx:if="{{!isAdmin && !loading}}">
+    <text class="state-icon">🔒</text>
+    <text class="state-title">无访问权限</text>
+    <text class="state-sub">{{loadError || '当前账号不是管理员'}}</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="state-box" wx:elif="{{loading}}">
+    <text class="state-icon">⏳</text>
+    <text class="state-title">正在加载图纸库...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 操作说明 -->
+    <view class="hint-bar">
+      <text class="hint-text">勾选你想要的图纸，点底部按钮即可加到你的名下</text>
+    </view>
+
+    <!-- 工具行：全选 + 公开/私密 -->
+    <view class="tool-row">
+      <view class="tool-left" bindtap="toggleSelectAll">
+        <view class="checkbox {{selectedCount > 0 && selectedCount === drafts.length ? 'checked' : ''}}">
+          <text wx:if="{{selectedCount > 0 && selectedCount === drafts.length}}">✓</text>
+        </view>
+        <text class="tool-label">全选</text>
+      </view>
+      <view class="tool-right">
+        <text class="tool-label">添加后：</text>
+        <view class="seg">
+          <view class="seg-item {{isPublic ? 'active' : ''}}" data-v="public" bindtap="setPublic">公开</view>
+          <view class="seg-item {{!isPublic ? 'active' : ''}}" data-v="private" bindtap="setPublic">私密</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 图纸网格 -->
+    <scroll-view class="grid-scroll" scroll-y>
+      <view class="grid">
+        <view class="card {{item.checked ? 'checked' : ''}}" wx:for="{{drafts}}" wx:key="key"
+              data-key="{{item.key}}" bindtap="toggleSelect">
+          <view class="thumb-wrap">
+            <image class="thumb" src="{{item.thumb}}" mode="aspectFit"
+                   data-url="{{item.thumb}}" catchtap="previewThumb"></image>
+            <view class="checkbox card-check {{item.checked ? 'checked' : ''}}">
+              <text wx:if="{{item.checked}}">✓</text>
+            </view>
+            <view class="claimed-badge" wx:if="{{item.claimed}}">已添加</view>
+          </view>
+          <view class="card-info">
+            <text class="card-name">{{item.name}}</text>
+            <text class="card-meta">{{item.sizeText}} · {{item.beadCount}}颗 · {{item.paletteCount}}色</text>
+            <view class="card-tags">
+              <text class="tag" wx:for="{{item.tags}}" wx:for-item="t" wx:key="*this">{{t}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="grid-bottom-pad"></view>
+    </scroll-view>
+
+    <!-- 底部操作条 -->
+    <view class="bottom-bar">
+      <view class="bottom-info">
+        <text class="bottom-count">已选 {{selectedCount}} 张</text>
+        <text class="bottom-sub">将标记为：{{isPublic ? '公开' : '私密'}}</text>
+      </view>
+      <view class="claim-btn {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="confirmClaim">
+        <text>{{submitting ? '处理中...' : '放到我名下'}}</text>
+      </view>
+    </view>
+  </block>
+</view>
+
+<privacy-popup />

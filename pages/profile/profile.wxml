@@ -135,6 +135,21 @@
       </view>
     </view>
 
+    <view class="menu-group" wx:if="{{isAdmin}}">
+      <view class="menu-item" bindtap="goToAdminDrafts" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-orange">
+            <text class="menu-icon">🛠️</text>
+          </view>
+          <text class="item-title">图纸库管理</text>
+          <view class="admin-badge">管理员</view>
+        </view>
+        <view class="item-right">
+          <text class="icon-chevron"></text>
+        </view>
+      </view>
+    </view>
+
     <view class="menu-group">
       <view class="menu-item" bindtap="goToContact" hover-class="hover-scale">
         <view class="item-left">

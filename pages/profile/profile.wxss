@@ -329,6 +329,17 @@ page {
   font-weight: 500;
 }
 
+/* 管理员徽标 */
+.admin-badge {
+  margin-left: 14rpx;
+  font-size: 20rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #FF8A3D, #FF6B00);
+  padding: 3rpx 14rpx;
+  border-radius: 16rpx;
+  font-weight: 600;
+}
+
 /* Chevron Right Arrow */
 .icon-chevron::after {
   content: '';

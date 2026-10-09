@@ -1,5 +1,6 @@
 const app = getApp();
 const db = wx.cloud.database();
+const GRID_HEADER = 20; // 开启「数字」时，图纸左侧/顶部预留的坐标标尺宽度(px)
 
 Page({
   /**
@@ -59,6 +60,7 @@ Page({
     hasPixel: false,     // 是否有可绘制的图纸数据（有则显示像素图纸，无则回退原图）
     showGrid: true,      // 网格线
     showCode: true,      // 色号文字
+    showNumber: false,   // 行列坐标标尺（数字开关）
     scale: 1,            // 缩放倍数（1/2/3/4）
     viewW: 0,            // 画布可视宽（px）
     viewH: 0,            // 画布可视高（px）
@@ -190,18 +192,11 @@ Page({
         materialRows
       };
       if (pixel) {
-        const sysInfo = wx.getSystemInfoSync();
-        const winW = sysInfo.windowWidth || 375;
-        const winH = sysInfo.windowHeight || 667;
-        const viewW = winW;
-        const cell = viewW / pixel.w;
-        const naturalH = Math.ceil(cell * pixel.h);
-        const maxH = Math.floor(winH * 0.6);
-        const finalH = Math.min(naturalH, maxH);
-        extra.viewW = viewW;
-        extra.viewH = finalH;
-        extra.canvasW = Math.round(viewW);
-        extra.canvasH = Math.round(finalH);
+        const size = this._recalcCanvasSize(pixel);
+        extra.viewW = size.viewW;
+        extra.viewH = size.viewH;
+        extra.canvasW = size.canvasW;
+        extra.canvasH = size.canvasH;
       }
 
       this.setData(Object.assign({
@@ -599,20 +594,26 @@ Page({
       canvas.height = info.height * dpr;
       ctx.scale(dpr, dpr);
 
+      const HEADER = this.data.showNumber ? GRID_HEADER : 0;
       const { w, h, hexes, codes } = p;
-      const cell = info.width / w;
+      const gridW = info.width - HEADER;
+      const gridH = info.height - HEADER;
+      const cell = gridW / w;
       const codeReadable = this.data.showCode && cell >= 14;
       const fontSize = Math.min(13, Math.max(8, cell * 0.34));
+      const numFont = Math.min(12, Math.max(8, HEADER * 0.55));
 
+      // 整画布底色
       ctx.fillStyle = '#FBF7F2';
       ctx.fillRect(0, 0, info.width, info.height);
 
+      // 格子区（从 HEADER 偏移开始，给坐标标尺留位置）
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
           const idx = y * w + x;
           const hex = hexes[idx];
-          const x0 = x * cell;
-          const y0 = y * cell;
+          const x0 = HEADER + x * cell;
+          const y0 = HEADER + y * cell;
           if (!hex) {
             ctx.fillStyle = '#F2E9E2';
             ctx.fillRect(x0, y0, cell, cell);
@@ -636,6 +637,31 @@ Page({
           }
         }
       }
+
+      // 行列坐标标尺：画在图纸外侧（顶部列号 / 左侧行号），不在格子内
+      if (HEADER > 0) {
+        ctx.fillStyle = '#EFE6DF';
+        ctx.fillRect(0, 0, info.width, HEADER);   // 顶部表头
+        ctx.fillRect(0, 0, HEADER, info.height);  // 左侧表头
+        ctx.fillStyle = '#8A7B73';
+        ctx.font = '600 ' + numFont.toFixed(0) + 'px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let c = 1; c <= w; c++) {
+          ctx.fillText(String(c), HEADER + (c - 0.5) * cell, HEADER / 2);
+        }
+        for (let r = 1; r <= h; r++) {
+          ctx.fillText(String(r), HEADER / 2, HEADER + (r - 0.5) * cell);
+        }
+        // 表头分隔线
+        ctx.strokeStyle = '#D8C9C0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(HEADER, 0); ctx.lineTo(HEADER, info.height);
+        ctx.moveTo(0, HEADER); ctx.lineTo(info.width, HEADER);
+        ctx.stroke();
+      }
+
       this.canvasNode = canvas;
     });
   },
@@ -651,7 +677,8 @@ Page({
     const next = !this.data.showCode;
     let scale = this.data.scale;
     if (next && this._pixel) {
-      const baseCell = this.data.viewW / this._pixel.w;
+      const HEADER = this.data.showNumber ? GRID_HEADER : 0;
+      const baseCell = (this.data.viewW - HEADER) / this._pixel.w;
       if (baseCell * scale < 14) {
         scale = Math.min(4, Math.max(1, Math.ceil(14 / baseCell)));
       }
@@ -711,14 +738,50 @@ Page({
   },
 
   _applyScale(newScale) {
-    const viewW = this.data.viewW;
-    const viewH = this.data.viewH;
+    const HEADER = this.data.showNumber ? GRID_HEADER : 0;
+    const gridBaseW = this.data.viewW - HEADER;
+    const gridH = this.data.viewH;
     newScale = Math.min(4, Math.max(1, newScale));
     this.setData({
       scale: newScale,
-      canvasW: Math.round(viewW * newScale),
-      canvasH: Math.round(viewH * newScale)
+      canvasW: Math.round(HEADER + gridBaseW * newScale),
+      canvasH: Math.round(HEADER + gridH * newScale)
     });
+  },
+
+  // 根据 showNumber 计算画布尺寸（含坐标标尺预留）
+  _recalcCanvasSize(pixel) {
+    const sysInfo = wx.getSystemInfoSync();
+    const winW = sysInfo.windowWidth || 375;
+    const winH = sysInfo.windowHeight || 667;
+    const HEADER = this.data.showNumber ? GRID_HEADER : 0;
+    const gridBaseW = winW - HEADER;
+    const baseCell = gridBaseW / pixel.w;
+    const baseGridH = baseCell * pixel.h;
+    const maxGridH = Math.floor(winH * 0.6) - HEADER;
+    const finalGridH = Math.max(1, Math.min(baseGridH, maxGridH));
+    const scale = this.data.scale || 1;
+    return {
+      viewW: winW,
+      viewH: Math.round(finalGridH),
+      canvasW: Math.round(HEADER + gridBaseW * scale),
+      canvasH: Math.round(HEADER + finalGridH * scale)
+    };
+  },
+
+  // 「数字」开关：在图纸外侧显示行列坐标标尺
+  toggleNumber() {
+    if (!this.data.hasPixel) return;
+    const next = !this.data.showNumber;
+    const size = this._recalcCanvasSize(this._pixel);
+    this.setData({
+      showNumber: next,
+      viewW: size.viewW,
+      viewH: size.viewH,
+      canvasW: size.canvasW,
+      canvasH: size.canvasH
+    }, () => setTimeout(() => this.drawPixel(), 40));
+    wx.vibrateShort({ type: 'light' });
   },
 
   onCanvasScroll() {

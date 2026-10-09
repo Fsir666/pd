@@ -14,6 +14,7 @@
       <view class="viewer-bar viewer-bar-top">
         <view class="viewer-toggle {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
         <view class="viewer-toggle {{showCode ? 'on' : ''}}" bindtap="toggleCode">色号</view>
+        <view class="viewer-toggle {{showNumber ? 'on' : ''}}" bindtap="toggleNumber">数字</view>
       </view>
       <view class="viewer-bar viewer-bar-zoom">
         <view class="zoom-btn {{scale === 1 ? 'on' : ''}}" data-scale="1" bindtap="setScale">1×</view>

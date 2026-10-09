@@ -1,0 +1,235 @@
+.page {
+  min-height: 100vh;
+  background: #FAF7F3;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部栏 */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 88rpx 28rpx 20rpx;
+  background: #FAF7F3;
+}
+.back-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.back-icon {
+  font-size: 52rpx;
+  color: #3A2A2E;
+  line-height: 1;
+}
+.topbar-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #3A2A2E;
+}
+.myworks-btn {
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  background: #FFEDE0;
+}
+.myworks-btn text {
+  font-size: 24rpx;
+  color: #FF6B00;
+}
+
+/* 状态提示 */
+.state-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+}
+.state-icon { font-size: 72rpx; margin-bottom: 20rpx; }
+.state-title { font-size: 30rpx; color: #3A2A2E; font-weight: 600; }
+.state-sub { font-size: 26rpx; color: #9A8A86; margin-top: 12rpx; }
+
+/* 提示条 */
+.hint-bar {
+  padding: 0 28rpx 16rpx;
+}
+.hint-text {
+  font-size: 24rpx;
+  color: #A08C88;
+}
+
+/* 工具行 */
+.tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28rpx 16rpx;
+}
+.tool-left, .tool-right {
+  display: flex;
+  align-items: center;
+}
+.tool-label {
+  font-size: 26rpx;
+  color: #6B5852;
+  margin-left: 10rpx;
+}
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid #D8C8C0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+.checkbox.checked {
+  background: #FF6B00;
+  border-color: #FF6B00;
+}
+.checkbox text {
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+.seg {
+  display: flex;
+  background: #F0E8E2;
+  border-radius: 24rpx;
+  padding: 4rpx;
+  margin-left: 12rpx;
+}
+.seg-item {
+  padding: 8rpx 26rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #8A7670;
+}
+.seg-item.active {
+  background: #fff;
+  color: #FF6B00;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
+}
+
+/* 网格 */
+.grid-scroll {
+  flex: 1;
+  padding: 0 20rpx;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.card {
+  width: calc(50% - 16rpx);
+  margin: 8rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  border: 3rpx solid transparent;
+  box-shadow: 0 2rpx 12rpx rgba(150,120,110,0.08);
+}
+.card.checked {
+  border-color: #FF6B00;
+}
+.thumb-wrap {
+  position: relative;
+  width: 100%;
+  height: 320rpx;
+  background: #FBF7F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.thumb {
+  width: 100%;
+  height: 100%;
+}
+.card-check {
+  position: absolute;
+  top: 14rpx;
+  right: 14rpx;
+  width: 46rpx;
+  height: 46rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.15);
+}
+.card-check text { font-size: 30rpx; }
+.claimed-badge {
+  position: absolute;
+  left: 14rpx;
+  top: 14rpx;
+  background: rgba(28,156,79,0.9);
+  color: #fff;
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+.card-info {
+  padding: 16rpx 18rpx 20rpx;
+}
+.card-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3A2A2E;
+}
+.card-meta {
+  display: block;
+  font-size: 22rpx;
+  color: #9A8A86;
+  margin-top: 6rpx;
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+.tag {
+  font-size: 20rpx;
+  color: #B0806A;
+  background: #FBF0E8;
+  padding: 2rpx 12rpx;
+  border-radius: 12rpx;
+  margin-right: 8rpx;
+  margin-bottom: 6rpx;
+}
+.grid-bottom-pad { height: 180rpx; }
+
+/* 底部操作条 */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: rgba(255,255,255,0.96);
+  border-top: 1rpx solid #F0E8E2;
+}
+.bottom-info { display: flex; flex-direction: column; }
+.bottom-count { font-size: 30rpx; color: #3A2A2E; font-weight: 600; }
+.bottom-sub { font-size: 22rpx; color: #9A8A86; margin-top: 4rpx; }
+.claim-btn {
+  padding: 22rpx 56rpx;
+  background: linear-gradient(135deg, #FF8A3D, #FF6B00);
+  border-radius: 44rpx;
+  box-shadow: 0 6rpx 18rpx rgba(255,107,0,0.3);
+}
+.claim-btn text {
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.claim-btn.disabled {
+  background: #E0D6D0;
+  box-shadow: none;
+}
+.claim-btn.disabled text { color: #A89A94; }
