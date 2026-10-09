@@ -193,6 +193,61 @@ Page({
     wx.navigateTo({ url: '/pages/my-works/my-works' });
   },
 
+  // 单张删除（已发布则撤回，未发布则从库移除）
+  deleteItem(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+    wx.showModal({
+      title: '删除图纸',
+      content: '确定删除这张图纸吗？\n（已发布将撤回，未发布从库移除）',
+      confirmText: '删除',
+      confirmColor: '#E2677A',
+      success: (res) => { if (res.confirm) this.doDelete([key]); }
+    });
+  },
+
+  // 批量删除选中
+  deleteSelected() {
+    const keys = Object.keys(this.data.selected);
+    if (!keys.length) {
+      wx.showToast({ title: '请先勾选图纸', icon: 'none' });
+      return;
+    }
+    wx.showModal({
+      title: '删除图纸',
+      content: `确定删除 ${keys.length} 张图纸吗？\n（已发布的将撤回，未发布的从库移除）`,
+      confirmText: '删除',
+      confirmColor: '#E2677A',
+      success: (res) => { if (res.confirm) this.doDelete(keys); }
+    });
+  },
+
+  doDelete(keys) {
+    wx.showLoading({ title: '处理中...', mask: true });
+    wx.cloud.callFunction({
+      name: 'template-api',
+      data: { action: 'deleteDraft', keys }
+    }).then(res => {
+      wx.hideLoading();
+      const r = (res && res.result) || {};
+      if (r.code === 0) {
+        const ok = (r.data && r.data.ok) || [];
+        const failed = (r.data && r.data.failed) || [];
+        let msg = `已删除 ${ok.length} 张`;
+        if (failed.length) msg += `，${failed.length} 张失败`;
+        wx.showToast({ title: msg, icon: 'none', duration: 2500 });
+        this.setData({ selected: {}, selectedCount: 0 });
+        this.loadDrafts();
+      } else {
+        wx.showToast({ title: r.msg || '删除失败', icon: 'none' });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('[admin-drafts] deleteDraft fail', err);
+      wx.showToast({ title: '网络错误', icon: 'none' });
+    });
+  },
+
   onShareAppMessage() {
     return { title: '悠米拼豆 · 精品图纸库', path: '/pages/index/index' };
   }

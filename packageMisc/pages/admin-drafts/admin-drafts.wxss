@@ -170,6 +170,21 @@
   padding: 4rpx 14rpx;
   border-radius: 16rpx;
 }
+.del-btn {
+  position: absolute;
+  right: 14rpx;
+  bottom: 14rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: rgba(226,103,122,0.92);
+  color: #fff;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2);
+}
 .card-info {
   padding: 16rpx 18rpx 20rpx;
 }
@@ -233,3 +248,21 @@
   box-shadow: none;
 }
 .claim-btn.disabled text { color: #A89A94; }
+.bottom-btns {
+  display: flex;
+  align-items: center;
+}
+.del-sel-btn {
+  padding: 22rpx 36rpx;
+  background: #fff;
+  border: 3rpx solid #E2677A;
+  border-radius: 44rpx;
+  margin-right: 16rpx;
+}
+.del-sel-btn text {
+  color: #E2677A;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.del-sel-btn.disabled { border-color: #E0D6D0; }
+.del-sel-btn.disabled text { color: #A89A94; }

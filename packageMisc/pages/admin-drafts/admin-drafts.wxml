@@ -58,6 +58,7 @@
               <text wx:if="{{item.checked}}">✓</text>
             </view>
             <view class="claimed-badge" wx:if="{{item.claimed}}">已添加</view>
+            <view class="del-btn" data-key="{{item.key}}" catchtap="deleteItem">🗑</view>
           </view>
           <view class="card-info">
             <text class="card-name">{{item.name}}</text>
@@ -77,8 +78,13 @@
         <text class="bottom-count">已选 {{selectedCount}} 张</text>
         <text class="bottom-sub">将标记为：{{isPublic ? '公开' : '私密'}}</text>
       </view>
-      <view class="claim-btn {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="confirmClaim">
-        <text>{{submitting ? '处理中...' : '放到我名下'}}</text>
+      <view class="bottom-btns">
+        <view class="del-sel-btn {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="deleteSelected">
+          <text>删除选中</text>
+        </view>
+        <view class="claim-btn {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="confirmClaim">
+          <text>{{submitting ? '处理中...' : '放到我名下'}}</text>
+        </view>
       </view>
     </view>
   </block>
