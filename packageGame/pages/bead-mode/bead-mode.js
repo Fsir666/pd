@@ -1371,7 +1371,10 @@ Page({
           // 长按500ms后进入连续绘制模式
           this.isContinuousDrawing = true;
           this.continuousDrawTriggered = true;
-          this.lastHistorySave = JSON.stringify(this.data.beadColors);
+          this.lastHistorySave = this._snapshot(this.data.beadColors, this.data.beadColorCodes, {
+            gridWidth: this.data.gridWidth,
+            gridHeight: this.data.gridHeight
+          });
           wx.vibrateShort({ type: 'light' });
           wx.showToast({ title: '连续绘制模式', icon: 'none', duration: 800 });
         }, 500);
@@ -1643,7 +1646,10 @@ Page({
         this.placeBead(touch.clientX, touch.clientY);
       } else if (this.lastHistorySave) {
         // 连续绘制结束，保存历史记录
-        const currentColors = JSON.stringify(this.data.beadColors);
+        const currentColors = this._snapshot(this.data.beadColors, this.data.beadColorCodes, {
+          gridWidth: this.data.gridWidth,
+          gridHeight: this.data.gridHeight
+        });
         if (currentColors !== this.lastHistorySave) {
           const { undoStack, maxHistory } = this.data;
           undoStack.push(this.lastHistorySave);
@@ -1720,7 +1726,9 @@ Page({
     // 应用对称模式
     const allCells = this.applySymmetry(cellsToDraw, symmetryMode);
 
+    const oldCodes = { ...this.data.beadColorCodes };
     const newBeadColors = { ...beadColors };
+    const newCodes = { ...this.data.beadColorCodes };
     let hasChanged = false;
 
     if (eraserMode) {
@@ -1729,7 +1737,7 @@ Page({
         const key = `${col},${row}`;
         if (newBeadColors[key]) {
           delete newBeadColors[key];
-          delete this.data.beadColorCodes[key];
+          delete newCodes[key];
           hasChanged = true;
         }
       });
@@ -1743,16 +1751,17 @@ Page({
         }
         // 同时存储色号
         if (selectedColor.code) {
-          this.data.beadColorCodes[key] = selectedColor.code;
+          newCodes[key] = selectedColor.code;
         }
       });
     }
 
     if (hasChanged) {
-      this.saveToHistory(beadColors, newBeadColors);
+      this.saveToHistory(beadColors, newBeadColors, oldCodes, newCodes);
 
       this.setData({
         beadColors: newBeadColors,
+        beadColorCodes: newCodes,
         currentCoordX: centerCol,
         currentCoordY: centerRow
       });
@@ -1762,18 +1771,42 @@ Page({
     }
   },
 
-  saveToHistory(oldColors, newColors) {
-    const { undoStack, redoStack, maxHistory } = this.data;
-    
-    if (JSON.stringify(oldColors) === JSON.stringify(newColors)) {
+  // 历史快照同时保存「颜色」和「色号」两份数据：
+  // 只存颜色的话，橡皮擦掉再撤销时色号已经丢了，拼豆会变回没有色号的空壳。
+  _snapshot(colors, codes, size) {
+    const snap = { colors: colors || {}, codes: codes || {} };
+    if (size) {
+      snap.gridWidth = size.gridWidth;
+      snap.gridHeight = size.gridHeight;
+    }
+    return JSON.stringify(snap);
+  },
+
+  // 尺寸变化了就一并恢复（导入图片会改画布尺寸，不恢复的话撤销后豆子会画到网格外）
+  _applySizeFromSnapshot(snap, patch) {
+    if (!snap || !snap.gridWidth || !snap.gridHeight) return;
+    if (snap.gridWidth === this.data.gridWidth && snap.gridHeight === this.data.gridHeight) return;
+    patch.gridWidth = snap.gridWidth;
+    patch.gridHeight = snap.gridHeight;
+    patch.previewSize = this.calculatePreviewSize(snap.gridWidth, snap.gridHeight);
+  },
+
+  saveToHistory(oldColors, newColors, oldCodes, newCodes) {
+    const { undoStack, maxHistory } = this.data;
+
+    if (JSON.stringify(oldColors) === JSON.stringify(newColors) &&
+        JSON.stringify(oldCodes || {}) === JSON.stringify(newCodes || {})) {
       return;
     }
 
-    undoStack.push(JSON.stringify(oldColors));
+    undoStack.push(this._snapshot(oldColors, oldCodes, {
+      gridWidth: this.data.gridWidth,
+      gridHeight: this.data.gridHeight
+    }));
     if (undoStack.length > maxHistory) {
       undoStack.shift();
     }
-    
+
     this.setData({ undoStack, redoStack: [] });
   },
 
@@ -1786,16 +1819,23 @@ Page({
     }
 
     const previousState = JSON.parse(undoStack.pop());
-    this.data.redoStack.push(JSON.stringify(beadColors));
+    this.data.redoStack.push(this._snapshot(beadColors, this.data.beadColorCodes, {
+      gridWidth: this.data.gridWidth,
+      gridHeight: this.data.gridHeight
+    }));
     if (this.data.redoStack.length > maxHistory) {
       this.data.redoStack.shift();
     }
 
-    this.setData({
-      beadColors: previousState,
+    const patch = {
+      beadColors: previousState.colors || previousState,
+      beadColorCodes: previousState.codes || {},
       undoStack: this.data.undoStack,
       redoStack: this.data.redoStack
-    });
+    };
+    this._applySizeFromSnapshot(previousState, patch);
+
+    this.setData(patch);
     this.drawGrid();
     this.updateMiniMapBounds();
     this.drawMiniMap();
@@ -1811,16 +1851,23 @@ Page({
     }
 
     const nextState = JSON.parse(redoStack.pop());
-    this.data.undoStack.push(JSON.stringify(beadColors));
+    this.data.undoStack.push(this._snapshot(beadColors, this.data.beadColorCodes, {
+      gridWidth: this.data.gridWidth,
+      gridHeight: this.data.gridHeight
+    }));
     if (this.data.undoStack.length > maxHistory) {
       this.data.undoStack.shift();
     }
 
-    this.setData({
-      beadColors: nextState,
+    const patch = {
+      beadColors: nextState.colors || nextState,
+      beadColorCodes: nextState.codes || {},
       undoStack: this.data.undoStack,
       redoStack: this.data.redoStack
-    });
+    };
+    this._applySizeFromSnapshot(nextState, patch);
+
+    this.setData(patch);
     this.drawGrid();
     this.updateMiniMapBounds();
     this.drawMiniMap();
@@ -1943,15 +1990,18 @@ Page({
       bottom: Math.max(...rows)
     };
     
-    // 更新选区
+    // 更新选区（同时弹出操作菜单，否则点选完没法复制/删除）
     this.setData({
       selection: {
         cells: selectedCells,
         bounds: bounds,
         mode: 'color'
-      }
+      },
+      selectionMenuVisible: true,
+      selectionMenuX: clientX,
+      selectionMenuY: Math.max(70, clientY - 20)
     });
-    
+
     wx.showToast({ title: `选中了${selectedCells.length}个豆子`, icon: 'success', duration: 1500 });
     this.drawGrid();
   },
@@ -2491,21 +2541,30 @@ Page({
     });
     
     // 删除选中的豆子
+    const oldCodes = { ...this.data.beadColorCodes };
     const newBeadColors = { ...beadColors };
+    const newCodes = { ...this.data.beadColorCodes };
     selection.cells.forEach(cell => {
       const key = `${cell.x},${cell.y}`;
       delete newBeadColors[key];
+      delete newCodes[key];
     });
-    
+
+    // 记进历史，否则剪掉一大片后撤销不了
+    this.saveToHistory(beadColors, newBeadColors, oldCodes, newCodes);
+
     // 清空选区
     this.setData({
       beadColors: newBeadColors,
+      beadColorCodes: newCodes,
       selection: null
     });
-    
+
     wx.showToast({ title: `已剪切${selection.cells.length}个豆子`, icon: 'success' });
     this.closeSelectionMenu();
     this.drawGrid();
+    this.updateMiniMapBounds();
+    this.drawMiniMap();
   },
 
   onSelectionDelete() {
@@ -2516,21 +2575,30 @@ Page({
     }
     
     // 删除选中的豆子
+    const oldCodes = { ...this.data.beadColorCodes };
     const newBeadColors = { ...beadColors };
+    const newCodes = { ...this.data.beadColorCodes };
     selection.cells.forEach(cell => {
       const key = `${cell.x},${cell.y}`;
       delete newBeadColors[key];
+      delete newCodes[key];
     });
-    
+
+    // 记进历史，否则删掉一大片后撤销不了
+    this.saveToHistory(beadColors, newBeadColors, oldCodes, newCodes);
+
     // 清空选区
     this.setData({
       beadColors: newBeadColors,
+      beadColorCodes: newCodes,
       selection: null
     });
-    
+
     wx.showToast({ title: `已删除${selection.cells.length}个豆子`, icon: 'success' });
     this.closeSelectionMenu();
     this.drawGrid();
+    this.updateMiniMapBounds();
+    this.drawMiniMap();
   },
 
   onSelectionClear() {
@@ -4291,6 +4359,9 @@ Page({
                       newBeadColorCodes[key] = bead.color.code;
                     }
                   }
+
+                  // 导入会整幅覆盖，必须先记一笔历史，否则一键撤销不回来
+                  this.saveToHistory(this.data.beadColors, newBeadColors, this.data.beadColorCodes, newBeadColorCodes);
 
                   this.setData({
                     beadColors: newBeadColors,
