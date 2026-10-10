@@ -45,6 +45,7 @@
 .state-icon { font-size: 72rpx; margin-bottom: 20rpx; }
 .state-title { font-size: 30rpx; color: #3A2A2E; font-weight: 600; }
 .state-sub { font-size: 26rpx; color: #9A8A86; margin-top: 12rpx; }
+.state-tip { font-size: 23rpx; color: #C2B4B4; margin-top: 8rpx; }
 .state-btn {
   margin-top: 40rpx;
   padding: 18rpx 56rpx;

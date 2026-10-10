@@ -19,6 +19,7 @@
     <text class="state-icon">🔒</text>
     <text class="state-title">无访问权限</text>
     <text class="state-sub">{{loadError || '当前账号不是管理员'}}</text>
+    <view class="state-tip">此页面仅限管理员使用</view>
     <view class="state-btn" wx:if="{{loadError === '网络错误，请重试'}}" bindtap="checkAdmin">重新加载</view>
   </view>
 

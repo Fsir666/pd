@@ -132,11 +132,46 @@ Page({
     });
   },
 
-  // 管理员入口（所有人可见，进去后非管理员会看到无权限提示）
+  // 管理员入口（所有人可见，但只有管理员能进）
+  // 双保险：前端先拦一道，服务端 checkAdmin 再拦一道
   goToAdmin() {
     wx.vibrateShort({ type: 'light' });
-    wx.navigateTo({
-      url: '/packageMisc/pages/admin/admin'
+
+    // 未登录：先引导登录
+    if (!this.data.isLogged) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      this.onLoginTap();
+      return;
+    }
+
+    // 已登录：实时校验管理员身份，非管理员不放行
+    wx.showLoading({ title: '校验中...', mask: true });
+    wx.cloud.callFunction({
+      name: 'template-api',
+      data: { action: 'checkAdmin' }
+    }).then(res => {
+      wx.hideLoading();
+      const r = (res && res.result) || {};
+      const d = r.data || {};
+      const isAdmin = !!d.isAdmin;
+      if (this.data.isAdmin !== isAdmin) this.setData({ isAdmin });
+      if (!isAdmin) {
+        wx.showModal({
+          title: d.needLogin ? '请先登录' : '无访问权限',
+          content: d.needLogin
+            ? '此功能需要登录后使用，是否现在登录？'
+            : '当前账号没有管理员权限，如需开通请联系开发者。',
+          showCancel: !!d.needLogin,
+          confirmText: d.needLogin ? '去登录' : '知道了',
+          success: (m) => { if (d.needLogin && m.confirm) this.onLoginTap(); }
+        });
+        return;
+      }
+      wx.navigateTo({ url: '/packageMisc/pages/admin/admin' });
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('[profile] goToAdmin checkAdmin fail', err);
+      wx.showToast({ title: '网络错误，请重试', icon: 'none' });
     });
   },
 
