@@ -325,6 +325,11 @@ Page({
         gridHeight: gridHeight,
         selectedBrand: selectedBrand,
         beadColors: session.beadColors,
+        // 接收随作品带入的色号映射。此前未接收，导致所有已有色块都画不出色号
+        // （只有新画的色块会即时写入 beadColorCodes 并显示）。
+        beadColorCodes: (session.beadColorCodes && typeof session.beadColorCodes === 'object')
+          ? session.beadColorCodes
+          : {},
         showGrid: session.showGrid !== false,
         showRuler: session.showRuler !== false,
         showCellCodes: session.showCellCodes !== false
@@ -343,22 +348,45 @@ Page({
     // 兼容旧的 pixelHexes 格式
     else if (session.pixelHexes && session.pixelHexes.length > 0) {
       const beadColors = {};
+      const beadColorCodes = {};
+      // 修正：原实现用 gridSize 同时当行宽处理，宽高不等时会整体错位；
+      // 这里按实际宽度取模，高度由数组长度自然截断。
       const size = gridSize;
-      
+
+      // 尝试通过 hex 反查色号，让旧格式的数据也能显示色号
+      let hexCodeMap = Object.create(null);
+      try {
+        const bd = colorData[String(selectedBrand).toLowerCase()] || null;
+        if (bd) {
+          const subs = bd.subSeries || [];
+          subs.forEach((s) => {
+            (s.colors || []).forEach((c) => {
+              if (c && c.hex && c.code) hexCodeMap[String(c.hex).toUpperCase()] = c.code;
+            });
+          });
+        }
+      } catch (e) {
+        console.warn('[bead-mode] 构建 hex->色号 映射失败', e);
+      }
+
       for (let i = 0; i < session.pixelHexes.length; i++) {
         const hex = session.pixelHexes[i];
         if (hex) {
           const x = (i % size) + 1;
           const y = Math.floor(i / size) + 1;
-          beadColors[`${x},${y}`] = hex;
+          const key = `${x},${y}`;
+          beadColors[key] = hex;
+          const code = hexCodeMap[String(hex).toUpperCase()];
+          if (code) beadColorCodes[key] = code;
         }
       }
-      
+
       this.setData({
         gridWidth: gridSize,
         gridHeight: gridHeight,
         selectedBrand: selectedBrand,
         beadColors: beadColors,
+        beadColorCodes: beadColorCodes,
         showGrid: session.showGrid !== false,
         showRuler: session.showRuler !== false,
         showCellCodes: session.showCellCodes !== false

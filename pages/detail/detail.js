@@ -1359,10 +1359,27 @@ Page({
       
       const appInst = getApp();
       appInst.globalData = appInst.globalData || {};
+      // 构建色号映射：拼豆模式需要 "x,y" -> 色号 才能在每个格子内绘制色号。
+      // 此前只传了 beadColors，导致从作品页进入拼豆模式时所有已有色块都显示不出色号
+      // （只有当场用画笔新画的色块才带色号）。
+      const sessionCodes = Object.create(null);
+      try {
+        const brandKey = String(board.brand || 'MARD').toUpperCase();
+        const hexMap = this._getHexCodeMap(brandKey);
+        Object.keys(board.beadColors).forEach((k) => {
+          const hex = board.beadColors[k];
+          if (!hex) return;
+          const code = hexMap[String(hex).toUpperCase()];
+          if (code) sessionCodes[k] = code;
+        });
+      } catch (e) {
+        console.warn('[detail] 构建色号映射失败', e);
+      }
       appInst.globalData.beadSession = {
         gridSize: gridWidth,
         gridHeight: gridHeight,
         beadColors: board.beadColors,
+        beadColorCodes: sessionCodes,
         selectedBrand: board.brand || 'MARD',
         statsSort: 'count',
         showGrid: true,
