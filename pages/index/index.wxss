@@ -651,6 +651,30 @@ scroll-view {
   width: 100%;
 }
 
+.rank-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56rpx 40rpx 64rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 24rpx;
+}
+
+.rank-empty-icon {
+  font-size: 64rpx;
+  line-height: 1;
+  margin-bottom: 20rpx;
+  opacity: 0.8;
+}
+
+.rank-empty-text {
+  font-size: 25rpx;
+  color: #B7A9A9;
+  text-align: center;
+  line-height: 1.6;
+}
+
 .rank-column {
   width: 48.5%;
   display: flex;

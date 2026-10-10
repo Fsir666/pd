@@ -9,7 +9,7 @@
     <view class="header-sub">{{list.length}} 张原创图纸 · 免费拿去拼</view>
   </view>
 
-  <view class="grid">
+  <view class="grid" wx:if="{{list.length > 0}}">
     <view class="card" wx:for="{{list}}" wx:key="key" bindtap="openDetail" data-key="{{item.key}}">
       <view class="thumb-wrap">
         <image class="thumb" src="{{item.thumb}}" mode="aspectFit"></image>
@@ -19,7 +19,13 @@
     </view>
   </view>
 
-  <view class="footer-tip">图纸均为本站原创，可放心使用 · 持续更新中</view>
+  <view class="empty-state" wx:if="{{list.length === 0}}">
+    <view class="empty-icon">📦</view>
+    <view class="empty-title">图纸正在准备中</view>
+    <view class="empty-desc">新的原创图纸即将上线，敬请期待～</view>
+  </view>
+
+  <view class="footer-tip" wx:if="{{list.length > 0}}">图纸均为本站原创，可放心使用 · 持续更新中</view>
   <view class="safe-bottom"></view>
 </view>
 

@@ -27,7 +27,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: '拼豆图纸库 · 21 张原创图纸免费拿',
+      title: '拼豆图纸库 · 原创图纸免费拿',
       path: '/pages/patterns/patterns'
     };
   }

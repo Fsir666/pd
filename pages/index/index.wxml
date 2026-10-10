@@ -222,7 +222,7 @@ module.exports = {
         </template>
 
         <!-- Two Column Flex Layout -->
-        <view class="rank-list-flex">
+        <view class="rank-list-flex" wx:if="{{leftTemplates.length > 0 || rightTemplates.length > 0}}">
           <view class="rank-column">
             <block wx:for="{{leftTemplates}}" wx:key="id">
               <template is="rankItem" data="{{item}}"/>
@@ -233,6 +233,12 @@ module.exports = {
               <template is="rankItem" data="{{item}}"/>
             </block>
           </view>
+        </view>
+
+        <!-- 空态：暂无榜单作品 -->
+        <view class="rank-empty" wx:if="{{leftTemplates.length === 0 && rightTemplates.length === 0}}">
+          <text class="rank-empty-icon">🏆</text>
+          <text class="rank-empty-text">榜单还在酝酿中，快发布作品抢占第一吧～</text>
         </view>
       </view>
       
