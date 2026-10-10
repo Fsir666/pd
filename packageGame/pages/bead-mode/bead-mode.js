@@ -287,10 +287,17 @@ Page({
     this.loadSettings();
     this.loadQuickButtons();
     this.initCanvas();
-    this.initMiniMap();
+    // 注意：小地图画布不在此处初始化。
+    // 它所在的容器是 wx:if 条件渲染（miniMapBeadCount > 0），onLoad 阶段节点尚未
+    // 渲染，createSelectorQuery 拿不到节点会导致初始化永久失败。改到 onReady 处理。
     
     // 检查是否有从作品详情页传入的数据
     this.loadBeadSession();
+  },
+
+  onReady() {
+    // 页面首次渲染完成，此时条件渲染的小地图节点已存在，可安全初始化画布
+    this.initMiniMap();
   },
   
   loadBeadSession() {
@@ -502,8 +509,18 @@ Page({
     query.select('#miniMapCanvas')
       .fields({ node: true, size: true })
       .exec((res) => {
-        if (!res || !res[0]) return;
-        
+        // 小地图容器是 wx:if 条件渲染（依赖 miniMapBeadCount > 0），
+        // 首次进来时该节点可能尚未渲染，拿不到就稍后重试，避免一次失败后永久空白。
+        if (!res || !res[0] || !res[0].node) {
+          if (this._pageAlive !== false && !this._miniMapRetried) {
+            this._miniMapRetried = true;
+            setTimeout(() => {
+              if (this._pageAlive !== false) this.initMiniMap();
+            }, 300);
+          }
+          return;
+        }
+
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
         const dpr = wx.getSystemInfoSync().pixelRatio;
@@ -514,6 +531,11 @@ Page({
 
         this.miniMapCanvas = canvas;
         this.miniMapCtx = ctx;
+
+        // 画布就绪后补绘一次：initMiniMap 是异步的，此前的 drawMiniMap 调用
+        // 因画布未就绪而静默 return，这里补上以免小地图一直空白。
+        this.updateMiniMapBounds();
+        this.drawMiniMap();
       });
   },
 
@@ -547,16 +569,20 @@ Page({
     
     this.setData({
       miniMapScale: scale,
-      miniMapOffsetX: minX,
-      miniMapOffsetY: minY,
       miniMapBeadCount: keys.length
     });
   },
 
   drawMiniMap() {
-    const { beadColors, miniMapSize, miniMapScale, miniMapOffsetX, miniMapOffsetY, miniMapBeadCount, canvasWidth, canvasHeight, cellSize, scale, offsetX, offsetY } = this.data;
-    
-    if (!this.miniMapCtx || miniMapBeadCount === 0) return;
+    const { beadColors, miniMapSize, miniMapScale, miniMapBeadCount, canvasWidth, canvasHeight, cellSize, scale, offsetX, offsetY } = this.data;
+
+    // 画布未就绪时自救：补一次初始化，就绪后会回调本函数重绘。
+    // 避免因初始化时序问题导致小地图永久空白。
+    if (!this.miniMapCtx) {
+      this.initMiniMap();
+      return;
+    }
+    if (miniMapBeadCount === 0) return;
 
     const ctx = this.miniMapCtx;
     ctx.clearRect(0, 0, miniMapSize, miniMapSize);
@@ -564,52 +590,93 @@ Page({
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.fillRect(0, 0, miniMapSize, miniMapSize);
 
-    const centerX = miniMapSize / 2;
-    const centerY = miniMapSize / 2;
+    // 计算图案实际占用的格子范围，用于居中定位。
+    // 修复：原实现以画布中心为起点叠加坐标，导致图案整体偏向右下、超出画布被裁切；
+    // 现改为先算出图案像素尺寸，再据此求出左上角起点，使其在画布内居中。
+    let pMinX = Infinity, pMaxX = -Infinity, pMinY = Infinity, pMaxY = -Infinity;
+    Object.keys(beadColors).forEach(key => {
+      const [c, r] = key.split(',').map(Number);
+      if (!Number.isFinite(c) || !Number.isFinite(r)) return;
+      if (c < pMinX) pMinX = c;
+      if (c > pMaxX) pMaxX = c;
+      if (r < pMinY) pMinY = r;
+      if (r > pMaxY) pMaxY = r;
+    });
+    if (!Number.isFinite(pMinX)) return;
+
+    const drawScale = miniMapScale > 0 ? miniMapScale : 1;
+    const patternW = (pMaxX - pMinX + 1) * drawScale;
+    const patternH = (pMaxY - pMinY + 1) * drawScale;
+    const originX = (miniMapSize - patternW) / 2;
+    const originY = (miniMapSize - patternH) / 2;
 
     Object.keys(beadColors).forEach(key => {
       const [col, row] = key.split(',').map(Number);
       const color = beadColors[key];
+      if (!Number.isFinite(col) || !Number.isFinite(row)) return;
 
-      const x = centerX + (col - miniMapOffsetX - (Object.keys(beadColors).length > 0 ? 0 : 0)) * miniMapScale;
-      const y = centerY + (row - miniMapOffsetY) * miniMapScale;
+      const x = originX + (col - pMinX) * drawScale;
+      const y = originY + (row - pMinY) * drawScale;
 
       ctx.fillStyle = color;
       const dotSize = Math.max(miniMapScale * 0.8, 2);
       ctx.fillRect(x - dotSize / 2, y - dotSize / 2, dotSize, dotSize);
     });
 
+    // 视野范围框：与图案使用同一套坐标基准（originX/originY + 相对图案起点的偏移）
     const actualCellSize = cellSize * scale;
-    const viewportWidth = (canvasWidth / actualCellSize) * miniMapScale;
-    const viewportHeight = (canvasHeight / actualCellSize) * miniMapScale;
-    const viewportX = centerX + (offsetX / actualCellSize) * miniMapScale - viewportWidth / 2;
-    const viewportY = centerY + (offsetY / actualCellSize) * miniMapScale - viewportHeight / 2;
+    if (actualCellSize > 0) {
+      const viewportWidth = (canvasWidth / actualCellSize) * drawScale;
+      const viewportHeight = (canvasHeight / actualCellSize) * drawScale;
+      // 主画布中心对应的网格坐标相对图案左上角的偏移
+      const centerColOffset = (-offsetX / actualCellSize) - pMinX;
+      const centerRowOffset = (-offsetY / actualCellSize) - pMinY;
+      const viewportX = originX + centerColOffset * drawScale - viewportWidth / 2;
+      const viewportY = originY + centerRowOffset * drawScale - viewportHeight / 2;
 
-    ctx.strokeStyle = '#007aff';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(viewportX, viewportY, viewportWidth, viewportHeight);
+      ctx.strokeStyle = '#007aff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(viewportX, viewportY, viewportWidth, viewportHeight);
+    }
   },
 
   onMiniMapTap(e) {
-    const { miniMapSize, miniMapScale, cellSize, canvasWidth, canvasHeight, miniMapOffsetX, miniMapOffsetY } = this.data;
-    
-    const rect = e.detail;
+    const { miniMapSize, miniMapScale, cellSize, canvasWidth, canvasHeight, beadColors } = this.data;
+
     const tapX = e.detail.x || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
     const tapY = e.detail.y || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-    
+
+    // 与 drawMiniMap 保持同一套坐标换算：先求图案在画布中的居中起点
+    let pMinX = Infinity, pMaxX = -Infinity, pMinY = Infinity, pMaxY = -Infinity;
+    Object.keys(beadColors || {}).forEach(key => {
+      const [c, r] = key.split(',').map(Number);
+      if (!Number.isFinite(c) || !Number.isFinite(r)) return;
+      if (c < pMinX) pMinX = c;
+      if (c > pMaxX) pMaxX = c;
+      if (r < pMinY) pMinY = r;
+      if (r > pMaxY) pMaxY = r;
+    });
+    if (!Number.isFinite(pMinX)) return;
+
+    const drawScale = miniMapScale > 0 ? miniMapScale : 1;
+    const originX = (miniMapSize - (pMaxX - pMinX + 1) * drawScale) / 2;
+    const originY = (miniMapSize - (pMaxY - pMinY + 1) * drawScale) / 2;
+
     const query = wx.createSelectorQuery();
     query.select('.mini-map-container').boundingClientRect((rect) => {
       if (!rect) return;
-      
+
       const localX = tapX - rect.left;
       const localY = tapY - rect.top;
-      
-      const centerX = miniMapSize / 2;
-      const centerY = miniMapSize / 2;
-      
+
       const actualCellSize = cellSize * this.data.scale;
-      const newOffsetX = -(localX - centerX) / miniMapScale * actualCellSize;
-      const newOffsetY = -(localY - centerY) / miniMapScale * actualCellSize;
+      if (actualCellSize <= 0) return;
+
+      // 点击位置换算成图案内的格子坐标，再转为主画布偏移
+      const tapCol = pMinX + (localX - originX) / drawScale;
+      const tapRow = pMinY + (localY - originY) / drawScale;
+      const newOffsetX = -tapCol * actualCellSize;
+      const newOffsetY = -tapRow * actualCellSize;
 
       this.data.offsetX = newOffsetX;
       this.data.offsetY = newOffsetY;
