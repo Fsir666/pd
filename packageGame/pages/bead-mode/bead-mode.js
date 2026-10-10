@@ -356,12 +356,15 @@ Page({
       // 尝试通过 hex 反查色号，让旧格式的数据也能显示色号
       let hexCodeMap = Object.create(null);
       try {
-        const bd = colorData[String(selectedBrand).toLowerCase()] || null;
+        const bd = this._resolveBrandData(selectedBrand);
         if (bd) {
           const subs = bd.subSeries || [];
           subs.forEach((s) => {
             (s.colors || []).forEach((c) => {
-              if (c && c.hex && c.code) hexCodeMap[String(c.hex).toUpperCase()] = c.code;
+              // 注意用 if 而不是直接赋值：数据里存在「同 hex 多个色号」的条目，
+              // 直接覆盖会让后出现的色号顶掉前面的，导致显示错色号。
+              const h = c && c.hex ? String(c.hex).toUpperCase() : '';
+              if (c && h && c.code && !hexCodeMap[h]) hexCodeMap[h] = String(c.code).trim();
             });
           });
         }
@@ -402,6 +405,31 @@ Page({
         wx.showToast({ title: '作品已加载', icon: 'success' });
       }, 300);
     }
+  },
+
+  // 品牌标识归一化：外部入口传进来的可能是 'MARD'（大写 id）、
+  // 'mard'、或 '漫漫'/'咪小窝'（中文名），而 colorData 的键一律是小写英文 id。
+  // 历史 bug：只用 toLowerCase() 查表，中文品牌名一律查不到 → 这些品牌的
+  // 作品进拼豆模式后色号全部空白。
+  _resolveBrandData(brand) {
+    if (!brand) return null;
+    const raw = String(brand).trim();
+    if (!raw) return null;
+
+    const byKey = colorData[raw.toLowerCase()];
+    if (byKey) return byKey;
+
+    // 中文名 / 名称大小写不一致时的兜底匹配
+    const lower = raw.toLowerCase();
+    const keys = Object.keys(colorData);
+    for (let i = 0; i < keys.length; i++) {
+      const bd = colorData[keys[i]];
+      if (!bd) continue;
+      const name = String(bd.name || '').trim().toLowerCase();
+      const id = String(bd.id || '').trim().toLowerCase();
+      if (name === lower || id === lower) return bd;
+    }
+    return null;
   },
 
   initBrands() {
@@ -4594,7 +4622,12 @@ Page({
           board: {
             gridWidth: this.data.gridWidth,
             gridHeight: this.data.gridHeight,
-            beadColors: this.data.beadColors
+            beadColors: this.data.beadColors,
+            // 必须把色号一起存到作品里。
+            // 历史 bug：只存了颜色，别人（或自己）从作品页进拼豆模式时
+            // 只能用 hex 反查色号，遇到「同色不同批」的颜色就会查不到或查错。
+            beadColorCodes: this.data.beadColorCodes,
+            brand: this.data.selectedBrand || 'MARD'
           },
           spec: {
             cols: this.data.gridWidth,

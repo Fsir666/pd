@@ -1362,16 +1362,27 @@ Page({
       // 构建色号映射：拼豆模式需要 "x,y" -> 色号 才能在每个格子内绘制色号。
       // 此前只传了 beadColors，导致从作品页进入拼豆模式时所有已有色块都显示不出色号
       // （只有当场用画笔新画的色块才带色号）。
+      // 优先直接用作品里存的 beadColorCodes：那才是作者当初真实用的色号，
+      // 用 hex 反查只能得到一个「近似答案」（调色板里存在同色不同色的条目）。
       const sessionCodes = Object.create(null);
-      try {
-        const brandKey = String(board.brand || 'MARD').toUpperCase();
-        const hexMap = this._getHexCodeMap(brandKey);
-        Object.keys(board.beadColors).forEach((k) => {
-          const hex = board.beadColors[k];
-          if (!hex) return;
-          const code = hexMap[String(hex).toUpperCase()];
-          if (code) sessionCodes[k] = code;
+      if (board.beadColorCodes && typeof board.beadColorCodes === 'object') {
+        Object.keys(board.beadColorCodes).forEach((k) => {
+          const code = board.beadColorCodes[k];
+          if (code) sessionCodes[k] = String(code).trim();
         });
+      }
+      // 作品没存色号（老作品）时才回退到 hex 反查
+      try {
+        if (Object.keys(sessionCodes).length === 0) {
+          const brandKey = String(board.brand || 'MARD').toUpperCase();
+          const hexMap = this._getHexCodeMap(brandKey);
+          Object.keys(board.beadColors).forEach((k) => {
+            const hex = board.beadColors[k];
+            if (!hex) return;
+            const code = hexMap[String(hex).toUpperCase()];
+            if (code) sessionCodes[k] = code;
+          });
+        }
       } catch (e) {
         console.warn('[detail] 构建色号映射失败', e);
       }
