@@ -132,11 +132,11 @@ Page({
     });
   },
 
-  // 管理员：图纸库管理入口
-  goToAdminDrafts() {
+  // 管理员入口（所有人可见，进去后非管理员会看到无权限提示）
+  goToAdmin() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({
-      url: '/packageMisc/pages/admin-drafts/admin-drafts'
+      url: '/packageMisc/pages/admin/admin'
     });
   },
 

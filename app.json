@@ -55,6 +55,7 @@
         "pages/my-orders/my-orders",
         "pages/contact/contact",
         "pages/beginner-guide/beginner-guide",
+        "pages/admin/admin",
         "pages/admin-drafts/admin-drafts"
       ]
     }

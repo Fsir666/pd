@@ -1,0 +1,49 @@
+<view class="page">
+  <!-- 顶部栏 -->
+  <view class="topbar">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="topbar-title">管理员</view>
+    <view class="topbar-right"></view>
+  </view>
+
+  <!-- 校验中 -->
+  <view class="state-box" wx:if="{{checking}}">
+    <text class="state-icon">⏳</text>
+    <text class="state-title">正在校验权限...</text>
+  </view>
+
+  <!-- 非管理员：无权限 -->
+  <view class="state-box" wx:elif="{{!isAdmin}}">
+    <text class="state-icon">🔒</text>
+    <text class="state-title">无访问权限</text>
+    <text class="state-sub">{{loadError || '当前账号不是管理员'}}</text>
+    <view class="state-btn" wx:if="{{loadError === '网络错误，请重试'}}" bindtap="checkAdmin">重新加载</view>
+  </view>
+
+  <!-- 管理员：功能列表 -->
+  <block wx:else>
+    <view class="section-label">管理功能</view>
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToDrafts" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-orange">
+            <text class="menu-icon">🛠️</text>
+          </view>
+          <view class="item-texts">
+            <text class="item-title">图纸库管理</text>
+            <text class="item-sub">管理待选图纸，认领到你名下</text>
+          </view>
+        </view>
+        <view class="item-right">
+          <text class="icon-chevron"></text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tips">更多管理功能会陆续加到这里</view>
+  </block>
+</view>
+
+<privacy-popup />
