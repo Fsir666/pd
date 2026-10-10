@@ -1830,6 +1830,9 @@ Page({
     const patch = {
       beadColors: previousState.colors || previousState,
       beadColorCodes: previousState.codes || {},
+      // 撤销后原来的选区已经对不上画面了，顺手清掉，避免再点删除误删
+      selection: null,
+      selectionMenuVisible: false,
       undoStack: this.data.undoStack,
       redoStack: this.data.redoStack
     };
@@ -1862,6 +1865,8 @@ Page({
     const patch = {
       beadColors: nextState.colors || nextState,
       beadColorCodes: nextState.codes || {},
+      selection: null,
+      selectionMenuVisible: false,
       undoStack: this.data.undoStack,
       redoStack: this.data.redoStack
     };

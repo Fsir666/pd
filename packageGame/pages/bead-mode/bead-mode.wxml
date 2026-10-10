@@ -836,7 +836,7 @@
   <canvas type="2d" id="importCanvas" style="position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px;"></canvas>
   
   <!-- 选区操作菜单 -->
-  <view class="selection-menu-mask" wx:if="{{selectionMenuVisible}}" bindtap="closeSelectionMenu">
+  <view class="selection-menu-mask" wx:if="{{selectionMenuVisible}}" bindtap="onSelectionClear">
     <view class="selection-menu" catchtap="preventClose" style="left: {{selectionMenuX}}px; top: {{selectionMenuY}}px;">
       <view class="selection-menu-item" bindtap="onSelectionCopy">
         <text class="menu-icon">📋</text>
