@@ -249,6 +249,9 @@ Page({
   lastAxisUpdateTime: 0,
 
   onLoad(options) {
+    // 页面存活标记：延迟回调（setTimeout / 画布异步回调）执行前先查此标记，
+    // 避免用户退出页面后回调仍在已卸载实例上执行 setData、弹窗，造成报错与资源泄漏。
+    this._pageAlive = true;
     const res = wx.getSystemInfoSync();
     const recentColors = wx.getStorageSync('recent_bead_colors') || [];
     
@@ -325,6 +328,7 @@ Page({
       
       // 重绘
       setTimeout(() => {
+        if (this._pageAlive === false) return;
         this.redrawAll();
         wx.showToast({ title: '作品已加载', icon: 'success' });
       }, 300);
@@ -358,6 +362,7 @@ Page({
       
       // 重绘
       setTimeout(() => {
+        if (this._pageAlive === false) return;
         this.redrawAll();
         wx.showToast({ title: '作品已加载', icon: 'success' });
       }, 300);
@@ -3599,6 +3604,8 @@ Page({
   },
 
   onUnload() {
+    // 标记页面已销毁：所有延迟回调执行前先查此标记，避免在已卸载实例上 setData。
+    this._pageAlive = false;
     // 离开页面时务必清掉连续绘制定时器：
     // 该定时器仅在 touch 事件中清理，若用户未正常抬手就退出（侧滑返回/切后台/来电），
     // 500ms 后仍会在已卸载的页面实例上回调 setData，造成资源泄漏与控制台报错。
@@ -3860,6 +3867,7 @@ Page({
         dragCurrentY: touchY
       });
       setTimeout(() => {
+        if (this._pageAlive === false) return;
         if (this.data.showTooltip) {
           this.setData({ showTooltip: false });
         }
@@ -4147,6 +4155,7 @@ Page({
           this.setData({ processProgress: 30 });
 
           setTimeout(() => {
+            if (this._pageAlive === false) return;
             try {
               const imageData = ctx.getImageData(0, 0, imgWidth, imgHeight);
               const pixels = imageData.data;
@@ -4162,6 +4171,7 @@ Page({
               }
 
               setTimeout(() => {
+                if (this._pageAlive === false) return;
                 try {
                   const result = colorMatching.processImageToBeads(
                     pixels,
@@ -4336,6 +4346,11 @@ Page({
       // 导出图片
       ctx.draw(false, () => {
         setTimeout(() => {
+          // 页面已退出则不再生成，避免无谓的画布操作
+          if (this._pageAlive === false) {
+            resolve('');
+            return;
+          }
           wx.canvasToTempFilePath({
             canvasId: 'publishPreviewCanvas',
             width: previewSize,
