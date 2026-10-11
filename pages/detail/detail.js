@@ -175,8 +175,13 @@ Page({
         likes = data.heat || data.likeCount || 0;
       }
 
-      // 根据 board（beadColors / codesMard）构建像素图纸数据，替换原来那张「珠子照片」
-      const pixel = this._buildPixelData(board, spec);
+      // 优先解码轻量 cells 编码（palette/hexes/counts/cells），回退 board 大字典
+      let pixel = null;
+      if (data && typeof data.cells === 'string' && data.cells.length &&
+          Array.isArray(data.hexes) && data.hexes.length) {
+        pixel = this._buildPixelDataFromCells(data);
+      }
+      if (!pixel) pixel = this._buildPixelData(board, spec);
       this._pixel = pixel;
       // 规格行 + 用料清单（供详情页「图纸核心区」直接展示）
       const sizeInfo = this._buildSizeInfo(board, spec, pixel);
@@ -390,7 +395,10 @@ Page({
     const s = spec || {};
     const w = Number(b.gridWidth || (pixel && pixel.w) || s.cols || s.gridSize || 0);
     const h = Number(b.gridHeight || (pixel && pixel.h) || s.rows || s.gridSize || 0);
-    let beadCount = Number(b.beadCount || s.beadCount || 0);
+    let beadCount = Number(b.beadCount || s.beadCount || (pixel && pixel.beadCount) || 0);
+    if (!beadCount && pixel && Array.isArray(pixel.counts) && pixel.counts.length) {
+      beadCount = pixel.counts.reduce((a, c) => a + (Number(c) || 0), 0);
+    }
     let colorCount = 0;
 
     // 色号数：优先从像素数据统计实际出现的颜色
@@ -483,6 +491,38 @@ Page({
       return String(a.code).localeCompare(String(b2.code));
     });
     return rows;
+  },
+
+  // 轻量 cells 编码解码：cells 字符串（"."=空，其余为 hexes 下标的 0-9a-z 编码）
+  _buildPixelDataFromCells(data) {
+    const CH = '0123456789abcdefghijklmnopqrstuvwxyz';
+    const w = Number(data.w);
+    const h = Number(data.h);
+    const cells = String(data.cells || '');
+    const hexList = data.hexes || [];
+    const palette = Array.isArray(data.palette) ? data.palette : [];
+    if (!w || w <= 0 || !h || h <= 0) return null;
+    if (cells.length < w * h || !hexList.length) return null;
+    const hexes = new Array(w * h).fill('');
+    const codes = Object.create(null);
+    for (let i = 0; i < w * h; i++) {
+      const ch = cells[i];
+      if (ch === '.') continue;
+      const idx = CH.indexOf(ch);
+      if (idx < 0 || idx >= hexList.length) continue;
+      const hex = hexList[idx];
+      if (!hex) continue;
+      hexes[i] = hex;
+      const y = Math.floor(i / w) + 1;
+      const x = (i % w) + 1;
+      codes[x + ',' + y] = palette[idx] || String(hex).toUpperCase();
+    }
+    return {
+      w, h, hexes, codes,
+      palette,
+      counts: Array.isArray(data.counts) ? data.counts : [],
+      beadCount: Number(data.beadCount) || 0
+    };
   },
 
   // 构建像素数据：优先 beadColors（新），回退 codesMard（旧）
