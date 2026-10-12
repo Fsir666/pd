@@ -187,6 +187,7 @@
           <text class="item-title">版本概览</text>
         </view>
         <view class="item-right">
+          <text class="item-version" wx:if="{{appVersion}}">v{{appVersion}}</text>
           <text class="icon-chevron"></text>
         </view>
       </view>

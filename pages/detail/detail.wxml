@@ -40,6 +40,7 @@
       <text class="title">{{title}}</text>
       <!-- 规格行：宽×高 粒 · 颗数 颗 · 色号 个色号 -->
       <text class="spec-line" wx:if="{{sizeText}}">{{sizeText}}</text>
+      <view class="brand-line" wx:if="{{brandName}}">色号品牌：{{brandName}}</view>
       <view class="tags-container">
         <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
       </view>

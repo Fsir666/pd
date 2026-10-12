@@ -32,10 +32,18 @@ Page({
       const seedKey = id.indexOf('seed_') === 0 ? id.slice(5) : '';
       const p = seedKey ? presets.find(x => x.key === seedKey) : null;
       const author = w.author || '我';
+      // 尺寸文案：优先用本地预设（内置图纸），否则回退到接口返回的 w/h/beadCount。
+      // 接口已改为只返回列表所需字段，不再下发 palette 等像素数据。
+      let sizeText = '';
+      if (p) {
+        sizeText = p.w + '×' + p.h + ' · ' + p.beadCount + ' 颗 · ' + p.palette.length + ' 色';
+      } else if (w.w && w.h) {
+        sizeText = w.w + '×' + w.h + (w.beadCount ? ' · ' + w.beadCount + ' 颗' : '');
+      }
       return Object.assign({}, w, {
         seedKey,
         thumb: p ? '/images/patterns/' + p.key + '.png' : (w.imageUrl || ''),
-        sizeText: p ? (p.w + '×' + p.h + ' · ' + p.beadCount + ' 颗 · ' + p.palette.length + ' 色') : '',
+        sizeText,
         author,
         authorInitial: author.charAt(0),
         avatar: (w.userInfo && w.userInfo.avatarUrl) || (this.data.userInfo && this.data.userInfo.avatarUrl) || ''

@@ -355,6 +355,13 @@ page {
   margin-right: 6rpx;
 }
 
+/* 版本概览入口右侧的版本号 */
+.item-version {
+  font-size: 24rpx;
+  color: #9B8A8C;
+  margin-right: 10rpx;
+}
+
 /* 5. Logout Button (Destructive) */
 .logout-section {
   margin-top: 40rpx;

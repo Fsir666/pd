@@ -190,10 +190,18 @@ module.exports = {
                 data-likes="{{item.heat}}">
             
             <!-- 图片区域 -->
+            <!--
+              这里刻意【不显示作品的原始封面图】。
+              原始封面是插画/照片风格的示意图，和榜单上真正要展示的
+              「拼豆像素图」完全不是一个样子；如果先用它兜底，
+              用户会看到「先出来一张不对的图，过一下又变成对的」，观感很差。
+              所以这里一律用中性的骨架占位，等像素图真正画好再淡入。
+            -->
             <view class="rank-img-box">
-              <canvas wx:if="{{item.hasBoard}}" type="2d" id="rankcv-{{item.rank}}" class="rank-img-real rank-img-canvas"></canvas>
-              <image wx:elif="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" class="rank-img-real" binderror="onImageError" data-index="{{item.rank - 1}}"></image>
-              <view wx:else class="rank-img-placeholder">{{item.image}}</view>
+              <view class="rank-img-skeleton">
+                <text class="rank-img-skeleton-icon">{{item.image || '🎨'}}</text>
+              </view>
+              <canvas wx:if="{{item.boardReady}}" type="2d" id="rankcv-{{item.rank}}" class="rank-img-canvas {{item.boardPainted ? 'is-painted' : ''}}"></canvas>
               
               <!-- 排名角标 -->
               <view class="rank-badge" wx:if="{{item.rank <= 3}}">

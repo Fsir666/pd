@@ -358,7 +358,14 @@ Page({
       try {
         const bd = this._resolveBrandData(selectedBrand);
         if (bd) {
-          const subs = bd.subSeries || [];
+          // 与图纸数据保持一致：MARD 统一以最全的 Mard-291 为准。
+          // 若混用其他套装，反查可能得到 291 套装里买不到的色号。
+          const isMard = String(selectedBrand).toLowerCase() === 'mard'
+            || String(bd.id || '').toLowerCase() === 'mard';
+          const preferred = isMard
+            ? (bd.subSeries || []).find((s) => s && s.id === 'Mard-291')
+            : null;
+          const subs = preferred ? [preferred] : (bd.subSeries || []);
           subs.forEach((s) => {
             (s.colors || []).forEach((c) => {
               // 注意用 if 而不是直接赋值：数据里存在「同 hex 多个色号」的条目，
@@ -876,6 +883,14 @@ Page({
             // 根据背景色决定文字颜色
             const rgb = this.hexToRgb(color);
             const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+
+            // 高亮白（接近纯白）的格子不画色号：
+            // 这类珠子大量成片出现（多为图纸背景留白），若逐个叠字会让画面糊成一片、无法辨读。
+            // 判据取「三通道均 >= 240」，只滤掉接近纯白者，浅灰(#EDEDED 等)仍正常显示色号。
+            if (rgb.r >= 240 && rgb.g >= 240 && rgb.b >= 240) {
+              continue;
+            }
+
             ctx.fillStyle = brightness > 128 ? '#000000' : '#ffffff';
             
             // 获取色号

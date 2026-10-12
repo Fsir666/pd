@@ -192,6 +192,18 @@
   letter-spacing: 0.2px;
 }
 
+/* 品牌提示行：告诉用户下面这些色号属于哪个品牌 */
+.brand-line {
+  display: inline-block;
+  font-size: 23rpx;
+  color: #B5726F;
+  background: #FBEFEA;
+  border-radius: 999rpx;
+  padding: 6rpx 20rpx;
+  margin-bottom: 18rpx;
+  letter-spacing: 0.2px;
+}
+
 /* 用料清单卡片 */
 .material-card {
   background: #FBF7F2;

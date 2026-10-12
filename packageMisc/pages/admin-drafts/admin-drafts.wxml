@@ -51,7 +51,7 @@
         <view class="card {{item.checked ? 'checked' : ''}}" wx:for="{{drafts}}" wx:key="key"
               data-key="{{item.key}}" bindtap="toggleSelect">
           <view class="thumb-wrap">
-            <image class="thumb" src="{{item.thumb}}" mode="aspectFit"
+            <image class="thumb" src="{{item.thumb}}" mode="aspectFit" lazy-load="{{true}}"
                    data-url="{{item.thumb}}" catchtap="previewThumb"></image>
             <view class="checkbox card-check {{item.checked ? 'checked' : ''}}">
               <text wx:if="{{item.checked}}">✓</text>

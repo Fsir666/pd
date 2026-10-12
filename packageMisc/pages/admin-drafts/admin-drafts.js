@@ -36,8 +36,10 @@ Page({
         this.setData({ loading: false, loadError: '当前账号不是管理员' });
         return;
       }
-      // 管理员：先确保图纸库已灌入（幂等），再拉列表
-      return this.ensureSeeded().then(() => this.loadDrafts());
+      // 管理员：直接拉列表。
+      // 注意：不要再在进入页面时调 seedDrafts —— 它会对 218 张图纸逐张查库，
+      // 单次要 50 秒以上，是「图纸库加载慢」的根因；灌库已由运维一次性完成。
+      return this.loadDrafts();
     }).catch(err => {
       wx.hideLoading();
       console.error('[admin-drafts] checkAdmin fail', err);

@@ -1,7 +1,9 @@
 const app = getApp();
+const { APP_VERSION } = require('../../utils/version.js');
 
 Page({
   data: {
+    appVersion: APP_VERSION,
     isLogged: false,
     userInfo: null,
     showAuthModal: false,

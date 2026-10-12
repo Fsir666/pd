@@ -105,47 +105,28 @@ Page({
   if (app.globalData.isLogged) {
     this.fetchWallet();
   }
-  // 切回首页时 canvas 内容可能被回收，重绘榜单像素图
+  // 切回首页时 canvas 内容可能被回收（变空白但仍不透明），需要重绘。
+  // 先把 is-painted 摘掉（退回透明），重绘完成后再由 drawRankCanvases 淡入，
+  // 避免中途露出一块空白的画布。
+  //
+  // ⚠️ 只写 leftTemplates / rightTemplates：wxml 里渲染的只有这两个列数组，
+  //    hotTemplates 仅作数据源不参与渲染，去改它只会多出无谓的渲染批次，
+  //    还可能和列数组的写入交错，导致 canvas 刚建出来就被重建（表现为闪烁）。
   if (this._rankPixels && Object.keys(this._rankPixels).length) {
+    const patch = {};
+    (this.data.leftTemplates || []).forEach((t, i) => {
+      if (t.boardReady) patch['leftTemplates[' + i + '].boardPainted'] = false;
+    });
+    (this.data.rightTemplates || []).forEach((t, i) => {
+      if (t.boardReady) patch['rightTemplates[' + i + '].boardPainted'] = false;
+    });
+    if (Object.keys(patch).length) this.setData(patch);
     setTimeout(() => this.drawRankCanvases(), 120);
   }
 },
 
   // ===== 榜单像素方块渲染 =====
-  // board（beadColors / codesMard）→ { w, h, hexes[] }，无数据返回 null
-  _buildBoardPixels(board) {
-    if (!board) return null;
-    let w = Number(board.gridWidth);
-    let h = Number(board.gridHeight);
-    let hexes = null;
-    if (board.beadColors && Object.keys(board.beadColors).length) {
-      if (!Number.isFinite(w) || w <= 0) w = 32;
-      if (!Number.isFinite(h) || h <= 0) h = 32;
-      hexes = new Array(w * h).fill('');
-      Object.keys(board.beadColors).forEach((key) => {
-        const parts = key.split(',');
-        const x = Number(parts[0]);
-        const y = Number(parts[1]);
-        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-        const idx = (y - 1) * w + (x - 1);
-        if (idx < 0 || idx >= w * h) return;
-        hexes[idx] = board.beadColors[key] || '';
-      });
-    } else if (Array.isArray(board.codesMard) && Number(board.gridSize) > 0) {
-      const g = Number(board.gridSize);
-      w = g; h = g;
-      const rev = this._getMardRevMap();
-      hexes = new Array(g * g).fill('');
-      for (let i = 0; i < board.codesMard.length; i++) {
-        const code = board.codesMard[i] != null ? String(board.codesMard[i]).trim() : '';
-        if (code) hexes[i] = rev[code] || '';
-      }
-    }
-    if (!hexes) return null;
-    return { w, h, hexes };
-  },
-
-  // MARD 色号 → hex（旧版 codesMard 数据用）
+  // MARD 色号 → hex（board 数据里的色号按 Mard-291 体系查表上色）
   _getMardRevMap() {
     if (this._mardRev) return this._mardRev;
     let mapping = {};
@@ -161,6 +142,11 @@ Page({
   },
 
   // 把有图纸数据的榜单卡片画成小方块
+  //
+  // 流程刻意分两步，避免「图片闪烁」：
+  //   ① boardReady=true 让 canvas 挂载进 DOM（此时 opacity:0，用户看不见）；
+  //   ② 下一帧才去查询 canvas 节点并把像素画上去，画完置 boardPainted=true 淡入。
+  // 底层的兜底图片始终在，所以整个过程用户看不到空白帧。
   drawRankCanvases() {
     const pixelsMap = this._rankPixels || {};
     const ranks = Object.keys(pixelsMap);
@@ -171,10 +157,21 @@ Page({
     });
     q.exec((resList) => {
       if (!resList) return;
+      const painted = {};
       resList.forEach((info, i) => {
+        const rank = ranks[i];
         if (!info || !info.node || !info.width) return;
-        this._paintRankCanvas(pixelsMap[ranks[i]], info);
+        this._paintRankCanvas(pixelsMap[rank], info);
+        painted[rank] = true;
       });
+      // 真正画完了才让它淡入（同样只写两个列数组，见 onShow 里的说明）
+      const patch = {};
+      ['leftTemplates', 'rightTemplates'].forEach((col) => {
+        (this.data[col] || []).forEach((t, i) => {
+          if (painted[String(t.rank)]) patch[col + '[' + i + '].boardPainted'] = true;
+        });
+      });
+      if (Object.keys(patch).length) this.setData(patch);
     });
   },
 
@@ -212,65 +209,66 @@ Page({
     if (!isRefresh) {
       wx.showLoading({ title: '加载榜单...' });
     }
-    
+
     // 直接查询 templates 集合（排除已设为私密的作品）
+    //
+    // ⚠️ 这里【绝不能】把整条记录读下来：
+    //   每条作品的 board.beadColors 是 {"x,y":hex} 字典，一张 86×87 的图就有
+    //   7000+ 个键、单条 240KB；榜单 10 条接近 1.9MB，直接超过小程序端单次
+    //   查询的返回上限，导致整页查询失败（表现就是「热门榜单加载不出来」）。
+    //   所以：① 这里只投影展示所需字段（10 条约 3KB）；
+    //        ② 卡片上的像素缩略图另走 getHotBoards 按需取紧凑数据。
     const db = wx.cloud.database();
     const _ = db.command;
+    const listFields = {
+      _id: true, title: true, imageUrl: true, heat: true, likeCount: true,
+      w: true, h: true, beadCount: true, createTime: true, tags: true,
+      author: true, userInfo: true, image: true, time: true, size: true
+    };
     return db.collection('templates')
       .where({ isPublic: _.neq(false) })
       .orderBy('heat', 'desc')
       .limit(10)
+      .field(listFields)
       .get()
       .then(async res => {
-        if (!isRefresh) {
-          wx.hideLoading();
-        }
-
-        // 批量换取临时链接 (解决部分云图片加载问题)
+        // 批量换取临时链接：cloud:// 开头的云存储路径在小程序端 <image> 里
+        // 直接使用可能不显示，统一换成 https 临时链接再渲染。
         const fileList = res.data
-          .filter(item => item.imageUrl && item.imageUrl.startsWith('cloud://'))
+          .filter(item => item.imageUrl && String(item.imageUrl).startsWith('cloud://'))
           .map(item => item.imageUrl);
-          
         let urlMap = {};
         if (fileList.length > 0) {
           try {
             const urlRes = await wx.cloud.getTempFileURL({ fileList });
             urlRes.fileList.forEach(file => {
-              if (file.status === 0) {
-                urlMap[file.fileID] = file.tempFileURL;
-              }
+              if (file.status === 0) urlMap[file.fileID] = file.tempFileURL;
             });
           } catch (e) {
             console.error('换取链接失败', e);
           }
         }
-        
-        // 格式化数据以匹配UI
-        const rankPixels = {};
-        const templates = res.data.map((item, index) => {
-          // 尝试使用 HTTP 链接
-          const realUrl = (item.imageUrl && urlMap[item.imageUrl]) ? urlMap[item.imageUrl] : item.imageUrl;
-          const rank = index + 1;
-          const pixels = this._buildBoardPixels(item.board);
-          if (pixels) rankPixels[rank] = pixels;
 
+        // 格式化数据以匹配UI
+        const templates = res.data.map((item, index) => {
+          const rank = index + 1;
+          const realUrl = (item.imageUrl && urlMap[item.imageUrl]) ? urlMap[item.imageUrl] : item.imageUrl;
           return {
             ...item,
             id: item._id, // 映射 _id 到 id
             rank,
             // 确保字段存在
             image: item.image || '🎨', // 如果没有 icon，给个默认
-            imageUrl: realUrl, // 更新为 HTTP 链接
+            imageUrl: realUrl || '', // 像素缩略图由 canvas 兜底
             time: item.time || '-',
             size: item.size || '32x32',
-            hasBoard: !!pixels // 有图纸数据就用像素方块 canvas 渲染
+            boardReady: false, // 像素数据回来后置 true，挂载 canvas
+            boardPainted: false // canvas 真正画完后置 true，淡入显示
           };
         });
-        this._rankPixels = rankPixels;
-        
+
         const leftTemplates = [];
         const rightTemplates = [];
-        
         templates.forEach((item, index) => {
           if (index % 2 === 0) {
             leftTemplates.push(item);
@@ -279,13 +277,13 @@ Page({
           }
         });
 
-        this.setData({
-          hotTemplates: templates,
-          leftTemplates,
-          rightTemplates
-        });
-        // 榜单像素方块渲染（canvas 2d）
-        setTimeout(() => this.drawRankCanvases(), 80);
+        this.setData({ hotTemplates: templates, leftTemplates, rightTemplates });
+        if (!isRefresh) {
+          wx.hideLoading();
+        }
+
+        // 展示字段已就绪即可收工；像素缩略图异步补上，不阻塞首屏
+        this.fetchHotBoards(templates.map(t => t.id));
         return { ok: true };
       }).catch(err => {
         if (!isRefresh) {
@@ -297,6 +295,80 @@ Page({
         }
         return { ok: false, err };
       });
+  },
+
+  /**
+   * 拉取榜单的像素缩略数据并画成小方块。
+   * 数据走云函数 getHotBoards（把 board 压成「色号二维数组」，10 条约 200KB），
+   * 避免在列表查询里直接把 1.9MB 的原始 board 拖下来。
+   */
+  async fetchHotBoards(ids) {
+    if (!ids || !ids.length) return;
+    try {
+      const r = await wx.cloud.callFunction({
+        name: 'template-api',
+        data: { action: 'getHotBoards', ids }
+      });
+      const res = r && r.result ? r.result : null;
+      const packed = res && res.code === 0 ? (res.data || {}) : {};
+      // _rankPixels 按「名次」索引（canvas 的 id 是 rankcv-<rank>），
+      // 所以这里要把返回的作品 id 映射回它在榜单里的名次。
+      const rankById = {};
+      (this.data.hotTemplates || []).forEach((t) => { rankById[t.id] = t.rank; });
+      const rankPixels = {};
+      const hitRank = {};
+      Object.keys(packed).forEach((id) => {
+        const p = packed[id];
+        const pixels = this._unpackBoardPixels(p);
+        const rank = rankById[id];
+        if (pixels && rank) { rankPixels[rank] = pixels; hitRank[id] = true; }
+      });
+      this._rankPixels = rankPixels;
+
+      // 先让 canvas 挂载进 DOM（此时它是透明的，肉眼看不到），
+      // 下一帧再绘制，画完由 drawRankCanvases 负责淡入。
+      // 之所以不直接 drawRankCanvases：canvas 不在 DOM 里时查不到节点。
+      //
+      // ⚠️ 只写 leftTemplates / rightTemplates（wxml 只渲染这两个）。
+      //    一次性把所有卡片的 boardReady 一起置 true，只产生一个渲染批次，
+      //    避免逐个卡片反复触发节点重建。
+      const patch = {};
+      ['leftTemplates', 'rightTemplates'].forEach((col) => {
+        (this.data[col] || []).forEach((t, i) => {
+          if (hitRank[t.id]) patch[col + '[' + i + '].boardReady'] = true;
+        });
+      });
+      if (!Object.keys(patch).length) return;
+      this.setData(patch, () => {
+        // setData 回调意味着节点已就绪，再等一帧确保渲染完成
+        setTimeout(() => this.drawRankCanvases(), 50);
+      });
+    } catch (e) {
+      // 像素图是锦上添花，失败就退回 imageUrl / 占位图，不影响榜单主体
+      console.error('获取榜单像素数据失败', e);
+    }
+  },
+
+  /**
+   * 还原云函数下发的紧凑像素数据 → { w, h, hexes[] }
+   * 入参形如 { w, h, rows: ["A1 A1 B2 ...", ...] }
+   */
+  _unpackBoardPixels(p) {
+    if (!p || !p.w || !p.h || !Array.isArray(p.rows)) return null;
+    const rev = this._getMardRevMap();
+    const w = Number(p.w);
+    const h = Number(p.h);
+    const hexes = new Array(w * h).fill('');
+    for (let y = 0; y < h; y++) {
+      const parts = String(p.rows[y] || '').split(' ');
+      for (let x = 0; x < w; x++) {
+        const tok = parts[x] ? String(parts[x]).trim() : '';
+        if (!tok) continue;
+        // 色号 → hex；若本身就是 #RRGGBB 则直接使用
+        hexes[y * w + x] = tok.charAt(0) === '#' ? tok : (rev[tok] || '');
+      }
+    }
+    return { w, h, hexes };
   },
 
   onRefresh() {
@@ -430,28 +502,6 @@ Page({
     if (likes) url += `&likes=${likes}`;
     
     wx.navigateTo({ url });
-  },
-
-  // 首页榜单封面加载失败兜底（index.wxml:195 绑定）
-  // 注意：榜单拆成 leftTemplates / rightTemplates 两列渲染，只改 hotTemplates 不会刷新，
-  // 必须同步更新该项所在那一列，否则图片会一直裂着。
-  onImageError(e) {
-    const idx = Number(e.currentTarget.dataset.index);
-    if (!Number.isFinite(idx) || idx < 0) return;
-
-    const item = (this.data.hotTemplates || [])[idx];
-    const placeholder = '/images/placeholder.png';
-    // 已是占位图则跳过，避免加载失败时反复触发 error
-    if (!item || !item.imageUrl || item.imageUrl === placeholder) return;
-
-    const patch = { [`hotTemplates[${idx}].imageUrl`]: placeholder };
-    // 原数组偶数下标进左列、奇数下标进右列（见 fetchHotTemplates 的拆分规则）
-    if (idx % 2 === 0) {
-      patch[`leftTemplates[${idx / 2}].imageUrl`] = placeholder;
-    } else {
-      patch[`rightTemplates[${(idx - 1) / 2}].imageUrl`] = placeholder;
-    }
-    this.setData(patch);
   },
 
   onTemplateTap(e) {

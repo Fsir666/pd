@@ -1,0 +1,20 @@
+# 依赖
+node_modules/
+__pycache__/
+*.pyc
+
+# 构建产物
+*.zip
+
+# 备份
+*.bak
+*.bak[0-9]
+
+# 敏感文件（勿提交私钥/凭证）
+*.key
+*.pem
+
+# 系统/编辑器
+.DS_Store
+.vscode/
+.idea/

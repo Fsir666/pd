@@ -22,6 +22,7 @@ Page({
     spec: null,
     // 规格行：宽×高 粒 · 颗数 颗 · 色号 个色号
     sizeText: '',
+    brandName: '',
     beadCount: 0,
     colorCount: 0,
     // 用料清单（色块 + 色号 + hex + 颗数）
@@ -192,6 +193,7 @@ Page({
         showCode: true,
         scale: 1,
         sizeText: sizeInfo.sizeText,
+        brandName: sizeInfo.brandName || '',
         beadCount: sizeInfo.beadCount,
         colorCount: sizeInfo.colorCount,
         materialRows
@@ -433,7 +435,22 @@ Page({
     const sizeText = (w && h)
       ? `${w}×${h} 粒 · ${beadCount} 颗 · ${colorCount} 个色号`
       : '';
-    return { sizeText, beadCount, colorCount };
+    // 品牌显示名：图纸色号所属的品牌体系。用户在「这版要用的珠子」里看到的是
+    // 该品牌的色号（如优肯的 S44），不标出品牌会让人认不出这些色号。
+    const brandKey = String(b.brand || '').toLowerCase();
+    const brandName = this._brandDisplayName(brandKey);
+    return { sizeText, beadCount, colorCount, brandName };
+  },
+
+  // 品牌 key -> 中文/展示名；未知返回空串（不显示）
+  _brandDisplayName(brandKey) {
+    if (!brandKey || brandKey === 'unknown') return '';
+    try {
+      const cd = require('../../data/color-data.js');
+      const bd = cd[brandKey];
+      if (bd && bd.name) return String(bd.name).trim();
+    } catch (e) { /* ignore */ }
+    return brandKey;
   },
 
   // 用料清单：色块 + 色号 + hex + 颗数（按颗数倒序）
@@ -472,7 +489,7 @@ Page({
       });
       Object.keys(agg).forEach((k) => rows.push(agg[k]));
     } else if (Array.isArray(b.beadColors)) {
-      // 兜底：beadColors 为数组形态
+      // 兜底：beadColors 为数组形态（无法关联到 "x,y" 真实色号，只能反查）
       const map = this._getHexCodeMap((b.brand || 'MARD').toUpperCase());
       const agg = Object.create(null);
       b.beadColors.forEach((hex) => {
@@ -549,8 +566,17 @@ Page({
         const hex = board.beadColors[key] || '';
         hexes[idx] = hex;
         if (hex) {
-          const code = map[String(hex).toUpperCase()];
-          if (code) codes[key] = code;
+          // 优先使用作品自带的真实色号（beadColorCodes）。
+          // 这些色号来自图纸原始 palette，属于其真实品牌体系；
+          // 只有在缺失时才退回「hex 反查品牌色卡」——反查会把不同品牌的
+          // 同色 hex 张冠李戴（例如把优肯的白色显示成 MARD 的 T1）。
+          const rawCode = board.beadColorCodes && board.beadColorCodes[key];
+          if (rawCode) {
+            codes[key] = String(rawCode).trim();
+          } else {
+            const code = map[String(hex).toUpperCase()];
+            if (code) codes[key] = code;
+          }
         }
       });
     } else if (Array.isArray(board.codesMard) && Number(board.gridSize) > 0) {
@@ -587,10 +613,22 @@ Page({
       const colorData = require('../../data/color-data.js');
       const bd = colorData[String(brand).toLowerCase()];
       if (bd && Array.isArray(bd.subSeries)) {
-        bd.subSeries.forEach((series) => {
-          if (!series.colors) return;
+        // MARD 有多套色卡（Mard-24/48/…/291）。图纸数据统一按最全的
+        // Mard-291 转换，故这里也必须以 Mard-291 为准；
+        // 若混用其他套装的反查表，会出现 291 套装里买不到的色号。
+        const isMard = String(brand).toLowerCase() === 'mard';
+        const preferred = isMard
+          ? bd.subSeries.find((s) => s && s.id === 'Mard-291')
+          : null;
+        const seriesList = preferred ? [preferred] : bd.subSeries;
+        seriesList.forEach((series) => {
+          if (!series || !series.colors) return;
           series.colors.forEach((c) => {
-            if (c && c.hex && c.code) map[String(c.hex).toUpperCase()] = String(c.code).trim();
+            if (c && c.hex && c.code) {
+              const h = String(c.hex).toUpperCase();
+              // 不覆盖已有映射：数据里存在同 hex 多色号，保留先出现的更稳
+              if (!map[h]) map[h] = String(c.code).trim();
+            }
           });
         });
       }
@@ -614,6 +652,17 @@ Page({
     const g = parseInt(h.substring(2, 4), 16) || 0;
     const b = parseInt(h.substring(4, 6), 16) || 0;
     return (r + g + b) / 3;
+  },
+
+  // 是否接近纯白。判据：三通道均 >= 240。
+  // 用于跳过高亮白格子的色号绘制——这类珠子多为图纸背景留白，成片叠字会让画面糊成一片。
+  // 阈值收得较紧，避免误伤浅灰(#EDEDED)、浅米(#FCFBCD 之外仍需显示)等真正有区分度的浅色。
+  _isNearWhite(hex) {
+    const h = String(hex).replace('#', '');
+    const r = parseInt(h.substring(0, 2), 16) || 0;
+    const g = parseInt(h.substring(2, 4), 16) || 0;
+    const b = parseInt(h.substring(4, 6), 16) || 0;
+    return r >= 240 && g >= 240 && b >= 240;
   },
 
   // 绘制像素方块到 canvas（缩放时重绘，格子够大才显色号，放大不糊）
@@ -661,13 +710,17 @@ Page({
             ctx.fillStyle = hex;
             ctx.fillRect(x0, y0, cell, cell);
             if (codeReadable) {
-              const lum = this._lum(hex);
-              ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
-              ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              const code = codes[(x + 1) + ',' + (y + 1)];
-              if (code) ctx.fillText(code, x0 + cell / 2, y0 + cell / 2);
+              // 接近纯白的格子不画色号（与拼豆模式保持一致）：
+              // 成片的白色留白若逐个叠字会让小图糊成一片。
+              if (!this._isNearWhite(hex)) {
+                const lum = this._lum(hex);
+                ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
+                ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const code = codes[(x + 1) + ',' + (y + 1)];
+                if (code) ctx.fillText(code, x0 + cell / 2, y0 + cell / 2);
+              }
             }
           }
           if (this.data.showGrid) {
