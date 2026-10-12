@@ -2294,6 +2294,9 @@ exports.main = async (event, context) => {
         const listFields = {
           key: true, name: true, title: true, tags: true,
           w: true, h: true, beadCount: true,
+          // palette 只是色号字符串数组（数十~数百字节），带上它列表才能显示「X 色」；
+          // 真正占体积的是 cells/hexes/counts，仍然排除。
+          palette: true,
           imageUrl: true, image: true,
           claimed: true, sort: true
         };
