@@ -7,7 +7,7 @@ const path = require('path');
     type: 'miniProgram',
     projectPath: '/workspace/pd',
     privateKeyPath: '/workspace/pd_private.key',
-    ignores: ['node_modules/**/*', 'ci/**/*', '*.key'],
+    ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
   const result = await ci.upload({

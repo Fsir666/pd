@@ -20,6 +20,14 @@
     "ignore": [
       {
         "type": "glob",
+        "value": "cf/**"
+      },
+      {
+        "type": "glob",
+        "value": "ci/**"
+      },
+      {
+        "type": "glob",
         "value": "cloudfunctions/**"
       },
       {
@@ -81,6 +89,14 @@
       {
         "type": "glob",
         "value": "pages/project*.json"
+      },
+      {
+        "type": "glob",
+        "value": "scripts/**"
+      },
+      {
+        "type": "file",
+        "value": "data/color-mapping.json"
       }
     ],
     "include": []
