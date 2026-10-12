@@ -10,6 +10,36 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 const db = cloud.database()
 const _ = db.command
 
+// 图纸缩略图在函数包内有两处可能目录（历史遗留）：
+//   drafts-images/<key>.png  与  drafts-images/drafts-images/<key>.png
+// 统一按「先扁平、后嵌套」顺序查找，避免因层级不一致导致 imageUrl 为空、列表不显示缩略图。
+function findDraftImageFile(key) {
+  const candidates = [
+    path.join(__dirname, 'drafts-images', key + '.png'),
+    path.join(__dirname, 'drafts-images', 'drafts-images', key + '.png')
+  ]
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) return p
+    } catch (e) { /* ignore */ }
+  }
+  return ''
+}
+
+async function uploadDraftImage(key) {
+  const file = findDraftImageFile(key)
+  if (!file) return ''
+  try {
+    const up = await cloud.uploadFile({
+      cloudPath: 'drafts/' + key + '.png',
+      fileContent: fs.readFileSync(file)
+    })
+    return up.fileID || ''
+  } catch (e) {
+    return ''
+  }
+}
+
 function escapeRegExp(input) {
   return String(input || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -2176,7 +2206,6 @@ exports.main = async (event, context) => {
 
       let seeded = 0, skipped = 0;
       const failed = [];
-      const imagesDir = path.join(__dirname, 'drafts-images');
 
       for (const d of drafts) {
         try {
@@ -2184,18 +2213,7 @@ exports.main = async (event, context) => {
           if (exist && exist.data && exist.data.length) { skipped++; continue; }
 
           // 上传缩略图到云存储
-          let imageUrl = '';
-          const imgFile = path.join(imagesDir, d.key + '.png');
-          if (fs.existsSync(imgFile)) {
-            try {
-              const buf = fs.readFileSync(imgFile);
-              const up = await cloud.uploadFile({
-                cloudPath: 'drafts/' + d.key + '.png',
-                fileContent: buf
-              });
-              imageUrl = up.fileID;
-            } catch (e) { imageUrl = ''; }
-          }
+          const imageUrl = await uploadDraftImage(d.key);
 
           await db.collection('owner_drafts').add({
             data: {
@@ -2235,11 +2253,29 @@ exports.main = async (event, context) => {
       if (_tk !== _exp && !isAdminCaller(_caller)) return { code: -3, msg: 'forbidden' };
       try {
         const r = await db.collection('owner_drafts').limit(100).get();
-        const list = (r.data || []).map(d => ({
+        let list = (r.data || []).map(d => ({
           key: d.key, name: d.name, w: d.w, h: d.h,
           colors: (d.palette || []).length, beads: d.beadCount,
-          img: !!d.imageUrl, claimed: !!d.claimed
+          img: !!d.imageUrl, imgUrl: d.imageUrl || d.image || '', sort: d.sort,
+          claimed: !!d.claimed
         }));
+        // 可选：按 key 精确查询（诊断用），不受 100 条上限影响
+        const wantKeys = Array.isArray(event.keys) && event.keys.length ? event.keys.map(String) : null;
+        if (wantKeys) {
+          const found = [];
+          for (const k of wantKeys) {
+            const one = await db.collection('owner_drafts').where({ key: k }).limit(1).get();
+            const d = one && one.data && one.data[0];
+            if (!d) { found.push({ key: k, missing: true }); continue; }
+            found.push({
+              key: d.key, name: d.name, w: d.w, h: d.h,
+              colors: (d.palette || []).length, beads: d.beadCount,
+              img: !!d.imageUrl, imgUrl: d.imageUrl || d.image || '', sort: d.sort,
+              claimed: !!d.claimed, deleted: !!d.deleted
+            });
+          }
+          return { code: 0, data: { count: found.length, list: found }, msg: 'success(byKeys)' };
+        }
         return { code: 0, data: { count: list.length, list }, msg: 'ok' };
       } catch (e) {
         return { code: -1, msg: String((e && (e.message || e.errMsg)) || e) };
@@ -2443,7 +2479,6 @@ exports.main = async (event, context) => {
       const _gt = String(event.seedToken || '');
       const _ge = String(getEnvString('SEED_TOKEN') || 'seed-47012803-pd');
       if (!_gt || _gt !== _ge) return { code: -3, msg: 'forbidden: 需要 seedToken' };
-      const imagesDir = path.join(__dirname, 'drafts-images');
       const seeded = []; const failed = [];
       const notDeleted = { deleted: _.neq(true) };
       const drafts = await db.collection('owner_drafts').where(notDeleted).limit(300).get();
@@ -2453,13 +2488,7 @@ exports.main = async (event, context) => {
           // 缩略图：优先复用台账里已有的 fileID，否则从包内上传
           let imageUrl = d.imageUrl || d.image || '';
           if (!imageUrl) {
-            const imgFile = path.join(imagesDir, d.key + '.png');
-            if (fs.existsSync(imgFile)) {
-              try {
-                const up = await cloud.uploadFile({ cloudPath: 'drafts/' + d.key + '.png', fileContent: fs.readFileSync(imgFile) });
-                imageUrl = up.fileID;
-              } catch (e) { imageUrl = ''; }
-            }
+            imageUrl = await uploadDraftImage(d.key);
           }
           await db.collection('templates').doc(docId).set({
             data: {
@@ -2563,7 +2592,11 @@ exports.main = async (event, context) => {
       }
       let updated = 0, notFound = 0;
       const failed = [];
+      // 可选：只同步指定 key；可选：顺带补传缩略图（历史记录 imageUrl 为空时用）
+      const onlyKeys = Array.isArray(event.keys) && event.keys.length ? event.keys.map(String) : null;
+      const wantImage = event.uploadImage === true;
       for (const d of drafts) {
+        if (onlyKeys && onlyKeys.indexOf(d.key) === -1) continue;
         try {
           const r = await db.collection('owner_drafts').where({ key: d.key }).limit(1).get();
           const doc = r && r.data && r.data[0];
@@ -2580,6 +2613,10 @@ exports.main = async (event, context) => {
             cells: d.cells || '',
             beadCount: d.beadCount || 0
           };
+          if (wantImage) {
+            const url = await uploadDraftImage(d.key);
+            if (url) { patch.imageUrl = url; patch.image = url; }
+          }
           const board = buildBoardFromDraft(d);
           if (board) patch.board = _.set(board);
           await db.collection('owner_drafts').doc(doc._id).update({ data: patch });
@@ -2605,7 +2642,15 @@ exports.main = async (event, context) => {
         .field({ _id: true })
         .limit(300)
         .get();
-      const docs = res && res.data ? res.data : [];
+      let docs = res && res.data ? res.data : [];
+      // 可选：只处理指定 key（避免全量跑超过云函数 60s 超时）
+      const onlyKeys2 = Array.isArray(event.keys) && event.keys.length
+        ? event.keys.map(k => String(k))
+        : null;
+      if (onlyKeys2) {
+        const want = new Set(onlyKeys2);
+        docs = docs.filter(doc => want.has(String(doc._id).replace(/^(draft|seed)_/i, '')));
+      }
 
       let updated = 0, sourceMissing = 0;
       const failed = [];
@@ -2617,6 +2662,7 @@ exports.main = async (event, context) => {
           if (!d) { sourceMissing++; continue; }
 
           const board = buildBoardFromDraft(d);
+          const imgUrl = d.imageUrl || d.image || '';
           const patch = {
             cells: d.cells || '',
             hexes: d.hexes || [],
@@ -2625,6 +2671,7 @@ exports.main = async (event, context) => {
             w: d.w || 0,
             h: d.h || 0,
             beadCount: d.beadCount || 0,
+            title: d.name || d.title || key,
             spec: {
               gridSize: d.w || 0,
               cols: d.w || 0,
@@ -2633,10 +2680,17 @@ exports.main = async (event, context) => {
             },
             updateTime: db.serverDate()
           };
+          // 缩略图：认领发生在补图之前时，作品记录会是空图，这里一并追平
+          if (imgUrl) patch.imageUrl = imgUrl;
           // board 原值存在时用整体替换，避免嵌套字段残留旧颜色
           if (board) patch.board = _.set(board);
 
           await db.collection('templates').doc(doc._id).update({ data: patch });
+          // 同步更新广场帖子里的缩略图（同 id）
+          if (imgUrl) {
+            await db.collection('community_posts').doc(doc._id)
+              .update({ data: { imageUrl: imgUrl } }).catch(() => {});
+          }
           updated++;
         } catch (e) {
           failed.push({ id: doc._id, reason: String((e && (e.message || e.errMsg)) || e) });
