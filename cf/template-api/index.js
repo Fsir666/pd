@@ -2265,11 +2265,14 @@ exports.main = async (event, context) => {
           .where(notDeleted)
           .field(listFields)
           .orderBy('sort', 'asc')
-          .limit(200)
+          // 上限 500：图纸库已超过 200 张，若仍按 200 截断，排在末尾的新图纸
+          // 会因为 orderBy('sort','asc') 被截掉，管理员在列表里看不到。
+          // 该接口已用 field() 剔除 cells/hexes 等像素数据，500 条的返回体远低于 1MB 上限。
+          .limit(500)
           .get()
           .catch(async () => {
             // orderBy 失败（无该字段）时降级
-            return await db.collection('owner_drafts').where(notDeleted).field(listFields).limit(200).get();
+            return await db.collection('owner_drafts').where(notDeleted).field(listFields).limit(500).get();
           });
         return { code: 0, data: result.data || [], msg: 'success' };
       } catch (err) {
@@ -2566,6 +2569,9 @@ exports.main = async (event, context) => {
           const doc = r && r.data && r.data[0];
           if (!doc) { notFound++; continue; }
           const patch = {
+            name: d.name,
+            title: d.name,
+            sort: d.sort != null ? d.sort : 0,
             w: d.w,
             h: d.h,
             palette: d.palette || [],
