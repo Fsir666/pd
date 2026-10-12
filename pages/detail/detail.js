@@ -654,17 +654,6 @@ Page({
     return (r + g + b) / 3;
   },
 
-  // 是否接近纯白。判据：三通道均 >= 240。
-  // 用于跳过高亮白格子的色号绘制——这类珠子多为图纸背景留白，成片叠字会让画面糊成一片。
-  // 阈值收得较紧，避免误伤浅灰(#EDEDED)、浅米(#FCFBCD 之外仍需显示)等真正有区分度的浅色。
-  _isNearWhite(hex) {
-    const h = String(hex).replace('#', '');
-    const r = parseInt(h.substring(0, 2), 16) || 0;
-    const g = parseInt(h.substring(2, 4), 16) || 0;
-    const b = parseInt(h.substring(4, 6), 16) || 0;
-    return r >= 240 && g >= 240 && b >= 240;
-  },
-
   // 绘制像素方块到 canvas（缩放时重绘，格子够大才显色号，放大不糊）
   drawPixel(retry) {
     const p = this._pixel;
@@ -710,17 +699,16 @@ Page({
             ctx.fillStyle = hex;
             ctx.fillRect(x0, y0, cell, cell);
             if (codeReadable) {
-              // 接近纯白的格子不画色号（与拼豆模式保持一致）：
-              // 成片的白色留白若逐个叠字会让小图糊成一片。
-              if (!this._isNearWhite(hex)) {
-                const lum = this._lum(hex);
-                ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
-                ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const code = codes[(x + 1) + ',' + (y + 1)];
-                if (code) ctx.fillText(code, x0 + cell / 2, y0 + cell / 2);
-              }
+              // 白色格子同样显示色号。
+              // 历史背景：v1.0.112 曾为「避免成片白色留白叠字糊成一片」而跳过三通道≥240 的格子，
+              // 但白豆同样需要辨认色号（H1/H2 等是不同颜色），故 v1.0.121 恢复显示。
+              const lum = this._lum(hex);
+              ctx.fillStyle = lum > 150 ? '#3A2A2E' : '#FFFDFB';
+              ctx.font = '600 ' + fontSize.toFixed(0) + 'px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              const code = codes[(x + 1) + ',' + (y + 1)];
+              if (code) ctx.fillText(code, x0 + cell / 2, y0 + cell / 2);
             }
           }
           if (this.data.showGrid) {

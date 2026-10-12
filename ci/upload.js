@@ -12,8 +12,8 @@ const path = require('path');
 
   const result = await ci.upload({
     project,
-    version: '1.0.120',
-    desc: '首页榜单缩略图不再先显示错误的原图，改为像素图直接淡入',
+    version: '1.0.121',
+    desc: '白色格子恢复显示色号（详情页与拼豆模式）',
     setting: {
       es6: true,
       minify: true,
