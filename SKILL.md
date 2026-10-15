@@ -42,15 +42,10 @@ MARD 拼豆图纸截图高精度转换为小程序图纸库数据。使用场景
 ### 可直接复制的命令序列
 
 ```bash
-# 0) 一键落地两个脚本（本文件是单文件 skill，代码块不是独立文件）
-python3 - <<'PY'
-import re, pathlib
-t = pathlib.Path('/workspace/pd.txt').read_text(encoding='utf-8')   # 改成本文档实际路径
-b = re.findall(r'```python\n(.*?)```', t, re.S)
-pathlib.Path('/tmp/convert_pattern.py').write_text(b[0], encoding='utf-8')
-pathlib.Path('/tmp/make_draft_entry.py').write_text(b[1], encoding='utf-8')
-print('落地完成:', b[0].count('\n'), '/', b[1].count('\n'), '行')
-PY
+# 0) 落地两个脚本。权威版本在 D:/workB/scripts/（v4 双判据，优先用这两个）：
+cp D:/workB/scripts/convert_pattern.py D:/workB/scripts/make_draft_entry.py ./
+#    本文件内联的代码块是同一版本的快照，落后时以 D:/workB/scripts/ 为准
+#    （批量并行模式下子 agent 直接用 D:/workB/scripts/ 的路径，见「批量并行模式」）
 
 # 1) 图例：一次性裁出放大图（只此一张，不要反复裁），读它 -> 写 legend.json
 python3 -c "from PIL import Image as I; im=I.open('X.png'); W,H=im.size; \
@@ -87,6 +82,80 @@ python3 /tmp/make_draft_entry.py --pattern ./out/final_pattern.json \
 | 自检不符就自由发挥、试新方法 | 按下面「失败决策树」走 |
 | 同一件事试 3 次还没进展 | 停下来报告：现状 + 卡点 + 已排除的可能，别继续烧时间 |
 | 重跑整个流程来"确认一下" | 计数全中就是通过，重跑不会更对 |
+
+## 🎯 批量并行模式（多图纸指挥部）
+
+用户一次给 N 张截图说"一起弄/太慢了" → **主 agent 当指挥部，一张图派一个子 agent 并行跑**，
+主 agent 只做：派活 → 收齐 → 分配 sort → 合并 → 总验收 → 部署上线。转换本身一颗豆都不自己碰。
+
+### 分工（写隔离是生命线）
+
+| 角色 | 干什么 | 绝不干 |
+|---|---|---|
+| 子 agent（每张图一个） | 读图例 → 转换 → 计数全中 → entry + 缩略图 → 写进**自己的交付目录** | 不碰仓库 drafts.json、不部署、不 commit |
+| 主 agent（指挥部） | 派活 → 收齐 entry → 分 sort → 合并进仓库 → verify_all → 部署 → 灌库 → 验证 → commit | 不自己重跑转换（那是浪费并行成果） |
+
+> **为什么必须写隔离**：N 个 agent 同时追加同一个 `drafts.json` 必然互相覆盖（各读各写、后写覆盖）。
+> 每个子 agent 只写 `D:/workB/delivery/<图号>/`，合并由主 agent 串行做，30 秒的事。
+
+### 派活协议
+
+1. 主 agent 先建好 `D:/workB/delivery/` 骨架，给每张图编号（pp-101/pp-102/… 或按内容起 key）
+2. **一条消息里并发派 N 个 Agent**（subagent_type 用 `general-purpose`），每个 agent 的提示词自包含，
+   照下面模板抄改路径——子 agent 看不到本对话，所有路径/命令/标准都必须写全
+3. 子 agent 全部回来后，主 agent 跑收尾五步
+
+### 子 agent 提示词模板（照抄改路径）
+
+```
+你是拼豆图纸转换子 agent，只负责 <图号> 这一张。有其他 agent 在并行处理别的图纸，
+不要碰它们的目录，不要碰仓库 pd/，不要部署不要 commit。
+
+截图：D:/workB/input/<图号>.<ext>
+你的交付目录：D:/workB/delivery/<图号>/（不存在就建，先 echo '[]' > entry.json）
+权威脚本（v4 双判据，勿用 SKILL.md 内联旧版）：
+  D:/workB/scripts/convert_pattern.py
+  D:/workB/scripts/make_draft_entry.py
+python：C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+
+步骤：
+1. 读图例写 <交付目录>/legend.json（图例位置不固定：右侧竖排/底部左侧单排都见过；
+   只裁一次放大图，数量逐个读准并加总校验）。色号按图复用，必须逐图采样，别抄旧图的色值。
+2. 转换：python <脚本> --image <截图> --legend <交付目录>/legend.json --out <交付目录>/out
+   默认已开 text-diff + 颜色判据。自检不符按 D:/workB/pd/SKILL.md「失败决策树」走；
+   标定可疑时用上下左右角裁剪放大确认行列数（网格范围三查见铁律 15）。
+3. 验收：计数与图例 ALL MATCH 才算完；只读一次 <交付目录>/out/compare.png 核对无串位。
+4. 生成 entry + 缩略图：
+   python make_draft_entry.py --pattern <交付目录>/out/final_pattern.json \
+       --key pp-<英文key> --name "<中文名>" \
+       --drafts <交付目录>/entry.json --thumb-dir <交付目录>/thumbs --sort -99
+   （--drafts 指你自己的 entry.json；--sort 先填 -99 占位，主 agent 最后统一分配）
+5. 写 <交付目录>/report.md：网格参数、遇到的坑、验收结果，三五行为止。
+
+完成标准：entry.json 一条 + thumbs/<key>.png + report.md 三样齐全，计数全中。
+同一件事试 3 次没进展就停：报告现状 + 卡点 + 已排除的可能，不要继续烧时间。
+```
+
+### 429 限流降级
+
+子 agent 队列有并发上限，超额返回 429。**不要硬刚重试**：改主 agent 串行跑，或分批（每批 2-3 个）。
+实测：一批 4 个并行全 429；串行 3 张含标定排坑约 40 分钟。并行省的是「等」不是「做」——
+每张图的标定排坑仍可能要主 agent 兜底（见下）。
+
+### 主 agent 收尾五步（串行，约 5 分钟）
+
+1. **齐活检查**：每个交付目录三样齐全；把各 entry.json 合并成 `delivery/drafts-entries.json`，
+   跑 `delivery/verify_all.py`（cells 长度/计数合计/三数组等长/缩略图存在/解码网格与源一致）
+2. **分配 sort**：查仓库 drafts.json 现有最小值，新图从 (最小值-1) 依次往下排
+   （例：现有最小 -10 有三张 → 新图 -13/-12/-11）。`listDrafts` 只按 sort 升序、并列无序，
+   别都写 -10。改完重跑 verify_all
+3. **合并**：entry 追加进 `pd/cf/template-api/drafts.json`，缩略图复制进
+   `pd/cf/template-api/drafts-images/drafts-images/<key>.png`（双层目录，别放错）
+4. **上线四连**：打 zip（根目录直含 index.js，6MB 级约 1 分钟）→ `deploy_template_api.py`
+   → `seedDrafts {"force":true}`（seeded/skipped/failed 三数核对）→
+   `verifyDrafts {"keys":[...]}` 逐条确认 `img:true`、尺寸豆数色数 sort 全对
+5. **本地 commit**（身份 `Fsir666 <fsir666@users.noreply.github.com>`）；
+   **GitHub 推送等用户明确说「推」**。密钥只走环境变量，不写进任何新文件
 
 ## 失败决策树（自检不符时按顺序走）
 
@@ -220,6 +289,23 @@ python3 /tmp/make_draft_entry.py --pattern ./out/final_pattern.json \
    （无参 verifyDrafts 只返回前 100 条，新图纸在末尾会 grep 不到，误判失败）
 11. **新图纸 sort=-10**——排 223 张末尾用户找不到（已验证两次）
 12. **列表接口不带像素数据**——cells/hexes 太大超 1MB 返回上限，别往 listDrafts 加
+13. **【v3 中值差分判据，`--text-diff` 默认开】**——`diff = |原图 − 5×5 中值滤波|`，
+    格中心区 `(diff>60)` 占比判定。文字是细笔画、中值滤波只抹文字留底色，
+    **深色底白字/浅色底黑字通吃**，不受底色亮度影响（v2 暗像素判据下白字格全漏）
+14. **【v4 双判据，`--color-bead` 默认开】**——① **颜色判据**：主色有彩（通道跨度≥20）
+    且贴近某图例色（距≤12）即判有豆。救「文字与底色对比度低」的格：实测 pp-103 的 F8
+    深红底 (184,0,40) 印暗红字 (128,0,32)，差分信号仅 0.2%~2.3% 全低于阈值，43 颗真豆
+    全靠颜色判据捞回（全图恰好命中 46 个 F8 = 图例数，零误伤）。
+    ② **白/黑/灰格提高文字阈值**（`--pale-thr 0.16`）：真豆的色号文字是高对比度
+    （frac≥0.17），半透明灰水印笔画差分信号弱（frac≤0.15）——pp-103 底部「@款款kk.」
+    水印 7 个假阳性据此全拒，**两者之间有干净间隙**。质心位置判别器试过，重叠不可用
+15. **【网格范围三查，行列数不能只看一边】**——① **列号/行号数字个数才是行列数**：
+    顶部+底部列号带都要看（pp-103 列号只到 27，「第 28 列」整列是右侧粉色行号带，
+    色 (250,233,238) + 高文字信号，自动标定极易误收）；② **底边框可能被行间线冒充**：
+    pp-103 的 y=1243 只是 28/29 行间线，真底边框在 1282，第 29 行差点整行漏掉；
+    ③ 存疑就裁左右下角放大确认。粗线每 5 格一条，首尾粗线反推格距比自相关准
+16. **【多图 sort 策略】**——查现有最小值往下排（-13/-12/-11），不要都写 -10：
+    `listDrafts` 只按 sort 升序、**并列时顺序不定**。单张新图才用「低于所有现有值」的一张
 
 ---
 
@@ -295,7 +381,7 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 # ---------------------------------------------------------------- 1. 网格标定
@@ -714,14 +800,33 @@ def bead_color(patch):
     return np.median(sel, axis=0)
 
 
-def extract(a, X0, Y0, CW, CH, n_rows, n_cols, ctr_thr=0.01, verbose=True):
+def extract(a, X0, Y0, CW, CH, n_rows, n_cols, ctr_thr=0.01, verbose=True, diff=None,
+            legend_rgb=None, color_dist=12.0, color_spread=20.0, pale_thr=0.16):
     """全格扫描 -> cells{(r,c): dict}，r/c 均为 1-based。
 
-    有豆判定 = 格中心区(28%~72%)暗像素占比 >= ctr_thr。
+    有豆判定 = 格中心区(28%~72%)文字像素占比 >= ctr_thr。
     见文件头 [1]：图纸每格都印色号文字，文字在格中心、网格线在格边缘。
+
+    diff 模式（v3 新增，pp-101 实测必需）：
+      MARD 图纸深色底格用**白字**、浅色底格用黑字。原判据只测暗像素
+      (max<150)，白字格全部漏检。diff = |原图 - 5x5 中值滤波| 的通道最大值，
+      文字是细笔画、中值滤波只抹文字留底色，黑白字通吃且不受底色亮度影响。
+      传入 diff 时用 (diff>60) 占比判定，否则退回原暗像素判据。
+
+    v4 双判据（pp-103 实测必需）：
+      [A] 颜色判据：格子主色有彩（spread>=color_spread）且与某图例色距离
+          <= color_dist -> 有豆。救活「文字与底色对比度低」的格：
+          pp-103 的 F8 深红底印暗红字，diff 信号仅 0.2%~2.3% 全低于阈值，
+          43 颗真豆全靠本判据捞回（颜色判据总计 46 颗 = 图例数，零误伤）。
+      [B] 白/黑/灰格提高文字阈值：主色无彩（spread<color_spread）时
+          ctr_thr 升至 pale_thr。真豆的色号文字是高对比度（frac>=0.17），
+          而半透明灰水印笔画差分信号弱（frac<=0.15）——pp-103 底部
+          「@款款kk.」水印 7 个假阳性据此全部拒掉，与真豆之间有干净间隙。
     """
     cells = {}
     n_empty = 0
+    n_color = 0
+    n_pale_rej = 0
     for r in range(1, n_rows + 1):
         for c in range(1, n_cols + 1):
             patch = cell_patch_of(a, X0, Y0, CW, CH, r, c)
@@ -731,13 +836,30 @@ def extract(a, X0, Y0, CW, CH, n_rows, n_cols, ctr_thr=0.01, verbose=True):
                 continue
             y0, y1 = int(ph * 0.28), max(int(ph * 0.72), int(ph * 0.28) + 1)
             x0, x1 = int(pw * 0.28), max(int(pw * 0.72), int(pw * 0.28) + 1)
-            frac = float((patch[y0:y1, x0:x1].max(axis=2) < 150).mean())
-            if frac < ctr_thr:
+            if diff is not None:
+                dpatch = cell_patch_of(diff[:, :, None], X0, Y0, CW, CH, r, c)[..., 0]
+                frac = float((dpatch[y0:y1, x0:x1] > 60).mean())
+            else:
+                frac = float((patch[y0:y1, x0:x1].max(axis=2) < 150).mean())
+            col = bead_color(patch)
+            spread = float(col.max() - col.min())
+            colored = spread >= color_spread
+            thr = ctr_thr if colored else pale_thr
+            is_bead = frac >= thr
+            if not is_bead and colored and legend_rgb is not None:
+                d = np.linalg.norm(legend_rgb - np.asarray(col, dtype=float), axis=1)
+                if d.min() <= color_dist:
+                    is_bead = True
+                    n_color += 1
+            if not is_bead:
                 n_empty += 1
+                if frac >= ctr_thr and not colored:
+                    n_pale_rej += 1
                 continue
-            cells[(r, c)] = dict(color=[float(v) for v in bead_color(patch)], ctr=frac)
+            cells[(r, c)] = dict(color=[float(v) for v in col], ctr=frac)
     if verbose:
-        print('[提取] 有豆格 %d / %d（空格 %d）' % (len(cells), n_rows * n_cols, n_empty))
+        print('[提取] 有豆格 %d / %d（空格 %d；颜色判据补回 %d，低阈值文字格按水印拒掉 %d）' %
+              (len(cells), n_rows * n_cols, n_empty, n_color, n_pale_rej))
     return cells
 
 
@@ -814,6 +936,16 @@ def main():
     ap.add_argument('--ctr-thr', type=float, default=0.01,
                     help='有豆判定阈值（格中心区暗像素占比），默认 0.01')
     ap.add_argument('--name', default=None)
+    ap.add_argument('--text-diff', type=int, default=1,
+                    help='有豆判据用中值差分检测文字(黑白字通吃), 默认 1; 传 0 退回暗像素判据')
+    ap.add_argument('--color-bead', type=int, default=1,
+                    help='颜色判据: 主色有彩且贴近某图例色即判有豆(救低对比度文字格), 默认 1')
+    ap.add_argument('--color-dist', type=float, default=12.0,
+                    help='颜色判据的最大图例色距, 默认 12')
+    ap.add_argument('--color-spread', type=float, default=20.0,
+                    help='主色通道跨度>=此值算"有彩", 默认 20')
+    ap.add_argument('--pale-thr', type=float, default=0.16,
+                    help='白/黑/灰格的文字判据阈值(真豆色号文字对比度高, 水印差分弱), 默认 0.16')
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -821,6 +953,12 @@ def main():
     a = np.asarray(Image.open(args.image).convert('RGB')).astype(int)
     H, W, _ = a.shape
     print('[读图] %s %dx%d' % (args.image, W, H))
+
+    diff = None
+    if args.text_diff:
+        med = np.asarray(Image.open(args.image).convert('RGB').filter(
+            ImageFilter.MedianFilter(5))).astype(int)
+        diff = np.abs(a - med).max(axis=2)
 
     legend = json.loads(Path(args.legend).read_text(encoding='utf-8'))
     legend_total = sum(v[1] for v in legend.values())
@@ -841,7 +979,14 @@ def main():
     print('[标定] 采用 X0=%.1f Y0=%.1f CW=%.2f CH=%.2f 数据区 %d列 x %d行' %
           (X0, Y0, CW, CH, n_cols, n_rows))
 
-    cells = extract(a, X0, Y0, CW, CH, n_rows, n_cols, ctr_thr=args.ctr_thr)
+    legend_rgb = None
+    if args.color_bead:
+        legend_rgb = np.array([hex2rgb(v[0]) for v in legend.values()], dtype=float)
+
+    cells = extract(a, X0, Y0, CW, CH, n_rows, n_cols, ctr_thr=args.ctr_thr,
+                   diff=diff if args.text_diff else None,
+                   legend_rgb=legend_rgb, color_dist=args.color_dist,
+                   color_spread=args.color_spread, pale_thr=args.pale_thr)
 
     # ---- 自检：豆格数 vs 图例总数 ----
     if len(cells) != legend_total:
@@ -1288,7 +1433,9 @@ python3 call_cf.py template-api resyncDrafts '{"keys":["pp-xxx"]}'
 - `listDrafts` 按 `sort` 升序渲染，图纸库管理是一次性全量网格，无分页无搜索
 - 新图纸用 `max(sort)+1` 会排到 223 张的**最后一张**，用户根本找不到  
   （睡衣宝宝图纸因此被用户两次反馈"没找到"）
-- **新图纸一律 sort=-10 排第一张**（全库最小值原为 -4）
+- **单张新图：sort 取「低于所有现有值」的一张**（曾用 -10，当时全库最小 -4）
+- **多张新图：从现有最小值依次往下排**（如现有最小 -10 → 新图 -13/-12/-11）——
+  `orderBy('sort','asc')` 无次级排序键，**并列时顺序不定**，都写 -10 会随机排
 - 已入错的用 resyncDrafts 改
 
 ### B6. 其他坑
@@ -1299,9 +1446,14 @@ python3 call_cf.py template-api resyncDrafts '{"keys":["pp-xxx"]}'
   `seedDrafts` / `resyncDrafts` / `verifyDrafts` 可用 seedToken(`seed-47012803-pd`) 运维
 - seedToken 存在云函数环境变量 SEED_TOKEN
 - 部署脚本密钥在 artifact 目录 `.secrets`（TENCENT_SECRET_ID/KEY），不进仓库
+- **本机（Windows）权威运维脚本在 `D:/workB/scripts/`**：`deploy_template_api.py`（部署+轮询 Active）、
+  `invoke_action.py`（调动作）。密钥读环境变量 `TENCENT_SECRET_ID`/`TENCENT_SECRET_KEY`，
+  兜底从仓库 `cf/*.py` 解析；**不要把密钥写进任何新文件**。仓库 `cf/deploy.py` 的 ZIP 路径是
+  Linux workspace 老路径，直接用会找不到文件
 - **`InvokeFunction` 的入参字段是 `req.Event`，不是 `req.Payload`**——  
   写 `Payload` 会报 `UnknownParameter: 未定义参数`。仓库 `cf/invoke.py` 就是写错的，注意别再抄
-- 仓库 `cf/deploy.py` / `cf/invoke.py` 里**还硬编码着已吊销的旧腾讯云密钥**，顺手清掉更干净
+- 仓库 `cf/deploy.py` / `cf/invoke.py` / `cf/call.py` 里**还硬编码着已吊销的旧腾讯云密钥**
+  （实测报 `AuthFailure.SecretIdNotFound`），用本机脚本 + 环境变量绕过；要清理的话先问用户
 - 部署耗时：6.3MB 包 → base64 8.4MB，上传 + 轮询 Active ≈ 1 分钟；  
   `seedDrafts force` ≈ 25 秒。这部分是物理成本，省不掉
 
