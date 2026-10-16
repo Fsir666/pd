@@ -121,6 +121,50 @@ Page({
     // 阻止冒泡
   },
 
+  onDeleteWork(e) {
+    const id = e.currentTarget.dataset.id;
+    const work = (this._all || []).find(item => item._id === id);
+    if (!id || !work) return;
+
+    wx.showModal({
+      title: '删除作品',
+      content: '确定删除「' + (work.title || '我的作品') + '」吗？删除后无法恢复。',
+      confirmText: '删除',
+      confirmColor: '#D4607A',
+      success: result => {
+        if (!result.confirm) return;
+        wx.showLoading({ title: '删除中...', mask: true });
+        wx.cloud.callFunction({
+          name: 'template-api',
+          data: { action: 'deleteMyWork', templateId: id }
+        }).then(res => {
+          wx.hideLoading();
+          if (res.result && res.result.code === 0) {
+            const all = (this._all || []).filter(item => item._id !== id);
+            this._all = all;
+            const publicCount = all.filter(item => item.isPublic !== false).length;
+            this.setData({
+              works: this.applyFilter(all, this.data.filter),
+              totalCount: all.length,
+              publicCount,
+              privateCount: all.length - publicCount
+            });
+            wx.showToast({ title: '已删除', icon: 'success' });
+          } else {
+            wx.showToast({
+              title: (res.result && res.result.msg) || '删除失败',
+              icon: 'none'
+            });
+          }
+        }).catch(err => {
+          wx.hideLoading();
+          console.error('Delete work failed:', err);
+          wx.showToast({ title: '网络错误，删除失败', icon: 'none' });
+        });
+      }
+    });
+  },
+
   onPublicToggle(e) {
     const { id, index } = e.currentTarget.dataset;
     const isPublic = e.detail.value;

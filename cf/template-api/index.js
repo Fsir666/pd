@@ -1606,6 +1606,30 @@ exports.main = async (event, context) => {
       return { code: 0, data: { unlocked, title }, msg: 'success' };
     }
 
+    // 删除作品：必须确认作品归当前登录用户所有，并同步移除社区帖
+    if (action === 'deleteMyWork') {
+      const templateId = event && event.templateId ? String(event.templateId) : '';
+      const openid = wxContext.OPENID;
+      if (!templateId) return { code: -1, msg: 'Missing templateId' };
+      if (!openid) return { code: 401, msg: '请先登录' };
+
+      const templateRes = await db.collection('templates').doc(templateId).get().catch(() => ({ data: null }));
+      const template = templateRes && templateRes.data;
+      if (!template) return { code: -1, msg: '作品不存在' };
+      if (template._openid !== openid) {
+        return { code: -3, msg: '无权限：只能删除自己的作品' };
+      }
+
+      try {
+        await db.collection('templates').doc(templateId).remove();
+        await db.collection('community_posts').doc(templateId).remove().catch(() => null);
+        return { code: 0, msg: '作品已删除' };
+      } catch (err) {
+        console.error('Delete my work failed:', err);
+        return { code: -1, msg: '删除失败，请稍后重试' };
+      }
+    }
+
     // 12. 切换作品公开状态
     if (action === 'togglePublic') {
       const { templateId, isPublic } = event;
