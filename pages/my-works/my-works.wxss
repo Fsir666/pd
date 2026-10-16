@@ -380,3 +380,16 @@
 .go-create-btn:active {
   opacity: 0.9;
 }
+
+
+/* 删除作品 */
+.btn-delete {
+  margin-top: 18rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #FBECEF;
+  color: #C64F68;
+  font-size: 21rpx;
+  line-height: 1.4;
+  white-space: nowrap;
+}
