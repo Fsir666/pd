@@ -5,15 +5,17 @@ const path = require('path');
   const project = new ci.Project({
     appid: 'wx9db1df964c432583',
     type: 'miniProgram',
-    projectPath: '/workspace/pd',
-    privateKeyPath: '/workspace/pd_private.key',
+    projectPath: path.resolve(__dirname, '..'),
+    privateKeyPath: process.env.WECHAT_PRIVATE_KEY_PATH || '/workspace/pd_private.key',
     ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
+  const version = process.env.WECHAT_VERSION || '1.0.122';
+  const description = process.env.WECHAT_DESC || '我的作品可删除';
   const result = await ci.upload({
     project,
-    version: '1.0.121',
-    desc: '白色格子恢复显示色号（详情页与拼豆模式）',
+    version,
+    desc: description,
     setting: {
       es6: true,
       minify: true,
