@@ -1,20 +1,27 @@
 # -*- coding: utf-8 -*-
-"""用 ZipFile(base64 内联) 方式部署 template-api 云函数。
-前提：/workspace/cf/template-api-fixed.zip 已包含 **根目录下的 index.js**
-（腾讯云要求 zip 根目录直接是 index.js/package.json，不能套一层目录）
-"""
-import base64, json, sys, time
+"""部署 template-api 云函数。凭据与 ZIP 路径由环境变量提供。"""
+import base64
+import json
+import os
+import sys
+import time
+
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.scf.v20180416 import scf_client, models
 
-SECRET_ID = "AKIDxwjwwiFZgYoqfGdl6HMCoCM1SikYAZlp"
-SECRET_KEY = "tXw75pKaeV7UcXFjCTVIwMYWHn6B7sSn"
+SECRET_ID = os.environ.get("TENCENTCLOUD_SECRET_ID", "").strip()
+SECRET_KEY = os.environ.get("TENCENTCLOUD_SECRET_KEY", "").strip()
 REGION = "ap-shanghai"
 FUNC = "template-api"
 NS = "cloudbase-d3ghdhcts9aad4fec"
-ZIP = "/workspace/cf/template-api-root.zip"
+ZIP = os.environ.get("TEMPLATE_API_ZIP", "/workspace/cf/template-api-root.zip")
+
+if not SECRET_ID or not SECRET_KEY:
+    raise SystemExit("Missing TENCENTCLOUD_SECRET_ID or TENCENTCLOUD_SECRET_KEY")
+if not os.path.isfile(ZIP):
+    raise SystemExit("Cloud function archive not found: " + ZIP)
 
 cred = credential.Credential(SECRET_ID, SECRET_KEY)
 hp = HttpProfile(endpoint="scf.tencentcloudapi.com")
@@ -24,7 +31,7 @@ client = scf_client.ScfClient(cred, REGION, cp)
 with open(ZIP, "rb") as f:
     raw = f.read()
 b64 = base64.b64encode(raw).decode()
-print("zip 大小 %.1f MB, base64 %.1f MB" % (len(raw)/1048576, len(b64)/1048576))
+print("zip size %.1f MB, base64 %.1f MB" % (len(raw) / 1048576, len(b64) / 1048576))
 
 req = models.UpdateFunctionCodeRequest()
 req.FunctionName = FUNC
@@ -33,20 +40,19 @@ req.Handler = "index.main"
 req.CodeSource = "ZipFile"
 req.ZipFile = b64
 resp = client.UpdateFunctionCode(req)
-print(json.dumps(resp.to_json_string(), ensure_ascii=False))
+print(resp.to_json_string())
 
-# 轮询状态
-for i in range(40):
+for _ in range(40):
     time.sleep(3)
-    r2 = models.GetFunctionRequest()
-    r2.FunctionName = FUNC
-    r2.Namespace = NS
-    g = client.GetFunction(r2)
-    st = g.Status
-    print("status:", st, flush=True)
-    if st == "Active":
-        print("=== 部署完成 ===")
+    status_req = models.GetFunctionRequest()
+    status_req.FunctionName = FUNC
+    status_req.Namespace = NS
+    status = client.GetFunction(status_req).Status
+    print("status:", status, flush=True)
+    if status == "Active":
+        print("=== deployment complete ===")
         break
-    if st in ("UpdateFailed", "CreateFailed"):
-        print("=== 部署失败 ===")
-        sys.exit(1)
+    if status in ("UpdateFailed", "CreateFailed"):
+        raise SystemExit("=== deployment failed ===")
+else:
+    raise SystemExit("=== deployment timed out ===")
