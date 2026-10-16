@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      TENCENTCLOUD_SECRET_ID: \${{ secrets.TENCENTCLOUD_SECRET_ID }}
-      TENCENTCLOUD_SECRET_KEY: \${{ secrets.TENCENTCLOUD_SECRET_KEY }}
-      TEMPLATE_API_ZIP: \${{ runner.temp }}/template-api-root.zip
+      TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+      TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
+      TEMPLATE_API_ZIP: ${{ runner.temp }}/template-api-root.zip
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -71,9 +71,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      WECHAT_VERSION: \${{ inputs.version }}
-      WECHAT_DESC: \${{ inputs.description }}
-      WECHAT_PRIVATE_KEY_PATH: \${{ runner.temp }}/wechat-upload.key
+      WECHAT_VERSION: ${{ inputs.version }}
+      WECHAT_DESC: ${{ inputs.description }}
+      WECHAT_PRIVATE_KEY_PATH: ${{ runner.temp }}/wechat-upload.key
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
 
       - name: Upload to WeChat
         env:
-          WECHAT_PRIVATE_KEY: \${{ secrets.WECHAT_PRIVATE_KEY }}
+          WECHAT_PRIVATE_KEY: ${{ secrets.WECHAT_PRIVATE_KEY }}
         run: |
           test -n "$WECHAT_PRIVATE_KEY" || { echo "Missing GitHub secret WECHAT_PRIVATE_KEY"; exit 1; }
           umask 077
