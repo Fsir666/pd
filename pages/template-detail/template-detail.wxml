@@ -136,10 +136,6 @@
 
   <!-- 底部操作栏 -->
   <view class="bottom-bar">
-    <view class="price-info">
-      <text class="price-label">消耗体力</text>
-      <text class="price-value">⚡ 2</text>
-    </view>
     <view class="action-btn" bindtap="onStartBuild">拼一下</view>
   </view>
 </view>

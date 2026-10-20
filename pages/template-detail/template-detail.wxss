@@ -407,23 +407,9 @@
   align-items: center;
 }
 
-.price-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.price-label {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.price-value {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #FF6B00;
-}
-
 .action-btn {
+  flex: 1;
+  text-align: center;
   background: linear-gradient(135deg, #FF6B00, #FF8C42);
   color: white;
   padding: 20rpx 60rpx;

@@ -259,11 +259,10 @@ Page({
       if (!r || r.code !== 0) return false
       const d = r.data || {}
       const coins = typeof d.coins === 'number' ? d.coins : 0
-      const energy = typeof d.energy === 'number' ? d.energy : 0
       const today = d.today ? String(d.today) : ''
       const lastCheckinDay = d.lastCheckinDay ? String(d.lastCheckinDay) : ''
       const streak = typeof d.checkinStreak === 'number' ? d.checkinStreak : 0
-      app.updateUserInfo({ coins, energy })
+      app.updateUserInfo({ coins })
       this.syncData()
       // 今天是否已签到 = 云端「上次签到日」=== 云端「今天」。
       // 注意：d.today 是服务端今天的日期本身，与用户是否签到无关。
@@ -379,14 +378,11 @@ Page({
       if (r.code !== 0) throw new Error(r.msg || '签到失败')
       const d = r.data || {}
       const coins = typeof d.coins === 'number' ? d.coins : null
-      const energy = typeof d.energy === 'number' ? d.energy : null
       const rewardCoins = typeof d.rewardCoins === 'number' ? d.rewardCoins : 0
-      const rewardEnergy = typeof d.rewardEnergy === 'number' ? d.rewardEnergy : 0
       const streak = typeof d.streak === 'number' ? d.streak : 0
       const bonusCoins = typeof d.bonusCoins === 'number' ? d.bonusCoins : 0
       const next = {}
       if (typeof coins === 'number') next.coins = coins
-      if (typeof energy === 'number') next.energy = energy
       app.updateUserInfo(next)
       this.syncData()
       // 签到卡片在弹窗外也要立刻变成「已签到」态
@@ -395,10 +391,9 @@ Page({
       if (this.data.showCoinsModal) {
         this.fetchCoinLedger(true)
       }
-      const extra = rewardEnergy > 0 ? `，体力+${rewardEnergy}` : ''
       const bonus = bonusCoins > 0 ? `（连签奖励+${bonusCoins}）` : ''
       const s = streak > 0 ? ` 连签${streak}天` : ''
-      wx.showToast({ title: `豆币+${rewardCoins}${bonus}${extra}${s}`, icon: 'none' })
+      wx.showToast({ title: `豆币+${rewardCoins}${bonus}${s}`, icon: 'none' })
     }).catch((e) => {
       wx.hideLoading()
       wx.showToast({ title: (e && e.message) ? e.message : '签到失败', icon: 'none' })

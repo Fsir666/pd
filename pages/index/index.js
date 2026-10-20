@@ -20,8 +20,7 @@ Page({
     activeDetailCard: '',
     detailLaunch: null,
     userInfo: {
-      coins: 0,
-      energy: 0
+      coins: 0
     },
     isLogged: false,
     isRefreshing: false,
@@ -442,7 +441,7 @@ Page({
     } else {
       // 未登录时的默认状态
       this.setData({
-        userInfo: { coins: '-', energy: '-' },
+        userInfo: { coins: '-' },
         isLogged: false
       });
     }
@@ -458,8 +457,7 @@ Page({
       if (!r || r.code !== 0) return false
       const d = r.data || {}
       const coins = typeof d.coins === 'number' ? d.coins : 0
-      const energy = typeof d.energy === 'number' ? d.energy : 0
-      app.updateUserInfo({ coins, energy })
+      app.updateUserInfo({ coins })
       this.updateLocalUserData()
       return true
     }).catch(() => false)

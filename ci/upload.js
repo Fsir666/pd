@@ -10,8 +10,8 @@ const path = require('path');
     ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
-  const version = process.env.WECHAT_VERSION || '1.0.134';
-  const description = process.env.WECHAT_DESC || '管理员支付支持手动输入金额、付款金额确认和订单金额校验';
+  const version = process.env.WECHAT_VERSION || '1.0.136';
+  const description = process.env.WECHAT_DESC || '修复取消体力后的首页豆币栏留白和图纸详情按钮布局';
   require('./check-release-notes.js')(version);
   if (require('../utils/version.js').APP_VERSION !== version) {
     throw new Error('utils/version.js 中的版本号与上传版本不一致，请先同步。');

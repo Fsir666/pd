@@ -92,14 +92,15 @@ scroll-view {
 /* ---------- 顶部状态栏 ---------- */
 .header-status {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 16rpx;
   margin: 20rpx auto;
   z-index: 100;
   position: sticky;
   top: 20rpx;
-  width: calc(100% - 48rpx);
+  width: fit-content;
+  max-width: calc(100% - 48rpx);
   box-sizing: border-box;
   background: rgba(255, 253, 251, 0.86);
   backdrop-filter: blur(20px);

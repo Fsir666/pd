@@ -914,7 +914,6 @@ exports.main = async (event, context) => {
         msg: 'success',
         data: {
           coins: typeof user.coins === 'number' ? user.coins : 0,
-          energy: typeof user.energy === 'number' ? user.energy : 0,
           lastCheckinDay: user.lastCheckinDay ? String(user.lastCheckinDay) : '',
           checkinStreak: typeof user.checkinStreak === 'number' ? user.checkinStreak : 0,
           today: dayStringCN(Date.now())
@@ -930,8 +929,6 @@ exports.main = async (event, context) => {
       if (!user || !user._id) return { code: 401, msg: '请先登录' }
 
       const baseRewardCoins = 20
-      const rewardEnergy = 1
-      const maxEnergy = 10
       const streakBonusMap = {
         7: 50,
         14: 100,
@@ -946,7 +943,6 @@ exports.main = async (event, context) => {
         if (!doc) return { code: 401, msg: '请先登录' }
 
         const coins = typeof doc.coins === 'number' ? doc.coins : 0
-        const energy = typeof doc.energy === 'number' ? doc.energy : 0
         const last = doc.lastCheckinDay ? String(doc.lastCheckinDay) : ''
         const prevStreak = typeof doc.checkinStreak === 'number' ? doc.checkinStreak : 0
 
@@ -954,11 +950,10 @@ exports.main = async (event, context) => {
           return {
             code: 10002,
             msg: '今日已签到',
-            data: { coins, energy, rewardCoins: 0, rewardEnergy: 0, today, streak: prevStreak, bonusCoins: 0 }
+            data: { coins, rewardCoins: 0, today, streak: prevStreak, bonusCoins: 0 }
           }
         }
 
-        const nextEnergy = Math.min(maxEnergy, energy + rewardEnergy)
         const streak = last === yesterday ? Math.max(1, prevStreak + 1) : 1
         const bonusCoins = streakBonusMap[streak] ? Number(streakBonusMap[streak]) : 0
         const rewardCoins = baseRewardCoins + bonusCoins
@@ -966,7 +961,6 @@ exports.main = async (event, context) => {
         await userRef.update({
           data: {
             coins: _.inc(rewardCoins),
-            energy: nextEnergy,
             lastCheckinDay: today,
             checkinStreak: streak,
             updateTime: db.serverDate()
@@ -987,9 +981,7 @@ exports.main = async (event, context) => {
           msg: 'ok',
           data: {
             coins: coins + rewardCoins,
-            energy: nextEnergy,
             rewardCoins,
-            rewardEnergy: nextEnergy - energy,
             today,
             streak,
             bonusCoins

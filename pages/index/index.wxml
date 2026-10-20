@@ -88,14 +88,9 @@ module.exports = {
           <text class="value">{{userInfo.coins}}</text>
           <text class="label">豆币</text>
         </view>
-        <view class="status-item">
-          <text class="icon">⚡</text>
-          <text class="value">{{userInfo.energy}}/10</text>
-          <text class="label">体力</text>
-        </view>
       </view>
 
-      <!-- 顶部状态栏：豆币 / 体力（见下方 header-status） -->
+      <!-- 顶部状态栏：豆币（见下方 header-status） -->
 
       <!-- Hero 主创作入口：画板（bead-mode 空白大画板） -->
       <view class="hero-card" bindtap="onGoBoard">

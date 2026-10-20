@@ -37,11 +37,6 @@
           <text class="stat-label">豆币</text>
           <view class="stat-icon-bg coin-bg">💰</view>
         </view>
-        <view class="stat-widget" hover-class="hover-scale">
-          <text class="stat-num">{{userInfo.energy}}</text>
-          <text class="stat-label">体力</text>
-          <view class="stat-icon-bg energy-bg">⚡</view>
-        </view>
       </view>
     </view>
 
@@ -52,7 +47,7 @@
           <text class="checkin-title">每日签到</text>
           <text class="checkin-streak-badge" wx:if="{{walletStreak > 0}}">连签 {{walletStreak}} 天</text>
         </view>
-        <text class="checkin-sub">{{checkedInToday ? '今天已签到，明天再来~' : '点击签到，领豆币 + 体力'}}</text>
+        <text class="checkin-sub">{{checkedInToday ? '今天已签到，明天再来~' : '点击签到，领豆币'}}</text>
       </view>
       <view class="checkin-btn {{checkedInToday ? 'done' : ''}}">
         <text>{{checkedInToday ? '已签到' : '签到'}}</text>
