@@ -1,6 +1,6 @@
 <view class="page">
   <view class="heading">管理员支付测试</view>
-  <view class="subtitle">固定金额 0.01 元 · 仅管理员可用</view>
+  <view class="subtitle">自定义测试金额 · 仅管理员可用</view>
   <view class="card" wx:if="{{loading}}">正在检查管理员权限和支付配置…</view>
   <block wx:elif="{{isAdmin}}">
     <view class="card">
@@ -11,13 +11,16 @@
       <button class="secondary" bindtap="loadConfig" disabled="{{paying || querying}}">重新检查</button>
     </view>
     <view class="card">
-      <view class="amount">¥0.01</view>
+      <view class="card-title">测试金额（元）</view>
+      <input class="amount" type="digit" value="{{amountInput}}" bindinput="onAmountInput" disabled="{{paying || querying || amountLocked}}" placeholder="请输入金额" />
+      <view class="note">支持 0.01～200 元，最多两位小数。{{amountLocked ? '当前订单金额已锁定，修改前请先关闭未付款订单。' : ''}}</view>
       <view class="note">这是一笔真实的小额测试付款，不购买商品或增加权益。付款结果由服务端向微信支付核实。</view>
-      <button class="primary" bindtap="pay" loading="{{paying}}" disabled="{{!ready || paying || querying}}">{{paying ? '处理中' : '测试支付 0.01 元'}}</button>
+      <button class="primary" bindtap="pay" loading="{{paying}}" disabled="{{!ready || paying || querying}}">{{paying ? '处理中' : '确认金额并支付'}}</button>
     </view>
     <view class="card" wx:if="{{order}}">
       <view class="card-title">最近一次测试</view>
       <view class="state {{order.state === 'SUCCESS' ? 'ok' : ''}}">{{order.stateText}}</view>
+      <view class="order-no" wx:if="{{order.amountText}}">订单金额：¥{{order.amountText}}</view>
       <view class="order-no">商户订单号：{{order.outTradeNo}}</view>
       <view class="order-no" wx:if="{{order.transactionId}}">微信支付流水：{{order.transactionId}}</view>
       <view class="order-no" wx:if="{{order.paidAt}}">支付时间：{{order.paidAt}}</view>

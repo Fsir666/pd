@@ -10,8 +10,8 @@ const path = require('path');
     ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
-  const version = process.env.WECHAT_VERSION || '1.0.133';
-  const description = process.env.WECHAT_DESC || '新增管理员0.01元支付联调、支付通知验签和服务端查单确认';
+  const version = process.env.WECHAT_VERSION || '1.0.134';
+  const description = process.env.WECHAT_DESC || '管理员支付支持手动输入金额、付款金额确认和订单金额校验';
   require('./check-release-notes.js')(version);
   if (require('../utils/version.js').APP_VERSION !== version) {
     throw new Error('utils/version.js 中的版本号与上传版本不一致，请先同步。');

@@ -3,7 +3,14 @@ const https = require('https');
 
 const APP_ID = 'wx9db1df964c432583';
 const COLLECTION = 'payment_test_orders';
-const AMOUNT = 1; // Unit: fen. No amount or merchant parameters are accepted from clients.
+const MAX_AMOUNT = 20000; // Administrator test limit, in fen.
+function parseAmount(value) {
+  if (typeof value !== 'string' || !/^(0|[1-9]\d{0,2})(\.\d{1,2})?$/.test(value)) throw new Error('请输入正确金额，最多两位小数');
+  const [yuan, fraction = ''] = value.split('.');
+  const amount = Number(yuan) * 100 + Number(fraction.padEnd(2, '0'));
+  if (amount < 1 || amount > MAX_AMOUNT) throw new Error('测试金额须为 0.01～200 元');
+  return amount;
+}
 
 function config() {
   const env = process.env;
@@ -98,7 +105,7 @@ function request(c, method, route, body) {
 function summary(order) {
   return {
     outTradeNo: order.outTradeNo,
-    amountText: '0.01',
+    amountText: (order.amount / 100).toFixed(2),
     state: order.state,
     transactionId: order.transactionId || '',
     paidAt: order.paidAt || '',
@@ -119,7 +126,7 @@ async function applyTransaction(db, c, transaction) {
     const ref = tx.collection(COLLECTION).doc(id);
     const result = await ref.get();
     const order = result.data;
-    if (!order || order.amount !== AMOUNT || transaction.mchid !== c.mchid || transaction.appid !== c.appid || order.mchid !== c.mchid || order.appid !== c.appid || !transaction.payer || transaction.payer.openid !== order.ownerOpenid || !transaction.amount || transaction.amount.total !== AMOUNT || transaction.amount.currency !== 'CNY') {
+    if (!order || !Number.isInteger(order.amount) || order.amount < 1 || order.amount > MAX_AMOUNT || transaction.mchid !== c.mchid || transaction.appid !== c.appid || order.mchid !== c.mchid || order.appid !== c.appid || !transaction.payer || transaction.payer.openid !== order.ownerOpenid || !transaction.amount || transaction.amount.total !== order.amount || transaction.amount.currency !== 'CNY') {
       throw new Error('支付订单的商户、用户或金额校验失败');
     }
     const states = ['SUCCESS', 'NOTPAY', 'CLOSED', 'REVOKED', 'USERPAYING', 'PAYERROR'];
@@ -183,6 +190,7 @@ async function handle({ db, action, event, openid }) {
     const next = await applyTransaction(db, c, transaction);
     return { code: 0, data: { order: summary(next) } };
   }
+  const amount = parseAmount(event.amountText === undefined ? '0.01' : event.amountText);
   const requestId = String(event.requestId || '');
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(requestId)) throw new Error('请更新测试页面后重试');
   const id = 'AT' + crypto.createHash('sha256').update(openid + ':' + requestId).digest('hex').slice(0, 30);
@@ -196,10 +204,11 @@ async function handle({ db, action, event, openid }) {
       if (!/document.*(not exist|not found)|DOCUMENT_NOT_EXIST/i.test(message)) throw error;
     }
     if (order) return order;
-    const fresh = { outTradeNo: id, ownerOpenid: openid, mchid: c.mchid, appid: c.appid, amount: AMOUNT, state: 'CREATING', createdAt: now, expiresAt: now + 15 * 60 * 1000 };
+    const fresh = { outTradeNo: id, ownerOpenid: openid, mchid: c.mchid, appid: c.appid, amount, state: 'CREATING', createdAt: now, expiresAt: now + 15 * 60 * 1000 };
     await ref.set({ data: fresh });
     return null;
   });
+  if (existing && existing.amount !== amount) throw new Error('订单金额已锁定，请先关闭未付款订单再修改金额');
   if (existing && existing.state === 'SUCCESS') return { code: 0, data: { order: summary(existing) } };
   if (existing && ['NOTPAY', 'USERPAYING'].includes(existing.state) && existing.prepayId && existing.expiresAt > now) return paymentResult(c, existing);
   if (existing) return { code: -1, msg: '这笔测试订单已存在，请先查询结果；请勿重复下单', data: { outTradeNo: id } };
@@ -207,10 +216,10 @@ async function handle({ db, action, event, openid }) {
     const result = await request(c, 'POST', '/v3/pay/transactions/jsapi', {
       appid: c.appid, mchid: c.mchid, description: '悠米拼豆管理员支付测试', out_trade_no: id,
       time_expire: new Date(now + 15 * 60 * 1000).toISOString(), notify_url: c.notifyUrl,
-      amount: { total: AMOUNT, currency: 'CNY' }, payer: { openid }
+      amount: { total: amount, currency: 'CNY' }, payer: { openid }
     });
     if (!result.prepay_id) throw new Error('微信支付没有返回预支付信息');
-    const order = { outTradeNo: id, createdAt: now, expiresAt: now + 15 * 60 * 1000, prepayId: result.prepay_id, state: 'NOTPAY' };
+    const order = { amount, outTradeNo: id, createdAt: now, expiresAt: now + 15 * 60 * 1000, prepayId: result.prepay_id, state: 'NOTPAY' };
     // A very early notification must never be overwritten by a prepay response.
     await db.runTransaction(async tx => {
       const ref = tx.collection(COLLECTION).doc(id);
@@ -264,4 +273,4 @@ async function notify({ db, event }) {
   }
 }
 
-module.exports = { handle, notify, readiness, config, verifySignature, applyTransaction };
+module.exports = { parseAmount, handle, notify, readiness, config, verifySignature, applyTransaction };

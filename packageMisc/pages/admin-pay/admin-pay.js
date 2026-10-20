@@ -1,7 +1,7 @@
 const STATES = { CREATING: '下单结果待确认', NOTPAY: '尚未付款', USERPAYING: '支付处理中', SUCCESS: '服务端已确认付款', CLOSED: '订单已关闭', REVOKED: '订单已撤销', PAYERROR: '支付失败', CREATE_FAILED: '未生成微信支付订单' };
 
 Page({
-  data: { loading: true, isAdmin: false, ready: false, checks: [], merchantId: '', error: '', paying: false, querying: false, order: null },
+  data: { loading: true, isAdmin: false, ready: false, checks: [], merchantId: '', error: '', paying: false, querying: false, order: null, amountInput: '0.01', amountLocked: false },
   onLoad() { this.loadConfig(); },
   onUnload() { this._disposed = true; clearTimeout(this._queryTimer); },
 
@@ -25,7 +25,7 @@ Page({
       this._storageKey = 'admin_payment_test_' + data.accountKey;
       const saved = wx.getStorageSync(this._storageKey) || {};
       this._requestId = saved.requestId || '';
-      this.setData({ loading: false, isAdmin: true, ready: data.ready, checks: data.checks, merchantId: data.merchantId });
+      this.setData({ loading: false, isAdmin: true, ready: data.ready, checks: data.checks, merchantId: data.merchantId, amountInput: saved.amountText || '0.01' });
       if (saved.outTradeNo) {
         this.showOrder(saved);
         if (data.ready) this.queryOrder();
@@ -35,18 +35,26 @@ Page({
     }
   },
 
+  onAmountInput(event) { if (!this.data.amountLocked && !this.data.paying) this.setData({ amountInput: event.detail.value }); },
+
   showOrder(order) {
     if (this._disposed) return;
-    this.setData({ order: Object.assign({}, order, { stateText: STATES[order.state] || '等待查询确认' }) });
+    const amountLocked = !['SUCCESS', 'CLOSED', 'REVOKED', 'PAYERROR', 'CREATE_FAILED'].includes(order.state);
+    this.setData({ amountLocked, amountInput: amountLocked && order.amountText ? order.amountText : this.data.amountInput, order: Object.assign({}, order, { stateText: STATES[order.state] || '等待查询确认' }) });
     wx.setStorageSync(this._storageKey, Object.assign({}, order, { requestId: this._requestId }));
   },
 
   pay() {
     if (!this.data.ready || !this.data.isAdmin || this.data.paying || this.data.querying) return;
+    const text = String(this.data.amountInput).trim();
+    if (!/^(0|[1-9]\d{0,2})(\.\d{1,2})?$/.test(text) || Number(text) < 0.01 || Number(text) > 200) {
+      this.setData({ error: '请输入 0.01～200 元的金额，最多两位小数。' }); return;
+    }
+    this._confirmedAmount = Number(text).toFixed(2);
     this.setData({ paying: true, error: '' });
     wx.showModal({
       title: '确认测试付款',
-      content: '将向商户号 ' + this.data.merchantId + ' 实际支付 0.01 元，仅用于管理员联调，不购买商品或增加权益。',
+      content: '将向商户号 ' + this.data.merchantId + ' 实际支付 ' + this._confirmedAmount + ' 元，仅用于管理员联调，不购买商品或增加权益。',
       confirmText: '继续付款',
       success: result => {
         if (this._disposed) return;
@@ -61,11 +69,11 @@ Page({
     const old = this.data.order;
     if (!this._requestId || (old && ['SUCCESS', 'CLOSED', 'REVOKED', 'PAYERROR', 'CREATE_FAILED'].includes(old.state))) {
       this._requestId = Date.now().toString(36) + '_' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-      wx.setStorageSync(this._storageKey, { requestId: this._requestId });
-      this.setData({ order: null });
+      wx.setStorageSync(this._storageKey, { requestId: this._requestId, amountText: this._confirmedAmount });
+      this.setData({ order: null, amountLocked: false });
     }
     try {
-      const data = await this.call('createPayJsapiTest', { requestId: this._requestId });
+      const data = await this.call('createPayJsapiTest', { requestId: this._requestId, amountText: this._confirmedAmount });
       if (this._disposed) return;
       if (data.order) this.showOrder(data.order);
       if (data.payment) {
@@ -73,7 +81,7 @@ Page({
       }
     } catch (error) {
       if (this._disposed) return;
-      if (error.data && error.data.outTradeNo) this.showOrder({ outTradeNo: error.data.outTradeNo, state: 'CREATING' });
+      if (error.data && error.data.outTradeNo) this.showOrder({ outTradeNo: error.data.outTradeNo, state: 'CREATING', amountText: this._confirmedAmount });
       const cancelled = /cancel/i.test(error.errMsg || '');
       this.setData({ error: cancelled ? '已取消付款，可以查询订单或继续支付。' : (error.message || '付款未完成，请查询订单确认结果。') });
     } finally {
