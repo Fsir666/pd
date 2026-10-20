@@ -2048,8 +2048,6 @@ exports.main = async (event, context) => {
         .where({ _openid: targetOpenid, isPublic: true })
         .count()
         .catch(() => ({ total: 0 }));
-      const worksCount = worksCountRes && typeof worksCountRes.total === 'number' ? worksCountRes.total : 0;
-
       const worksRes = await db
         .collection('templates')
         .where({ _openid: targetOpenid, isPublic: true })
@@ -2057,6 +2055,25 @@ exports.main = async (event, context) => {
         .limit(30)
         .get()
         .catch(() => ({ data: [] }));
+
+      const postsRes = await db
+        .collection('community_posts')
+        .where({ _openid: targetOpenid })
+        .limit(50)
+        .get()
+        .catch(() => ({ data: [] }));
+      const templateWorks = (worksRes.data || []).map(work => Object.assign({}, work, { content: work.content || work.title || '', workType: '图纸' }));
+      const templateIds = new Set(templateWorks.map(work => String(work._id)));
+      const communityWorks = (postsRes.data || [])
+        .filter(post => !post.templateId && !templateIds.has(String(post._id)))
+        .map(work => Object.assign({}, work, { workType: '作品' }));
+      const publicWorks = templateWorks.concat(communityWorks)
+        .sort((a, b) => {
+          const time = value => value instanceof Date ? value.getTime() : (Number(value) || new Date(value || 0).getTime() || 0);
+          return time(b.createTime) - time(a.createTime);
+        })
+        .slice(0, 50);
+      const worksCount = Math.max(0, (worksCountRes.total || 0) + communityWorks.length);
 
       return {
         code: 0,
@@ -2066,7 +2083,7 @@ exports.main = async (event, context) => {
           worksCount,
           isFollowing,
           isSelf,
-          works: worksRes.data || []
+          works: publicWorks
         },
         msg: 'success'
       };

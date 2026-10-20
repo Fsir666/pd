@@ -5,30 +5,30 @@ var maxPull = 150;
 function onPulling(e, ownerInstance) {
   var dy = e.detail.dy;
   if (dy < 0) return;
-  
+
   // 简单的插值计算
   // 旋转：每像素转动 4 度
   var rotate = dy * 4;
-  
+
   // 缩放：0.6 -> 1.2
   var scale = 0.6 + (dy / pullThreshold) * 0.6;
   if (scale > 1.2) scale = 1.2;
-  
+
   // 获取组件实例
   var icon = ownerInstance.selectComponent('.refresh-icon');
   var text = ownerInstance.selectComponent('.refresh-text');
-  
+
   if (icon) {
     icon.setStyle({
       transform: 'rotate(' + rotate + 'deg) scale(' + scale + ')'
     });
   }
-  
+
   if (text) {
     var opacity = (dy - 20) / (pullThreshold - 20);
     if (opacity < 0) opacity = 0;
     if (opacity > 1) opacity = 1;
-    
+
     text.setStyle({
       opacity: opacity
     });
@@ -60,10 +60,10 @@ module.exports = {
     <view class="orb orb-3"></view>
   </view>
 
-  <scroll-view 
-    scroll-y 
-    style="height: 100vh;" 
-    refresher-enabled="{{true}}" 
+  <scroll-view
+    scroll-y="{{!detailOpen}}"
+    style="height: 100vh;"
+    refresher-enabled="{{!detailOpen}}"
     refresher-threshold="{{120}}"
     refresher-default-style="none"
     refresher-background="transparent"
@@ -178,17 +178,17 @@ module.exports = {
             <text class="section-more">查看全部 ></text>
           </view>
         </view>
-        
+
         <!-- Template Definition -->
         <template name="rankItem">
-          <view class="rank-item glass-card {{item.rank === 1 ? 'rank-gold' : ''}} {{item.rank === 2 ? 'rank-silver' : ''}} {{item.rank === 3 ? 'rank-bronze' : ''}}" 
-                bindtap="goToDetail" 
+          <view id="rank-card-{{item.rank}}" data-canvas-id="rankcv-{{item.rank}}" data-radius="32" style="opacity:{{activeDetailCard === 'rank-card-' + item.rank ? 0 : 1}};" class="rank-item glass-card {{item.rank === 1 ? 'rank-gold' : ''}} {{item.rank === 2 ? 'rank-silver' : ''}} {{item.rank === 3 ? 'rank-bronze' : ''}}"
+                bindtap="goToDetail"
                 data-id="{{item.id}}"
                 data-title="{{item.title}}"
                 data-image-url="{{item.imageUrl}}"
                 data-author="{{item.author}}"
                 data-likes="{{item.heat}}">
-            
+
             <!-- 图片区域 -->
             <!--
               这里刻意【不显示作品的原始封面图】。
@@ -197,12 +197,12 @@ module.exports = {
               用户会看到「先出来一张不对的图，过一下又变成对的」，观感很差。
               所以这里一律用中性的骨架占位，等像素图真正画好再淡入。
             -->
-            <view class="rank-img-box">
+            <view class="rank-img-box detail-cover-source">
               <view class="rank-img-skeleton">
                 <text class="rank-img-skeleton-icon">{{item.image || '🎨'}}</text>
               </view>
               <canvas wx:if="{{item.boardReady}}" type="2d" id="rankcv-{{item.rank}}" class="rank-img-canvas {{item.boardPainted ? 'is-painted' : ''}}"></canvas>
-              
+
               <!-- 排名角标 -->
               <view class="rank-badge" wx:if="{{item.rank <= 3}}">
                 <text wx:if="{{item.rank === 1}}">🥇</text>
@@ -211,11 +211,11 @@ module.exports = {
               </view>
               <view class="rank-badge normal" wx:else>{{item.rank}}</view>
             </view>
-            
+
             <!-- 内容区域 -->
             <view class="rank-content">
               <text class="rank-title">{{item.title}}</text>
-              
+
               <view class="rank-footer">
                 <view class="rank-author-row">
                   <text class="rank-author">{{item.author}}</text>
@@ -233,12 +233,12 @@ module.exports = {
         <view class="rank-list-flex" wx:if="{{leftTemplates.length > 0 || rightTemplates.length > 0}}">
           <view class="rank-column">
             <block wx:for="{{leftTemplates}}" wx:key="id">
-              <template is="rankItem" data="{{item}}"/>
+              <template is="rankItem" data="{{item, activeDetailCard}}"/>
             </block>
           </view>
           <view class="rank-column">
             <block wx:for="{{rightTemplates}}" wx:key="id">
-              <template is="rankItem" data="{{item}}"/>
+              <template is="rankItem" data="{{item, activeDetailCard}}"/>
             </block>
           </view>
         </view>
@@ -249,7 +249,7 @@ module.exports = {
           <text class="rank-empty-text">榜单还在酝酿中，快发布作品抢占第一吧～</text>
         </view>
       </view>
-      
+
       <!-- Bottom Padding for TabBar -->
       <view style="height: 160rpx;"></view>
     </view>
@@ -258,3 +258,5 @@ module.exports = {
 
 <!-- 全局隐私授权弹窗 -->
 <privacy-popup />
+
+<pattern-detail-sheet wx:if="{{detailOpen}}" id="pattern-detail-sheet" launch="{{detailLaunch}}" bindcloserequest="onDetailCloseRequest" bindclosed="onDetailClosed" />

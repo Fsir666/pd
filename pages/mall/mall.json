@@ -2,6 +2,7 @@
   "navigationBarTitleText": "灵感发现",
   "enablePullDownRefresh": false,
   "usingComponents": {
-    "privacy-popup": "/components/privacy-popup/privacy-popup"
+    "privacy-popup": "/components/privacy-popup/privacy-popup",
+    "pattern-detail-sheet": "/components/pattern-detail-sheet/pattern-detail-sheet"
   }
 }

@@ -90,6 +90,10 @@ Page({
     wx.switchTab({ url: urls[index] });
   },
 
+  goToShowcase() {
+    wx.navigateTo({ url: '/packageMisc/pages/showcase/showcase' });
+  },
+
   goToMyCollections() {
     wx.vibrateShort({ type: 'light' });
     wx.navigateTo({

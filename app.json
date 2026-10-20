@@ -56,7 +56,8 @@
         "pages/contact/contact",
         "pages/beginner-guide/beginner-guide",
         "pages/admin/admin",
-        "pages/admin-drafts/admin-drafts"
+        "pages/admin-drafts/admin-drafts",
+        "pages/showcase/showcase"
       ]
     }
   ],

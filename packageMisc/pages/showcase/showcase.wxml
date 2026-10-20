@@ -1,0 +1,7 @@
+<view class="showcase-page">
+  <view class="showcase-empty">
+    <view class="showcase-icon">🛍️</view>
+    <text class="showcase-title">橱窗还是空的</text>
+    <text class="showcase-description">暂无商品</text>
+  </view>
+</view>

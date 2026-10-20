@@ -59,6 +59,17 @@
       </view>
     </view>
 
+    <!-- 橱窗入口：先保留空状态，后续再接入商品。 -->
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToShowcase" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-orange"><text class="menu-icon">🛍️</text></view>
+          <text class="item-title">我的橱窗</text>
+        </view>
+        <view class="item-right"><text class="icon-chevron"></text></view>
+      </view>
+    </view>
+
     <!-- 菜单列表 (Inset Grouped Style) -->
     <view class="menu-group">
       <view class="menu-item" bindtap="goToMyWorks" hover-class="hover-scale">

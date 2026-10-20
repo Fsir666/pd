@@ -10,8 +10,8 @@ const path = require('path');
     ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
-  const version = process.env.WECHAT_VERSION || '1.0.122';
-  const description = process.env.WECHAT_DESC || '我的作品可删除';
+  const version = process.env.WECHAT_VERSION || '1.0.127';
+  const description = process.env.WECHAT_DESC || '图纸详情支持下滑关闭，背景柔和压暗';
   const result = await ci.upload({
     project,
     version,

@@ -1,3 +1,4 @@
+const detailHost = require('../../utils/pattern-detail-host.js');
 const app = getApp();
 const presets = require('../../data/pattern-presets.js');
 
@@ -5,7 +6,11 @@ const presets = require('../../data/pattern-presets.js');
 const FEED_PAGE_SIZE = 10;
 
 Page({
+  ...detailHost.methods,
   data: {
+    detailOpen: false,
+    activeDetailCard: '',
+    detailLaunch: null,
     communityList: [],
     feedLeft: [],
     feedRight: [],
@@ -293,11 +298,7 @@ Page({
 
   openPattern(e) {
     const key = e.currentTarget.dataset.key;
-    if (!key) return;
-    wx.vibrateShort({ type: 'light' });
-    // 统一作品页：发现页图纸卡片 → detail（与首页榜单同一页面、同一布局）
-    // 内置图纸在云端以固定 _id = seed_<key> 存在，这里直接按 id 进入 detail
-    wx.navigateTo({ url: '/pages/detail/detail?id=' + encodeURIComponent('seed_' + key) });
+    if (key) detailHost.open(this, e, 'seed_' + key);
   },
 
   // 辅助方法：批量换取云文件链接
@@ -454,13 +455,7 @@ Page({
   },
 
   goToDetail(e) {
-    const { id, title, imageUrl, author, likes } = e.currentTarget.dataset;
-    let url = `/pages/detail/detail?id=${id}`;
-    if (title) url += `&title=${encodeURIComponent(title)}`;
-    if (imageUrl) url += `&imageUrl=${encodeURIComponent(imageUrl)}`;
-    if (author) url += `&author=${encodeURIComponent(author)}`;
-    if (likes) url += `&likes=${likes}`;
-    wx.navigateTo({ url });
+    detailHost.open(this, e, e.currentTarget.dataset.id);
   },
 
   goToAuthor(e) {
@@ -569,6 +564,8 @@ Page({
   },
 
   onShareAppMessage() {
+    const detailShare = this.detailShareMessage();
+    if (detailShare) return detailShare;
     return {
       title: '灵感发现 - 发现精选拼豆作品',
       path: '/pages/mall/mall',

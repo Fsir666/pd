@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "privacy-popup": "/components/privacy-popup/privacy-popup"
+    "privacy-popup": "/components/privacy-popup/privacy-popup",
+    "pattern-detail-sheet": "/components/pattern-detail-sheet/pattern-detail-sheet"
   },
   "enablePullDownRefresh": false
 }

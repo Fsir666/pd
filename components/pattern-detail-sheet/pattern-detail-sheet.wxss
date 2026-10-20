@@ -1,0 +1,46 @@
+@import "../../app.wxss";
+@import "../../pages/detail/detail.wxss";
+
+:host { position: relative; z-index: 9998; }
+.detail-overlay { position: fixed; inset: 0; z-index: 9998; }
+.detail-backdrop { position: absolute; inset: 0; background: rgba(55, 38, 43, .22); opacity: 0; transition: opacity 260ms ease, background-color 260ms ease; }
+.is-settled .detail-backdrop { background: rgba(55, 38, 43, .38); }
+.is-expanded .detail-backdrop { opacity: 1; }
+.detail-surface {
+  position: absolute; top: 0; left: 0; overflow: hidden; background: #FFFDFB;
+  transform-origin: 0 0; will-change: transform, border-radius;
+  box-shadow: 0 12px 48px rgba(68, 42, 48, .16);
+  transition: transform 360ms cubic-bezier(.2, .75, .25, 1), border-radius 360ms cubic-bezier(.2, .75, .25, 1), opacity 220ms ease;
+}
+.is-expanded .detail-surface { background: #FBF7F2; box-shadow: none; }
+.detail-scroll { position: absolute; top: 0; left: 0; }
+.transition-cover { position: absolute; left: 0; top: 0; width: 100%; z-index: 50; overflow: hidden; background: #F5EDE6; opacity: 1; pointer-events: none; transition: height 360ms cubic-bezier(.2, .75, .25, 1), opacity 140ms linear; }
+.transition-image { width: 100%; height: 100%; display: block; }
+.transition-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #B9A99F; font-size: 48rpx; }
+.cover-hidden { opacity: 0; }
+.content-card { opacity: 0; transition: opacity 140ms linear; }
+.is-expanded .content-card { opacity: 1; }
+.card-header, .primary-actions, .material-card, .author-info, .description, .section-container, .bottom-action-bar, .back-btn, .viewer-bar, .detail-switcher {
+  opacity: 0; transform: translateY(20px); transition: opacity 240ms ease, transform 360ms cubic-bezier(.22, 1, .36, 1); pointer-events: none;
+}
+.is-settled .card-header, .is-settled .primary-actions, .is-settled .material-card, .is-settled .author-info, .is-settled .description, .is-settled .section-container, .is-settled .bottom-action-bar, .is-settled .back-btn, .is-settled .viewer-bar, .is-settled .detail-switcher {
+  opacity: 1; transform: translateY(0); pointer-events: auto;
+}
+.is-settled .primary-actions { transition-delay: 50ms; }
+.is-settled .material-card { transition-delay: 100ms; }
+.is-settled .author-info, .is-settled .description { transition-delay: 150ms; }
+.is-settled .section-container, .is-settled .bottom-action-bar { transition-delay: 200ms; }
+.is-closing .content-card { opacity: 0; }
+.is-closing .card-header, .is-closing .primary-actions, .is-closing .material-card, .is-closing .author-info, .is-closing .description, .is-closing .section-container, .is-closing .bottom-action-bar, .is-closing .back-btn, .is-closing .viewer-bar, .is-closing .detail-switcher { transition-duration: 90ms; transition-delay: 0ms; }
+.back-btn { z-index: 100; }
+.load-message { position: absolute; top: 65%; left: 0; width: 100%; text-align: center; color: #9C858B; font-size: 26rpx; opacity: 0; transition: opacity 180ms ease; }
+.is-settled .load-message { opacity: 1; }
+.retry-button { margin: 20rpx auto; padding: 12rpx 36rpx; width: 90rpx; border-radius: 32rpx; background: #F6E5EA; color: #B34F67; }
+
+.transition-summary { position: absolute; left: 0; right: 0; padding: 20rpx; color: #4A3A3E; font-size: 28rpx; font-weight: 600; opacity: 1; transition: opacity 120ms ease; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-expanded .transition-summary { opacity: 0; }
+.detail-switcher { display: flex; justify-content: space-between; gap: 16rpx; margin-top: 18rpx; }
+.switch-btn { flex: 1; padding: 14rpx 20rpx; border-radius: 999rpx; background: #F6E9E4; color: #A8455C; font-size: 24rpx; font-weight: 700; text-align: center; }
+.switch-disabled { opacity: .4; }
+.gesture-hint { position: absolute; z-index: 120; top: 48%; left: 50%; transform: translateX(-50%); padding: 16rpx 30rpx; border-radius: 999rpx; background: rgba(50, 38, 41, .68); color: #fff; font-size: 26rpx; white-space: nowrap; animation: hint-fade 2.4s ease forwards; pointer-events: none; }
+@keyframes hint-fade { 0%, 18% { opacity: 0; } 32%, 78% { opacity: 1; } 100% { opacity: 0; } }

@@ -187,6 +187,9 @@
   color: rgba(29, 29, 31, 0.92);
 }
 
+.works-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12rpx; }
+.works-subtitle { font-size: 22rpx; font-weight: 600; color: rgba(29, 29, 31, 0.48); }
+
 .works-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -218,6 +221,8 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.work-type { padding: 5rpx 12rpx; border-radius: 999rpx; background: rgba(255, 106, 0, 0.1); color: #D65E12; font-size: 20rpx; font-weight: 800; }
 
 .work-like {
   font-size: 24rpx;

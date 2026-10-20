@@ -3,11 +3,25 @@
   position: fixed;
   bottom: 40rpx;
   bottom: calc(40rpx + env(safe-area-inset-bottom));
-  left: 5%;
+  left: 50%;
   width: 90%;
   height: 100rpx; /* 减小高度，适应纯文字 */
   z-index: 9999;
   box-sizing: border-box;
+  transform: translate3d(-50%, 0, 0);
+  transition: transform 360ms cubic-bezier(0.22, 0.72, 0.2, 1), opacity 240ms ease;
+  will-change: transform, opacity;
+}
+
+.custom-tabbar.is-detail-hidden {
+  transform: translate3d(-50%, calc(100% + 80rpx), 0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Keep the navigation mounted during the slide so it glides back in. */
+.custom-tabbar.is-detail-hidden .touch-layer {
+  pointer-events: none;
 }
 
 .tab-bar-bg {

@@ -41,11 +41,11 @@ module.exports = {
     <view class="orb orb-3"></view>
   </view>
   <view class="header-bg"></view>
-  
-  <scroll-view 
-    scroll-y 
-    style="height: 100vh;" 
-    refresher-enabled="{{true}}" 
+
+  <scroll-view
+    scroll-y="{{!detailOpen}}"
+    style="height: 100vh;"
+    refresher-enabled="{{!detailOpen}}"
     refresher-threshold="{{100}}"
     refresher-default-style="none"
     refresher-background="transparent"
@@ -111,9 +111,9 @@ module.exports = {
         <view class="waterfall-column">
           <block wx:for="{{feedLeft}}" wx:key="_id">
             <!-- 图纸卡片 -->
-            <view class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
+            <view id="pattern-{{item.key}}" data-title="{{item.name}}" data-image-url="{{item.thumb}}" style="opacity:{{activeDetailCard === 'pattern-' + item.key ? 0 : 1}};" class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
                   bindtap="openPattern" data-key="{{item.key}}">
-              <view class="card-media">
+              <view class="card-media detail-cover-source">
                 <image class="card-img card-img-square" src="{{item.thumb}}" mode="aspectFill" lazy-load></image>
                 <view class="feed-badge">图纸</view>
               </view>
@@ -132,14 +132,14 @@ module.exports = {
               </view>
             </view>
             <!-- 作品卡片 -->
-            <view class="card-item" wx:elif="{{item.type === 'post'}}"
+            <view id="post-{{item._id}}" style="opacity:{{activeDetailCard === 'post-' + item._id ? 0 : 1}};" class="card-item" wx:elif="{{item.type === 'post'}}"
                   bindtap="goToDetail"
                   data-id="{{item._id}}"
                   data-title="{{item.content || '未命名'}}"
                   data-image-url="{{item.imageUrl}}"
                   data-author="{{item.author}}"
                   data-likes="{{item.likes}}">
-              <view class="card-media">
+              <view class="card-media detail-cover-source">
                 <image class="card-img" src="{{item.imageUrl}}" mode="widthFix" lazy-load binderror="onImageError" data-list="left" data-index="{{index}}"></image>
                 <view class="card-media-overlay"></view>
               </view>
@@ -165,9 +165,9 @@ module.exports = {
         <view class="waterfall-column">
           <block wx:for="{{feedRight}}" wx:key="_id">
             <!-- 图纸卡片 -->
-            <view class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
+            <view id="pattern-{{item.key}}" data-title="{{item.name}}" data-image-url="{{item.thumb}}" style="opacity:{{activeDetailCard === 'pattern-' + item.key ? 0 : 1}};" class="card-item feed-pattern" wx:if="{{item.type === 'pattern'}}"
                   bindtap="openPattern" data-key="{{item.key}}">
-              <view class="card-media">
+              <view class="card-media detail-cover-source">
                 <image class="card-img card-img-square" src="{{item.thumb}}" mode="aspectFill" lazy-load></image>
                 <view class="feed-badge">图纸</view>
               </view>
@@ -186,14 +186,14 @@ module.exports = {
               </view>
             </view>
             <!-- 作品卡片 -->
-            <view class="card-item" wx:elif="{{item.type === 'post'}}"
+            <view id="post-{{item._id}}" style="opacity:{{activeDetailCard === 'post-' + item._id ? 0 : 1}};" class="card-item" wx:elif="{{item.type === 'post'}}"
                   bindtap="goToDetail"
                   data-id="{{item._id}}"
                   data-title="{{item.content || '未命名'}}"
                   data-image-url="{{item.imageUrl}}"
                   data-author="{{item.author}}"
                   data-likes="{{item.likes}}">
-              <view class="card-media">
+              <view class="card-media detail-cover-source">
                 <image class="card-img" src="{{item.imageUrl}}" mode="widthFix" lazy-load binderror="onImageError" data-list="right" data-index="{{index}}"></image>
                 <view class="card-media-overlay"></view>
               </view>
@@ -221,7 +221,7 @@ module.exports = {
         <view class="feed-loading-dot" wx:if="{{feedHasMore}}"></view>
         <text class="feed-loading-text">{{feedHasMore ? '上滑加载更多' : '已经到底啦'}}</text>
       </view>
-      
+
       <!-- Bottom Padding for TabBar -->
       <view class="safe-bottom" style="height: 160rpx;"></view>
     </view>
@@ -307,3 +307,5 @@ module.exports = {
 
 <!-- 全局隐私授权弹窗 -->
 <privacy-popup />
+
+<pattern-detail-sheet wx:if="{{detailOpen}}" id="pattern-detail-sheet" launch="{{detailLaunch}}" bindcloserequest="onDetailCloseRequest" bindclosed="onDetailClosed" />

@@ -1,0 +1,5 @@
+.showcase-page { min-height: 100vh; background: #FBF7F2; padding: 100rpx 32rpx; box-sizing: border-box; }
+.showcase-empty { display: flex; flex-direction: column; align-items: center; padding: 100rpx 40rpx; background: #FFFDFB; border: 1rpx solid #F0E4DC; border-radius: 32rpx; }
+.showcase-icon { width: 120rpx; height: 120rpx; display: flex; align-items: center; justify-content: center; border-radius: 36rpx; background: #F7ECE5; font-size: 56rpx; margin-bottom: 32rpx; }
+.showcase-title { color: #4A3A3E; font-size: 32rpx; font-weight: 600; }
+.showcase-description { color: #A18D91; font-size: 26rpx; margin-top: 16rpx; }

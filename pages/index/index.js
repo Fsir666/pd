@@ -1,3 +1,4 @@
+const detailHost = require('../../utils/pattern-detail-host.js');
 const app = getApp();
 
 // 工具箱的小工具列表（收起时整块隐藏，点「全部工具」果冻动画展开）
@@ -14,7 +15,11 @@ const ALL_SMALL_TOOLS = [
 ];
 
 Page({
+  ...detailHost.methods,
   data: {
+    detailOpen: false,
+    activeDetailCard: '',
+    detailLaunch: null,
     userInfo: {
       coins: 0,
       energy: 0
@@ -491,17 +496,7 @@ Page({
   },
 
   goToDetail(e) {
-    const { id, title, imageUrl, author, time, likes } = e.currentTarget.dataset;
-    
-    // Construct URL with encoded parameters
-    let url = `/pages/detail/detail?id=${id}`;
-    if (title) url += `&title=${encodeURIComponent(title)}`;
-    if (imageUrl) url += `&imageUrl=${encodeURIComponent(imageUrl)}`;
-    if (author) url += `&author=${encodeURIComponent(author)}`;
-    if (time) url += `&time=${encodeURIComponent(time)}`;
-    if (likes) url += `&likes=${likes}`;
-    
-    wx.navigateTo({ url });
+    detailHost.open(this, e, e.currentTarget.dataset.id);
   },
 
   onTemplateTap(e) {
@@ -597,6 +592,8 @@ Page({
     },
 
     onShareAppMessage() {
+    const detailShare = this.detailShareMessage();
+    if (detailShare) return detailShare;
     return {
       title: '拼豆助手 - 创作你的拼豆作品',
       path: '/pages/index/index',

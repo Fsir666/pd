@@ -1,5 +1,5 @@
 <!-- custom-tab-bar/index.wxml -->
-<view class="custom-tabbar">
+<view class="custom-tabbar {{detailHidden ? 'is-detail-hidden' : ''}}">
   <!-- 背景容器 -->
   <view class="tab-bar-bg"></view>
 

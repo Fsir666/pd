@@ -39,7 +39,10 @@
         </view>
       </view>
 
-      <view class="section-title">作品</view>
+      <view class="works-heading">
+        <view class="section-title">创作者作品</view>
+        <text class="works-subtitle">公开图纸与社区作品</text>
+      </view>
       <view wx:if="{{works.length === 0}}" class="empty">暂无公开作品</view>
       <view wx:else class="works-grid">
         <view
@@ -50,8 +53,9 @@
           data-id="{{item._id}}"
         >
           <image class="work-img" src="{{item.imageUrl}}" mode="widthFix" lazy-load></image>
-          <view class="work-title">{{item.title || '未命名'}}</view>
+          <view class="work-title">{{item.title || item.content || '未命名'}}</view>
           <view class="work-meta">
+            <view class="work-type">{{item.workType || '图纸'}}</view>
             <view class="work-like">❤️ {{item.likeCount || item.heat || 0}}</view>
           </view>
         </view>
