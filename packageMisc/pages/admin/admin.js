@@ -60,6 +60,11 @@ Page({
     });
   },
 
+  goToPayTest() {
+    if (!this.data.isAdmin) return;
+    wx.navigateTo({ url: '/packageMisc/pages/admin-pay/admin-pay' });
+  },
+
   goBack() {
     wx.navigateBack();
   },

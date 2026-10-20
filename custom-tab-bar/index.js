@@ -1,6 +1,7 @@
 // 白条宽度占 tabBar 容器的百分比：120rpx / 750rpx 设计宽 ÷ 容器 90% 宽
 // 这个比例与屏幕尺寸无关，写成常量，避免依赖 getSystemInfoSync 才算出正确 left
 const CURSOR_WIDTH_PERCENT = (120 / 750 / 0.9) * 100; // ≈ 17.7778
+const tabNavigation = require('../utils/tab-navigation.js');
 
 Component({
   data: {
@@ -41,11 +42,9 @@ Component({
 
     this._startX = 0;
     this._startTime = 0;
-    this._switchTimer = null;
   },
 
   detached() {
-    if (this._switchTimer) clearTimeout(this._switchTimer);
     if (this._initTimer) clearTimeout(this._initTimer);
   },
 
@@ -110,25 +109,24 @@ Component({
         '/pages/profile/profile'
       ];
       
-      if (this.data.selected === index) return;
-
-      if (this._switchTimer) clearTimeout(this._switchTimer);
-
-      wx.vibrateShort({ type: 'light' });
-
-      this.setData({
-        isDragging: false,
-        selected: index,
-        cursorLeft: this._cursorLeftFor(index),
-        cursorWidth: '120rpx',
-        hoverIndex: -1,
-        initialized: true
-      });
-
-      this._switchTimer = setTimeout(() => {
-        this._switchTimer = null;
-        wx.switchTab({ url: urls[index] });
-      }, 150);
+      if (!urls[index]) return;
+      if (this.data.selected === index) {
+        this.handleTabCancel();
+        return;
+      }
+      if (!tabNavigation.switchTo(urls[index], () => {
+        wx.vibrateShort({ type: 'light' });
+        this.setData({
+          isDragging: false,
+          selected: index,
+          cursorLeft: this._cursorLeftFor(index),
+          cursorWidth: '120rpx',
+          hoverIndex: -1,
+          initialized: true
+        });
+      })) {
+        this.handleTabCancel();
+      }
     },
 
     handleTabStart(e) {
@@ -200,8 +198,6 @@ Component({
     },
 
     handleTabEnd(e) {
-      const endTime = Date.now();
-      const timeDiff = endTime - this._startTime;
       const clientX = e.changedTouches[0].clientX;
       
       let relativeX = clientX - this.tabBarLeft;
@@ -213,33 +209,7 @@ Component({
       else if (percent < 75) newTab = 2;
       else newTab = 3;
 
-      if (!this._isMoved || (timeDiff < 200 && Math.abs(clientX - this._startX) < 10)) {
-        this.switchTab(newTab);
-      } else {
-        const prevTab = this.data.selected;
-        this.setData({
-          isDragging: false,
-          selected: newTab,
-          cursorLeft: this._cursorLeftFor(newTab),
-          cursorWidth: '120rpx',
-          hoverIndex: -1,
-          initialized: true
-        });
-        
-        if (prevTab !== newTab) {
-           wx.vibrateShort({ type: 'medium' });
-           if (this._switchTimer) clearTimeout(this._switchTimer);
-           this._switchTimer = setTimeout(() => {
-             this._switchTimer = null;
-             wx.switchTab({ url: [
-               '/pages/index/index',
-               '/pages/mall/mall',
-               '/pages/square/square',
-               '/pages/profile/profile'
-             ][newTab] });
-           }, 150);
-        }
-      }
+      this.switchTab(newTab);
     },
   
     handleTabCancel() {

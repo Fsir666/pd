@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "管理员支付测试",
+  "usingComponents": { "privacy-popup": "/components/privacy-popup/privacy-popup" }
+}

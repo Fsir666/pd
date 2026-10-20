@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const https = require('https')
 const fs = require('fs')
 const path = require('path')
+const adminPay = require('./admin-pay.js')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 
@@ -505,6 +506,10 @@ async function seedPresetsToUser() {
 
 // 云函数入口函数
 exports.main = async (event, context) => {
+  // Public HTTP access serves signed payment notifications only, never SDK actions.
+  if (event && (event.httpMethod || (event.requestContext && event.requestContext.http))) {
+    return adminPay.notify({ db, event });
+  }
   const { action, id } = event;
   const wxContext = cloud.getWXContext()
 
@@ -2167,6 +2172,16 @@ exports.main = async (event, context) => {
       return false;
     }
 
+    if (['adminPayStatus', 'createPayJsapiTest', 'createPayTest', 'queryAdminPayTest', 'closeAdminPayTest'].includes(action)) {
+      const caller = await resolveCaller();
+      if (!caller.openid || !isAdminCaller(caller)) return { code: -3, msg: '仅管理员可使用测试支付' };
+      try {
+        return await adminPay.handle({ db, action, event, openid: caller.openid });
+      } catch (error) {
+        return { code: -1, msg: String(error.message || '支付接口暂不可用').slice(0, 200) };
+      }
+    }
+
     // 手机自助开通管理员：凭开通码把当前账号 openid 写入 config.adminOpenids（幂等）
     const ADMIN_SET_CODE = '47012803';
     if (action === 'setAdmin') {
@@ -2841,180 +2856,6 @@ exports.main = async (event, context) => {
         msg: 'Database reset successfully',
         count: SEED_DATA.length
       };
-    }
-
-    if (action === 'createPayJsapiTest') {
-      const mchid = String(event.mchid || getEnvString('WX_PAY_MCH_ID') || '')
-      const serialNo = String(event.serialNo || getEnvString('WX_PAY_CERT_SERIAL_NO') || '')
-      const notifyUrl = String(event.notifyUrl || getEnvString('WX_PAY_NOTIFY_URL') || '')
-      const privateKeyPem = getWxPayPrivateKey()
-      const appid = String(event.appid || getEnvString('WX_PAY_APP_ID') || wxContext.FROM_APPID || wxContext.APPID || '')
-
-      if (!mchid) return { code: -1, msg: 'Missing WX_PAY_MCH_ID' }
-      if (!serialNo) return { code: -1, msg: 'Missing WX_PAY_CERT_SERIAL_NO' }
-      if (!notifyUrl) return { code: -1, msg: 'Missing WX_PAY_NOTIFY_URL' }
-      if (!privateKeyPem) return { code: -1, msg: 'Missing WX_PAY_PRIVATE_KEY' }
-      if (!/BEGIN (RSA )?PRIVATE KEY/.test(privateKeyPem)) return { code: -1, msg: 'Invalid WX_PAY_PRIVATE_KEY (must be PEM private key)' }
-      if (!appid) return { code: -1, msg: 'Missing appid' }
-      if (!wxContext.OPENID) return { code: -1, msg: 'Missing openid' }
-
-      const totalFeeInput = typeof event.totalFee === 'undefined' ? 1 : Number(event.totalFee)
-      const totalFee = Number.isFinite(totalFeeInput) ? Math.max(1, Math.floor(totalFeeInput)) : 1
-      const description = String(event.body || event.description || '测试支付')
-      const outTradeNo = createOutTradeNo()
-
-      const path = '/v3/pay/transactions/jsapi'
-      const bodyObj = {
-        appid,
-        mchid,
-        description,
-        out_trade_no: outTradeNo,
-        notify_url: notifyUrl,
-        amount: { total: totalFee, currency: 'CNY' },
-        payer: { openid: wxContext.OPENID }
-      }
-      const bodyText = JSON.stringify(bodyObj)
-      const signed = buildWechatPayAuthorization({
-        mchid,
-        serialNo,
-        privateKeyPem,
-        method: 'POST',
-        path,
-        bodyText
-      })
-
-      const resp = await requestJson({
-        method: 'POST',
-        hostname: 'api.mch.weixin.qq.com',
-        path,
-        headers: {
-          Authorization: signed.authorization,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'User-Agent': 'wxcloud'
-        },
-        bodyText
-      })
-
-      const ok = resp.statusCode >= 200 && resp.statusCode < 300
-      if (!ok) {
-        const msg = (resp.json && resp.json.message) ? String(resp.json.message) : 'WeChatPay API error'
-        return {
-          code: -1,
-          msg,
-          data: { statusCode: resp.statusCode, resp: resp.json || resp.raw }
-        }
-      }
-
-      const prepayId = resp.json && resp.json.prepay_id ? String(resp.json.prepay_id) : ''
-      if (!prepayId) {
-        return { code: -1, msg: 'Missing prepay_id', data: { resp: resp.json || resp.raw } }
-      }
-
-      const timeStamp = String(Math.floor(Date.now() / 1000))
-      const nonceStr = randomString(32)
-      const pkg = `prepay_id=${prepayId}`
-      const paySign = signWithRsaSha256Base64(privateKeyPem, `${appid}\n${timeStamp}\n${nonceStr}\n${pkg}\n`)
-
-      return {
-        code: 0,
-        msg: 'success',
-        data: {
-          outTradeNo,
-          prepayId,
-          payment: {
-            timeStamp,
-            nonceStr,
-            package: pkg,
-            signType: 'RSA',
-            paySign
-          }
-        }
-      }
-    }
-
-    if (action === 'createPayTest') {
-      const subMchId = event.subMchId || process.env.SUB_MCH_ID
-      if (!subMchId) {
-        return {
-          code: -1,
-          msg: 'Missing subMchId (set env SUB_MCH_ID or pass subMchId)'
-        }
-      }
-
-      const totalFeeInput = typeof event.totalFee === 'undefined' ? 1 : Number(event.totalFee)
-      const totalFee = Number.isFinite(totalFeeInput) ? Math.max(1, Math.floor(totalFeeInput)) : 1
-      const body = String(event.body || '测试支付')
-      const outTradeNo = createOutTradeNo()
-      const nonceStr = randomString(24)
-      const debug = {
-        envId: wxContext.ENV,
-        fromAppid: wxContext.FROM_APPID || '',
-        hasOpenid: Boolean(wxContext.OPENID),
-        subMchId: String(subMchId),
-        totalFee
-      }
-
-      const unifiedOrderParamsCamel = {
-        functionName: 'template-api',
-        envId: wxContext.ENV,
-        subMchId,
-        nonceStr,
-        body,
-        outTradeNo,
-        totalFee,
-        spbillCreateIp: '127.0.0.1',
-        tradeType: 'JSAPI',
-        openid: wxContext.OPENID
-      }
-
-      const unifiedOrderParamsSnake = {
-        functionName: 'template-api',
-        envId: wxContext.ENV,
-        sub_mch_id: subMchId,
-        nonce_str: nonceStr,
-        body,
-        out_trade_no: outTradeNo,
-        total_fee: totalFee,
-        spbill_create_ip: '127.0.0.1',
-        trade_type: 'JSAPI',
-        openid: wxContext.OPENID
-      }
-
-      const payer = wxContext.FROM_APPID
-        ? cloud.cloudPay({ appid: wxContext.FROM_APPID })
-        : cloud.cloudPay
-
-      let payRes = await payer.unifiedOrder(unifiedOrderParamsCamel)
-
-      if (payRes && payRes.returnCode === 'FAIL') {
-        const msg = pickPayFailMessage(payRes)
-        if (/total_fee/i.test(msg) || /LACK_PARAMS/i.test(msg)) {
-          payRes = await payer.unifiedOrder(unifiedOrderParamsSnake)
-        }
-      }
-
-      if (payRes && payRes.returnCode === 'FAIL') {
-        return {
-          code: -1,
-          msg: pickPayFailMessage(payRes) || 'unifiedOrder failed',
-          data: { payRes, debug }
-        }
-      }
-
-      if (payRes && payRes.resultCode === 'FAIL') {
-        return {
-          code: -1,
-          msg: String(payRes.errCodeDes || payRes.err_code_des || pickPayFailMessage(payRes) || 'unifiedOrder failed'),
-          data: { payRes, debug }
-        }
-      }
-
-      return {
-        code: 0,
-        data: { ...payRes, debug },
-        msg: 'success'
-      }
     }
 
     return {

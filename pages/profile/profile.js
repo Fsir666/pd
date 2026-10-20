@@ -109,20 +109,6 @@ Page({
     });
   },
 
-  goToMyOrders() {
-    wx.vibrateShort({ type: 'light' });
-    wx.navigateTo({
-      url: '/packageMisc/pages/my-orders/my-orders'
-    });
-  },
-
-  goToContact() {
-    wx.vibrateShort({ type: 'light' });
-    wx.navigateTo({
-      url: '/packageMisc/pages/contact/contact'
-    });
-  },
-
   // 版本概览（更新日志）
   goToChangelog() {
     wx.vibrateShort({ type: 'light' });

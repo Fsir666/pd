@@ -1,0 +1,18 @@
+.page { min-height: 100vh; padding: 32rpx; box-sizing: border-box; background: #FBF7F2; color: #4A3A3E; }
+.heading { font-size: 38rpx; font-weight: 700; }
+.subtitle { color: #9B8A8C; font-size: 25rpx; margin: 12rpx 0 28rpx; }
+.card { padding: 28rpx; margin-bottom: 24rpx; border: 1rpx solid #F0E4DC; border-radius: 24rpx; background: #FFFDFB; font-size: 27rpx; }
+.card-title { font-size: 29rpx; font-weight: 600; margin-bottom: 18rpx; }
+.merchant { font-size: 25rpx; margin-bottom: 16rpx; }
+.check-row { display: flex; justify-content: space-between; padding: 16rpx 0; border-bottom: 1rpx solid #F5EDE6; }
+.ok { color: #4C7854; }
+.missing, .error { color: #B54F65; }
+.note { font-size: 24rpx; color: #9B8A8C; line-height: 1.65; margin: 20rpx 0; }
+.amount { text-align: center; font-size: 58rpx; font-weight: 700; color: #A8455C; }
+.primary, .secondary { margin-top: 20rpx; font-size: 27rpx; border-radius: 20rpx; }
+.primary { background: #D4607A; color: #FFFDFB; }
+.secondary { background: #F5EDE6; color: #7A6A6E; }
+.primary[disabled] { background: #E7D7D7; color: #A39296; }
+.state { font-size: 30rpx; font-weight: 600; margin-bottom: 18rpx; }
+.order-no { font-size: 23rpx; line-height: 1.7; word-break: break-all; }
+.error { background: #FBECEF; border-radius: 20rpx; padding: 22rpx; font-size: 25rpx; line-height: 1.65; margin-bottom: 24rpx; }

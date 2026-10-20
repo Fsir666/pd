@@ -63,6 +63,10 @@ Page({
     wx.navigateTo({ url: '/pages/detail/detail?id=' + encodeURIComponent('seed_' + key) });
   },
 
+  goToDiscover() {
+    wx.switchTab({ url: '/pages/mall/mall' });
+  },
+
   onShareAppMessage() {
     return {
       title: '拼豆图纸库 · 原创图纸免费拿',

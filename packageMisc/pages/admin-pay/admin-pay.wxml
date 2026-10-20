@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="heading">管理员支付测试</view>
+  <view class="subtitle">固定金额 0.01 元 · 仅管理员可用</view>
+  <view class="card" wx:if="{{loading}}">正在检查管理员权限和支付配置…</view>
+  <block wx:elif="{{isAdmin}}">
+    <view class="card">
+      <view class="card-title">支付配置</view>
+      <view class="merchant">收款商户号：{{merchantId || '未配置'}}</view>
+      <view class="check-row" wx:for="{{checks}}" wx:key="label"><text>{{item.label}}</text><text class="{{item.configured ? 'ok' : 'missing'}}">{{item.configured ? '已配置' : '未配置'}}</text></view>
+      <view class="note">{{ready ? '参数检查已完成，支付权限和小程序绑定以实际调用结果为准。' : '请补齐云端配置后重新检查。'}}</view>
+      <button class="secondary" bindtap="loadConfig" disabled="{{paying || querying}}">重新检查</button>
+    </view>
+    <view class="card">
+      <view class="amount">¥0.01</view>
+      <view class="note">这是一笔真实的小额测试付款，不购买商品或增加权益。付款结果由服务端向微信支付核实。</view>
+      <button class="primary" bindtap="pay" loading="{{paying}}" disabled="{{!ready || paying || querying}}">{{paying ? '处理中' : '测试支付 0.01 元'}}</button>
+    </view>
+    <view class="card" wx:if="{{order}}">
+      <view class="card-title">最近一次测试</view>
+      <view class="state {{order.state === 'SUCCESS' ? 'ok' : ''}}">{{order.stateText}}</view>
+      <view class="order-no">商户订单号：{{order.outTradeNo}}</view>
+      <view class="order-no" wx:if="{{order.transactionId}}">微信支付流水：{{order.transactionId}}</view>
+      <view class="order-no" wx:if="{{order.paidAt}}">支付时间：{{order.paidAt}}</view>
+      <button class="secondary" bindtap="queryOrder" loading="{{querying}}" disabled="{{querying || paying}}">查询支付结果</button>
+      <button class="secondary" wx:if="{{order.state === 'NOTPAY' || order.state === 'CREATING'}}" bindtap="closeOrder" disabled="{{querying || paying}}">关闭未付款测试单</button>
+    </view>
+  </block>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+  <button class="secondary" wx:if="{{!loading && !isAdmin}}" bindtap="loadConfig">重新检查权限</button>
+</view>
+<privacy-popup />

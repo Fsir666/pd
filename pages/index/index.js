@@ -10,8 +10,7 @@ const ALL_SMALL_TOOLS = [
   { id: 3, title: '我的仓库', desc: '管理色卡', iconClass: 'ico-box', size: 'small' },
   { id: 7, title: '收藏图纸', desc: '我的收藏', iconClass: 'ico-star' },
   { id: 5, title: '我的作品', desc: '查看创作', iconClass: 'ico-grid' },
-  { id: 6, title: '新手教程', desc: '入门指南', iconClass: 'ico-book' },
-  { id: 8, title: '我的订单', desc: '订单历史', iconClass: 'ico-receipt' }
+  { id: 6, title: '新手教程', desc: '入门指南', iconClass: 'ico-book' }
 ];
 
 Page({
@@ -575,9 +574,6 @@ Page({
         break;
       case 7: // 收藏图纸
         wx.navigateTo({ url: '/pages/my-collections/my-collections' });
-        break;
-      case 8: // 我的订单
-        wx.navigateTo({ url: '/packageMisc/pages/my-orders/my-orders' });
         break;
       case 12: // AI生成拼豆图
         // 该页面未在 app.json 注册，跳转必失败，改为提示

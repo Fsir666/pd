@@ -2,14 +2,12 @@ Page({
   data: {
     allTools: [
       { id: 2, title: '抠图', desc: '图片去底', icon: '✂️', color: '#54A0FF', bg: '#E3F2FD', animClass: 'wiggle' },
-      { id: 10, title: '拼豆计算器', desc: '成本估算', icon: '🧮', color: '#00C853', bg: '#E8F5E9', animClass: 'bounce' },
       { id: 4, title: '色卡对照表', desc: '色卡对照', icon: '🎨', color: '#FF6B6B', bg: '#FFEBEE', animClass: 'spin-slow' },
       { id: 11, title: '色卡表', desc: 'Excel下载', icon: '📊', color: '#20BF6B', bg: '#E8F5E9', animClass: 'pulse' },
       { id: 3, title: '我的仓库', desc: '管理色卡', icon: '🏰', color: '#AF52DE', bg: '#F3E5F5', animClass: 'breathe' },
       { id: 7, title: '收藏图纸', desc: '我的收藏', icon: '⭐', color: '#FF9F43', bg: '#FFF3E0', animClass: 'pulse' },
       { id: 5, title: '我的作品', desc: '查看创作', icon: '🧩', color: '#5F27CD', bg: '#EDE7F6', animClass: 'bounce' },
-      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#48DBFB', bg: '#E1F5FE', animClass: 'float' },
-      { id: 8, title: '我的订单', desc: '订单历史', icon: '🧾', color: '#54A0FF', bg: '#E3F2FD', animClass: 'wiggle' }
+      { id: 6, title: '新手教程', desc: '入门指南', icon: '📚', color: '#48DBFB', bg: '#E1F5FE', animClass: 'float' }
     ],
     isLogged: false
   },
@@ -62,9 +60,6 @@ Page({
       case 14: // 拼豆模式（替代原"转卡通"的卡片位）
         wx.navigateTo({ url: '/packageGame/pages/bead-mode/bead-mode' });
         break;
-      case 10: // 拼豆计算器
-        wx.showToast({ title: '计算器即将上线', icon: 'none' });
-        break;
       case 11: // Excel 色卡表
         wx.navigateTo({ url: '/packageTool/pages/color-list/color-list' });
         break;
@@ -85,11 +80,8 @@ Page({
       case 7: // 收藏图纸
         wx.navigateTo({ url: '/pages/my-collections/my-collections' });
         break;
-      case 8: // 我的订单
-        wx.navigateTo({ url: '/packageMisc/pages/my-orders/my-orders' });
-        break;
       default:
-        wx.showToast({ title: '功能开发中...', icon: 'none' });
+        wx.showToast({ title: '请返回工具箱选择工具', icon: 'none' });
     }
   }
 });

@@ -41,9 +41,14 @@
           <text class="icon-chevron"></text>
         </view>
       </view>
+      <view class="menu-item" bindtap="goToPayTest" hover-class="hover-scale">
+        <view class="item-left">
+          <view class="icon-box color-orange"><text class="menu-icon">¥</text></view>
+          <view class="item-texts"><text class="item-title">支付联调</text><text class="item-sub">管理员 0.01 元测试与结果查询</text></view>
+        </view>
+        <view class="item-right"><text class="icon-chevron"></text></view>
+      </view>
     </view>
-
-    <view class="tips">更多管理功能会陆续加到这里</view>
   </block>
 </view>
 

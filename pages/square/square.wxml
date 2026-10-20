@@ -19,7 +19,7 @@
             <view class="banner-item banner-item-2">
               <view class="banner-content">
                 <text class="banner-title">📚 图纸库</text>
-                <text class="banner-desc">海量精选模板，涵盖多种分类</text>
+                <text class="banner-desc">浏览拼豆图纸，挑选想制作的图案</text>
                 <view class="banner-btn" bindtap="goToMall">浏览模板</view>
               </view>
             </view>
@@ -28,8 +28,8 @@
             <view class="banner-item banner-item-3">
               <view class="banner-content">
                 <text class="banner-title">🖼️ 一键抠图</text>
-                <text class="banner-desc">上传图片自动抠图，快速生成拼豆图纸</text>
-                <view class="banner-btn" bindtap="goToCutout">体验功能</view>
+                <text class="banner-desc">处理图片背景，为创作准备素材</text>
+                <view class="banner-btn" bindtap="goToCutout">打开工具</view>
               </view>
             </view>
           </swiper-item>
@@ -54,43 +54,43 @@
         </swiper>
       </view>
 
-      <!-- 公告栏 -->
+      <!-- 现有功能使用提示 -->
       <view class="section">
         <view class="section-header">
-          <text class="section-icon">📢</text>
-          <text class="section-title">公告</text>
+          <text class="section-icon">💡</text>
+          <text class="section-title">使用小贴士</text>
         </view>
         <view class="notice-card">
           <view class="notice-item">
-            <text class="notice-badge">新</text>
-            <text class="notice-text">拼豆助手小程序正式上线啦！欢迎体验拼豆创作的乐趣～</text>
+            <text class="notice-badge">选图</text>
+            <text class="notice-text">在发现页浏览图纸，打开详情可查看尺寸和用料清单。</text>
           </view>
           <view class="notice-item">
-            <text class="notice-badge">热</text>
-            <text class="notice-text">新增内容安全审核，保障平台环境健康</text>
+            <text class="notice-badge">看图</text>
+            <text class="notice-text">图纸预览支持网格、色号和数字开关，可按需要调整。</text>
           </view>
           <view class="notice-item">
-            <text class="notice-badge">活</text>
-            <text class="notice-text">新手福利活动进行中，首次创作送100积分</text>
+            <text class="notice-badge">备料</text>
+            <text class="notice-text">在图纸详情点击“复制清单”，即可复制对应的用料信息。</text>
           </view>
           <view class="notice-item">
-            <text class="notice-badge">更</text>
-            <text class="notice-text">导出功能优化，支持更高清的图片导出</text>
+            <text class="notice-badge">入门</text>
+            <text class="notice-text">第一次接触拼豆，可以从上方“新手教程”了解制作步骤。</text>
           </view>
         </view>
       </view>
 
-      <!-- 新手教程 -->
+      <!-- 可用功能快捷入口 -->
       <view class="section">
         <view class="section-header">
           <text class="section-icon">📖</text>
-          <text class="section-title">新手教程</text>
+          <text class="section-title">常用入口</text>
         </view>
         <view class="tutorial-grid">
           <view class="tutorial-card" bindtap="goToBeadMode">
             <view class="tutorial-icon">🎨</view>
             <view class="tutorial-title">开始创作</view>
-            <view class="tutorial-desc">学习如何使用拼豆模式</view>
+            <view class="tutorial-desc">打开空白画板创作</view>
           </view>
           <view class="tutorial-card" bindtap="goToMall">
             <view class="tutorial-icon">📚</view>
@@ -99,8 +99,8 @@
           </view>
           <view class="tutorial-card" bindtap="goToProfile">
             <view class="tutorial-icon">💾</view>
-            <view class="tutorial-title">我的作品</view>
-            <view class="tutorial-desc">保存和管理你的创作</view>
+            <view class="tutorial-title">个人中心</view>
+            <view class="tutorial-desc">查看作品与收藏入口</view>
           </view>
         </view>
       </view>
@@ -123,7 +123,7 @@
             <view class="feature-icon">📚</view>
             <view class="feature-content">
               <view class="feature-title">图纸库</view>
-              <view class="feature-desc">海量精选模板，涵盖动物、人物、风景等多种分类</view>
+              <view class="feature-desc">浏览拼豆图纸，通过分类筛选寻找喜欢的图案</view>
             </view>
           </view>
           <view class="feature-item">
@@ -143,42 +143,11 @@
         </view>
       </view>
 
-      <!-- 拼豆礼物 -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-icon">🎁</text>
-          <text class="section-title">拼豆礼物</text>
-          <text class="coming-soon-tag">即将上线</text>
-        </view>
-        <view class="gift-card" bindtap="showComingSoon">
-          <view class="gift-content">
-            <view class="gift-title">达人手作服务</view>
-            <view class="gift-desc">将你的图纸变成真实的拼豆作品，送给自己或朋友一份独特的礼物</view>
-            <view class="gift-features">
-              <text class="gift-feature">✓ 精选达人</text>
-              <text class="gift-feature">✓ 品质保障</text>
-              <text class="gift-feature">✓ 定制服务</text>
-            </view>
-          </view>
-          <view class="gift-arrow">→</view>
-        </view>
-      </view>
-
       <!-- 底部间距 -->
       <view style="height: 160rpx;"></view>
     </view>
   </scroll-view>
 
-  <!-- 即将上线弹窗 -->
-  <view class="comingsoon-mask {{comingSoonVisible ? 'show' : ''}}" catchtap="hideComingSoon">
-    <view class="comingsoon-card" catchtap="hideComingSoon">
-      <view class="comingsoon-title">🎁 拼豆礼物即将上线</view>
-      <view class="comingsoon-desc">我们正在筹备达人手作服务
-上线后可以将图纸变成真实的拼豆作品
-敬请期待～</view>
-      <view class="comingsoon-btn">好的，期待中</view>
-    </view>
-  </view>
 </view>
 
 <!-- 全局隐私授权弹窗 -->

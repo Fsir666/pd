@@ -20,6 +20,14 @@
     "ignore": [
       {
         "type": "glob",
+        "value": "packageMisc/pages/my-orders/**"
+      },
+      {
+        "type": "glob",
+        "value": "packageMisc/pages/contact/**"
+      },
+      {
+        "type": "glob",
         "value": "cf/**"
       },
       {

@@ -2,15 +2,11 @@
 <page-container show="{{backGuard}}" overlay="{{false}}" duration="{{0}}" custom-style="height:0;background:transparent;" bindbeforeleave="onNativeBack" />
 <view wx:if="{{mounted}}" class="detail-overlay {{expanded ? 'is-expanded' : ''}} {{settled ? 'is-settled' : ''}} {{closing ? 'is-closing' : ''}}">
   <view class="detail-backdrop" catchtouchmove="noop" bindtap="goBack"></view>
-  <view class="detail-surface" style="{{surfaceStyle}}" catchtouchmove="noop">
-    <scroll-view class="detail-scroll" style="width:{{detailWidth}}px;height:{{detailHeight}}px;" scroll-y="{{settled && !closing}}" scroll-top="{{detailScrollTop}}" scroll-into-view="{{detailScrollTarget}}" show-scrollbar="{{false}}" bindscroll="onDetailScroll" bindtouchstart="onDetailTouchStart" bindtouchend="onDetailTouchEnd" bindtouchcancel="onDetailTouchCancel">
+  <view class="detail-surface" catchtouchmove="noop">
+    <scroll-view wx:if="{{loadState === 'ready'}}" class="detail-scroll" style="width:{{detailWidth}}px;height:{{detailHeight}}px;" scroll-y="{{settled && !closing}}" scroll-top="{{detailScrollTop}}" scroll-into-view="{{detailScrollTarget}}" show-scrollbar="{{false}}" bindscroll="onDetailScroll" bindtouchstart="onDetailTouchStart" bindtouchend="onDetailTouchEnd" bindtouchcancel="onDetailTouchCancel">
       <include src="../../pages/detail/detail-content.wxml" />
     </scroll-view>
-    <view class="transition-cover {{coverHidden ? 'cover-hidden' : ''}}" style="{{coverStyle}}">
-      <image wx:if="{{coverImage}}" class="transition-image" src="{{coverImage}}" mode="{{coverMode}}" />
-      <view wx:else class="transition-placeholder">🎨</view>
-    </view>
-    <view class="transition-summary" style="top:{{launch.coverHeight}}px;">{{transitionTitle}}</view>
+    <view wx:if="{{loadState !== 'ready'}}" class="back-btn loading-close" bindtap="goBack"><text class="back-icon">×</text></view>
     <view wx:if="{{showGestureHint && settled}}" class="gesture-hint">↓ 下滑关闭</view>
     <view class="load-message" wx:if="{{loadState !== 'ready' && !closing}}">
       <text>{{loadState === 'error' ? loadError : '正在加载图纸…'}}</text>

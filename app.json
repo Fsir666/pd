@@ -52,10 +52,9 @@
         "pages/user-profile/user-profile",
         "pages/developer/developer",
         "pages/developer/add-template/add-template",
-        "pages/my-orders/my-orders",
-        "pages/contact/contact",
         "pages/beginner-guide/beginner-guide",
         "pages/admin/admin",
+        "pages/admin-pay/admin-pay",
         "pages/admin-drafts/admin-drafts",
         "pages/showcase/showcase"
       ]

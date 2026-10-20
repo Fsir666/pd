@@ -1,21 +1,16 @@
 const detail = require('../../pages/detail/detail-model.js');
-const DURATION = 420;
+const DURATION = 280;
 const methods = {};
 Object.keys(detail).forEach(key => {
   if (typeof detail[key] === 'function' && !['onLoad', 'onReady', 'onShow'].includes(key)) methods[key] = detail[key];
 });
-function frame(rect, radius, width, height) {
-  const sx = rect.width / width;
-  const sy = rect.height / height;
-  return 'width:' + width + 'px;height:' + height + 'px;border-radius:' + radius + 'px;transform:translate3d(' + rect.left + 'px,' + rect.top + 'px,0) scale(' + sx + ',' + sy + ');';
-}
 Component({
   options: { styleIsolation: 'isolated' },
   properties: { launch: { type: Object, value: null } },
   data: Object.assign({}, detail.data, {
     embeddedDetail: true, expanded: false, settled: false, closing: false,
-    mounted: false, backGuard: false, surfaceStyle: '', coverStyle: '',
-    detailWidth: 375, detailHeight: 667, coverImage: '', coverHidden: false, coverMode: 'aspectFill', transitionTitle: '', previewReady: false,
+    mounted: false, backGuard: false,
+    detailWidth: 375, detailHeight: 667,
     loadState: 'loading', loadError: '', detailScrollTop: 0, detailScrollTarget: '',
     showGestureHint: false, canGoPrevious: false, canGoNext: false
   }),
@@ -24,14 +19,10 @@ Component({
     ready() {
       const launch = this.data.launch;
       if (!launch) return;
-      this._origin = launch.origin;
-      this._radius = launch.radius;
-      this._coverHeight = launch.coverHeight;
       this.setData({
-        mounted: true, backGuard: true, surfaceStyle: frame(launch.origin, launch.radius, launch.width, launch.height),
-        coverStyle: 'height:' + (launch.coverRatio * 100) + '%;',
+        mounted: true, backGuard: true,
         detailWidth: launch.width, detailHeight: launch.height,
-        coverImage: launch.image, coverMode: launch.coverMode, transitionTitle: launch.title, imageUrl: launch.image, title: launch.title,
+        title: launch.title,
         statusBarHeight: 12
       }, () => {
         const ids = launch.sequence || [];
@@ -39,14 +30,9 @@ Component({
         this._sequence = ids;
         this.setData({ canGoPrevious: index > 0, canGoNext: index >= 0 && index < ids.length - 1 });
         this._later(() => {
-          this.setData({
-            expanded: true,
-            surfaceStyle: frame({left: 0, top: 0, width: launch.width, height: launch.height}, 0, launch.width, launch.height),
-            coverStyle: 'height:62vh;'
-          });
+          this.setData({ expanded: true });
           this._later(() => {
             this.setData({ settled: true });
-            this._revealCover();
             if (!wx.getStorageSync('detail_swipe_hint_seen')) {
               this.setData({ showGestureHint: true });
               wx.setStorageSync('detail_swipe_hint_seen', true);
@@ -72,21 +58,10 @@ Component({
       this._timers.push(timer);
     },
     _onDetailLoaded() {
-      this.setData({ loadState: 'ready', loadError: '', previewReady: false });
-      if (!this.data.hasPixel && !this.data.imageUrl) this._onPreviewReady();
-      this._later(() => this._revealCover(), 180);
+      this.setData({ loadState: 'ready', loadError: '' });
     },
     _onDetailError(message) {
       this.setData({ loadState: 'error', loadError: message });
-    },
-    _onPreviewReady() {
-      this.setData({ previewReady: true });
-      this._revealCover();
-    },
-    _revealCover() {
-      if (this.data.settled && this.data.loadState === 'ready' && this.data.previewReady && !this.data.closing) {
-        this.setData({ coverHidden: true });
-      }
     },
     retryLoad() {
       if (this.data.loadState === 'loading' || this.data.closing) return;
@@ -97,23 +72,15 @@ Component({
       if (!this.data.closing) this.triggerEvent('closerequest');
     },
     onNativeBack() { this.goBack(); },
-    closeToCard(rect) {
+    closeToCard() {
       if (this.data.closing) return;
       this._timers.forEach(clearTimeout);
-      const valid = rect && rect.width > 0 && rect.bottom > 0 && rect.top < this.data.detailHeight;
-      // Hide all newly revealed layers first, then return the original cover to its card.
-      this.setData({ closing: true, settled: false, coverHidden: false, detailScrollTop: 0 });
+      // Keep the detail at its real size throughout the transition.
+      this.setData({ closing: true, expanded: false, settled: false, showGestureHint: false });
       this._later(() => {
-        this.setData({
-          expanded: false,
-          surfaceStyle: valid ? frame(rect, this._radius, this.data.detailWidth, this.data.detailHeight) : frame(this._origin, this._radius, this.data.detailWidth, this.data.detailHeight) + 'opacity:0;',
-          coverStyle: 'height:' + (this.data.launch.coverRatio * 100) + '%;'
-        });
-        this._later(() => {
-          this.setData({ backGuard: false });
-          this.triggerEvent('closed');
-        }, DURATION);
-      }, 90);
+        this.setData({ backGuard: false });
+        this.triggerEvent('closed');
+      }, DURATION);
     },
     onDetailScroll(event) {
       this._detailScrollTop = Math.max(0, Number(event.detail && event.detail.scrollTop) || 0);
@@ -148,7 +115,6 @@ Component({
       const id = ids[next];
       this.setData({
         id, loadState: 'loading', loadError: '', detailScrollTop: 0, detailScrollTarget: '',
-        previewReady: false, coverHidden: true, coverImage: '',
         canGoPrevious: next > 0, canGoNext: next < ids.length - 1
       });
       this._later(() => { this._switching = false; }, 280);

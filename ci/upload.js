@@ -10,8 +10,12 @@ const path = require('path');
     ignores: ['node_modules/**/*', 'ci/**/*', 'cf/**/*', 'scripts/**/*', '*.key'],
   });
 
-  const version = process.env.WECHAT_VERSION || '1.0.127';
-  const description = process.env.WECHAT_DESC || '图纸详情支持下滑关闭，背景柔和压暗';
+  const version = process.env.WECHAT_VERSION || '1.0.133';
+  const description = process.env.WECHAT_DESC || '新增管理员0.01元支付联调、支付通知验签和服务端查单确认';
+  require('./check-release-notes.js')(version);
+  if (require('../utils/version.js').APP_VERSION !== version) {
+    throw new Error('utils/version.js 中的版本号与上传版本不一致，请先同步。');
+  }
   const result = await ci.upload({
     project,
     version,

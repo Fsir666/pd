@@ -1,10 +1,4 @@
 Page({
-  data: {
-    comingSoonVisible: false
-  },
-
-  onLoad() {},
-
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setSelected(2);
@@ -49,24 +43,9 @@ Page({
     wx.navigateTo({ url: '/packageMisc/pages/beginner-guide/beginner-guide' });
   },
 
-  // 显示即将上线弹窗
-  showComingSoon() {
-    if (this.comingSoonTimer) clearTimeout(this.comingSoonTimer);
-    this.setData({ comingSoonVisible: true });
-    this.comingSoonTimer = setTimeout(() => {
-      this.setData({ comingSoonVisible: false });
-    }, 3000);
-  },
-
-  // 隐藏即将上线弹窗
-  hideComingSoon() {
-    if (this.comingSoonTimer) clearTimeout(this.comingSoonTimer);
-    this.setData({ comingSoonVisible: false });
-  },
-
   onShareAppMessage() {
     return {
-      title: '拼豆广场 - 公告与教程',
+      title: '拼豆广场 - 创作工具与使用指南',
       path: '/pages/square/square',
       imageUrl: '/images/share-cover.png'
     };
@@ -74,7 +53,7 @@ Page({
 
   onShareTimeline() {
     return {
-      title: '拼豆广场 - 公告与教程',
+      title: '拼豆广场 - 创作工具与使用指南',
       query: '',
       imageUrl: '/images/share-cover.png'
     };

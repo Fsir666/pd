@@ -51,13 +51,6 @@
           <text class="utility-title">{{item.title}}</text>
         </view>
       </block>
-      <!-- Coming Soon -->
-      <view class="utility-item glass-morphism coming-soon" bindtap="onToolTap" data-id="0">
-        <view class="utility-icon-box">
-          <text class="utility-icon">➕</text>
-        </view>
-        <text class="utility-title">更多...</text>
-      </view>
     </view>
   </scroll-view>
 </view>
