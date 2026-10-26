@@ -1,0 +1,29 @@
+name: Agent PR checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    name: Syntax and pixelate unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check cf/template-api/index.js
+          node --check utils/pixelate.js
+      - name: Check mini program config JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('app.json','utf8')); console.log('app.json OK')"
+      - name: Run pixelate unit tests
+        run: node scripts/pixelate.test.js
